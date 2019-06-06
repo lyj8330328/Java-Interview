@@ -1,7 +1,5 @@
 [TOC]
 
-
-
 # 一、启动类
 
 ```java
@@ -850,7 +848,7 @@ SpringApplication从application.properties以下位置的文件加载属性并�
 
 ### 3.2.4 createApplicationContext()方法
 
-根据SpringApplication构造方法生成的webApplicationType变量创建一个ApplicationContext，默认生成AnnotationConfigApplicationContext。
+根据SpringApplication构造方法生成的webApplicationType变量创建一个ApplicationContext，默认生成**AnnotationConfigApplicationContext**。
 
 ```java
 protected ConfigurableApplicationContext createApplicationContext() {

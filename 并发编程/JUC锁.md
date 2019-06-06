@@ -226,7 +226,7 @@ private void doAcquireSharedInterruptibly(int arg)
 阻塞的逻辑相对简单
 
 1. 判断state计数是否为0，不是，则直接放过执行后面的代码
-2. 大于0，则表示需要阻塞等待计数为0
+2. **大于0，则表示需要阻塞等待计数为0**
 3. 当前线程封装Node对象，进入阻塞队列
 4. 然后就是循环尝试获取锁，直到成功（即state为0）后出队，继续执行线程后续代码
 
@@ -929,7 +929,31 @@ public class MyBlockingQueueTest {
 
 ## 4.3 底层实现
 
-**await()源码**
+ConditionObject是同步器AbstractQueuedSynchronizer的内部类，因为Condition的操作需要获取相关联的锁，所以作为同步器的内部类也较为合理。**每个Condition对象都包含着一个队列**（以下称为等待队列），该队列是Condition对象实现等待/通知功能的关键。
+
+### 4.3.1 等待队列
+
+等待队列是一个FIFO的队列，在队列中的每个节点都包含了一个线程引用，该线程就是在Condition对象上等待的线程，如果一个线程调用了Condition.await()方法，那么该线程将会释放锁、构造成节点加入等待队列并进入等待状态。事实上，节点的定义复用了同步器中节点的定义，也就是说，同步队列和等待队列中节点类型都是同步器的静态内部类AbstractQueuedSynchronizer.Node。
+
+一个Condition包含一个等待队列，Condition拥有首节点（firstWaiter）和尾节点（lastWaiter）。当前线程调用Condition.await()方法，将会以当前线程构造节点，并将节点从尾部加入等待队列：
+
+![](http://mycsdnblog.work/201919061619-M.png)
+
+在Object的监视器模型上，一个对象拥有一个同步队列和等待队列，而并发包中的Lock（更确切地说是同步器）拥有一个同步队列和多个等待队列：
+
+![](http://mycsdnblog.work/201919061620-4.png)
+
+正因为这样，才能对线程进行细粒度的控制，不同的condition用来阻塞不同的线程，并且唤醒特定的线程。
+
+### 4.3.2 等待await
+
+调用Condition的await()方法（或者以await开头的方法），会使当前线程进入等待队列并释放锁，同时线程状态变为等待状态。当从await()方法返回时，当前线程一定获取了Condition相关联的锁。
+
+如果从队列（同步队列和等待队列）的角度看await()方法，当调用await()方法时，相当于同步队列的首节点（获取了锁的节点）移动到Condition的等待队列中。
+
+**await()源码如下**：
+
+------
 
 当我们往队列里插入一个元素时，如果队列不可用，阻塞生产者主要通过LockSupport.park(this);来实现
 
@@ -937,14 +961,19 @@ public class MyBlockingQueueTest {
 public final void await() throws InterruptedException {
             if (Thread.interrupted())
                 throw new InterruptedException();
+    		//当前线程加入《等待队列》
             Node node = addConditionWaiter();
+    		//释放同步状态，即释放锁
             int savedState = fullyRelease(node);
             int interruptMode = 0;
+    		//判断当前节点是否在《同步队列》当中，如果是则退出循环，如果不是则阻塞当前线程
+        	//其他线程如果发出了signal信号之后，会把等待队列的线程移入同步队列，此时就会退出循环，进入下面的重新获取锁的acquireQueued
             while (!isOnSyncQueue(node)) {
                 LockSupport.park(this);
                 if ((interruptMode = checkInterruptWhileWaiting(node)) != 0)
                     break;
             }
+    		//其他发出signal信号的线程释放锁之后，该线程被唤醒并重新竞争锁
             if (acquireQueued(node, savedState) && interruptMode != THROW_IE)
                 interruptMode = REINTERRUPT;
             if (node.nextWaiter != null) // clean up if cancelled
@@ -1017,3 +1046,75 @@ void os::PlatformEvent::park() {
 ```
 
 pthread_cond_wait是一个多线程的条件变量函数，cond是condition的缩写，字面意思可以理解为线程在等待一个条件发生，这个条件是一个全局变量。这个方法接收两个参数，一个共享变量_cond，一个互斥量_mutex。而unpark方法在linux下是使用pthread_cond_signal实现的。park 在windows下则是使用WaitForSingleObject实现的。
+
+------
+
+调用await()的线程成功获取了锁的线程，也就是同步队列中的首节点，该方法会将当前线程构造成节点并加入等待队列中，然后释放同步状态，唤醒同步队列中的后继节点，然后当前线程会进入等待状态。
+
+当等待队列中的节点被唤醒，则唤醒节点的线程开始尝试获取同步状态。如果不是通过其他线程调用Condition.signal()方法唤醒，而是对等待线程进行中断，则会抛出InterruptedException。
+
+如果从队列的角度去看，当前线程加入Condition的等待队列的过程如下：
+
+![](http://mycsdnblog.work/201919061650-E.png)
+
+如图所示，同步队列的首节点并不会直接加入等待队列，而是通过addConditionWaiter()方法把当前线程构造成一个新的节点并将其加入等待队列中。
+
+### 4.3.3 通知signal
+
+调用Condition的signal()方法，将会唤醒在等待队列中等待时间最长的节点（首节点），在唤醒节点之前，会将节点移到同步队列中：
+
+![](http://mycsdnblog.work/201919061656-n.png)
+
+**signal()代码**
+
+```java 
+public final void signal() {
+    if (!isHeldExclusively())
+        throw new IllegalMonitorStateException();
+    Node first = firstWaiter;
+    if (first != null)
+        doSignal(first);
+}
+```
+
+调用该方法的前置条件是当前线程必须获取了锁，可以看到signal()方法进行了isHeldExclusively()检查，也就是当前线程必须是获取了锁的线程。接着获取等待队列的首节点，然后调用doSignal方法进行唤醒：
+
+```java
+private void doSignal(Node first) {
+    do {
+        if ( (firstWaiter = first.nextWaiter) == null)
+            lastWaiter = null;
+        first.nextWaiter = null;
+    } while (!transferForSignal(first) &&
+             (first = firstWaiter) != null);
+}
+```
+
+在`transferForSignal`方法中，通过调用同步器的enq(Node node)方法，等待队列中的头节点线程安全地移动到同步队列，当节点移动到同步队列后，当前线程再使用LockSupport唤醒该节点的线程。
+
+
+```java
+final boolean transferForSignal(Node node) {
+    /*
+     * If cannot change waitStatus, the node has been cancelled.
+     */
+    if (!compareAndSetWaitStatus(node, Node.CONDITION, 0))
+        return false;
+
+    /*
+     * Splice onto queue and try to set waitStatus of predecessor to
+     * indicate that thread is (probably) waiting. If cancelled or
+     * attempt to set waitStatus fails, wake up to resync (in which
+     * case the waitStatus can be transiently and harmlessly wrong).
+     */
+    Node p = enq(node);
+    int ws = p.waitStatus;
+    if (ws > 0 || !compareAndSetWaitStatus(p, ws, Node.SIGNAL))
+        LockSupport.unpark(node.thread);
+    return true;
+}
+```
+
+被唤醒后的线程，将从await()方法中的while循环中退出（isOnSyncQueue(Node node)方法返回true，节点已经在同步队列中），进而调用同步器的acquireQueued()方法加入到获取同步状态的竞争中。
+
+![1559811884338](http://mycsdnblog.work/201919061709-x.png)

@@ -102,7 +102,18 @@ unreachable 其它的对象。
 
 # 三、Arrays.sort 实现原理和 Collections.sort 实现原理
 
-![1551191608732](assets/1551191608732.png)
+```java
+public static void sort(int[] a) {
+    DualPivotQuicksort.sort(a, 0, a.length - 1, null, 0, 0);
+}
+```
+
+
+![1551191608732](http://mycsdnblog.work/201919061054-m.png)
+
+
+
+
 
 
 
@@ -425,7 +436,7 @@ Java的API文档中说，对abs(int a)运算，“如果参数等于 Integer.MIN
 
 # 二十、static关键字
 
-static变量也称作静态变量，静态变量和非静态变量的区别是：静态变量被所有的对象所共享，在内存中只有一个副本，**它当且仅当在类初次加载时会被初始化**。而非静态变量是对象所拥有的，在创建对象的时候被初始化，存在多个副本，各个对象拥有的副本互不影响。
+static变量也称作静态变量，静态变量和非静态变量的区别是：静态变量被所有的对象所共享，在内存中只有一个副本，**它当且仅当在类初次加载时会被初始化**。**而非静态变量是对象所拥有的，在创建对象的时候被初始化，存在多个副本，各个对象拥有的副本互不影响**。
 
 **static成员变量的初始化顺序按照定义的顺序进行初始化**。
 
@@ -489,4 +500,109 @@ String string = String.valueOf(i);
 String string2 = 1 + "";
 String string3 = i.toString();
 ```
+
+# 二十六、Java中的异常
+
+Java有两种异常类型：受检查异常和运行时异常
+
+检查异常：**这些异常从程序的角度来说是必须经过捕捉处理的，否则编译通不过，**比如IOException，SQLException。
+
+运行时异常（不受检查异常）：Error和运行时异常
+
+Error是程序无法处理的，如：OutOfMemmoryError，如果出现Error，Java虚拟机就会终止线程。
+
+运行时异常：如RunTimeException，IndexOutOfBoundsException，NullPointerException，这些异常一般是由程序的逻辑错误引起的，解决此类异常应该仔细排查程序，不需要进行检查。
+
+**两者的区别：**
+
+非检查异常表示无法让程序恢复运行的异常，导致这种异常的原因通常是由于执行了错误的操作。一旦出现错误，建议让程序终止。
+
+**受检查异常表示程序可以处理的异常。如果抛出异常的方法本身不处理或者不能处理它，那么方法的调用者就必须去处理该异常，否则调用会出错，连编译也无法通过。**
+
+对于运行异常，建议不要用 try...catch...捕获处理，应该在程序开发调试的过程中尽量的避免，当然有一些必须要处理的，自己知道了那个部分会出现异常，而这种异常你要把它处理的你想要的结果，例如：空值处理。
+
+![](http://mycsdnblog.work/201919152249-a.png)
+
+
+
+1.Java中的所有不正常类都继承于Throwable类。Throwable主要包括两个大类，一个是Error类，另一个是Exception类；
+
+![](http://mycsdnblog.work/201919152250-n.png)
+
+2.其中Error类中包括虚拟机错误和线程死锁，一旦Error出现了，程序就彻底的挂了，被称为程序终结者；
+
+![](http://mycsdnblog.work/201919152250-9.png)
+
+3.Exception类，也就是通常所说的“异常”。主要指编码、环境、用户操作输入出现问题，Exception主要包括两大类，非检查异常（RuntimeException）和检查异常（其他的一些异常）
+
+![](http://mycsdnblog.work/201919152251-y.png)
+
+4.RuntimeException异常主要包括以下四种异常（其实还有很多其他异常，这里不一一列出）：空指针异常、数组下标越界异常、类型转换异常、算术异常。RuntimeException异常会由java虚拟机自动抛出并自动捕获**（就算我们没写异常捕获语句运行时也会抛出错误！！）**，此类异常的出现绝大数情况是代码本身有问题应该从逻辑上去解决并改进代码。
+
+![](http://mycsdnblog.work/201919152252-T.png)
+
+5.检查异常，引起该异常的原因多种多样，比如说文件不存在、或者是连接错误等等。跟它的“兄弟”RuntimeException运行异常不同，**该异常我们必须手动在代码里添加捕获语句来处理该异常**，这也是我们学习java异常语句中主要处理的异常对象。
+
+![](http://mycsdnblog.work/201919152253-t.png)
+
+# 二十七、Enum
+
+### 27.1 什么是Enum
+
+Enum是一个Java的关键字，用于表示一个固定的常用值。例如，每周的天数，每年的月数等。Enum是一种类型，就像Class和Interface可以用于定义一系列的Enum常量
+
+### 27.2 Enum的特性
+
+- Enum常量隐式的加上了static和final，一旦被创建就无法修改
+- Enum提供了是类型安全的(type-safe)
+- Enum隐式的加上了values()方法，返回一个数组包含所有的Enum常量
+- 两个Enum常量可以使用 `==`或`equals()`方法比较
+- Enum可以用在switch语句中，就像int，String。
+- Enum有自己的名称空间
+- Enum可以实现Java接口
+- 可以在Enum中定义构造器
+
+```java
+package com.design.pattern.singleton;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-04-26 20:42
+ * @Feature:
+ */
+public enum Singleton6 {
+
+    INSTANCE;
+
+    public void todo(){
+        System.out.println("something");
+    }
+}
+```
+
+### 27.3 Enum面试问题
+
+1. 说说Enum的继承
+   所有的enums隐式的extend了java.lang.Enum类，因为一个类只能extend一个父亲，所以enum不能extend其它的类。但是Enum可以实现许多接口
+2. Enum的values,ordinal,valueOf方法
+   enums默认有values()，ordinal()和valueOf()方法。
+   values()方法返回所有在enum中定义的常量值，以数组形式返回。
+   ordinal()方法返回每个常量的索引下标，就像数组的下标
+   valueOf()方法传入字符串参数，如果enum中存在对应字符串的常量值，则返回对应的enum常量
+
+# 二十八、Java数组复制的方法
+
+# 二十九、Java中的泛型
+
+# 三十、Java中的迭代器
+
+# 三十一、Java中的内部类作用
+
+# 三十二、如何解析JSON
+
+# 三十三、不用中间变量交换两个数
+
+a=a+b b=a-b a=a-b
+
+a= a ^ b b = a ^ b a = a ^ b
 

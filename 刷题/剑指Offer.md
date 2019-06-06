@@ -363,7 +363,6 @@ public int NumberOf1(int n) {
             count++;
         }
         tag = tag << 1;
-        System.out.println(tag);
     }
     return count;
 }
@@ -384,6 +383,24 @@ public int NumberOf12(int n) {
     return count;
 }
 ```
+
+最优解：
+
+```class
+public class Solution {
+    // you need to treat n as an unsigned value
+    public int hammingWeight(int n) {
+        int count = 0;
+        while (n != 0){
+            count++;
+            n = n & (n - 1);
+        }
+        return count;
+    }
+}
+```
+
+
 
 # 十二、数值的整数次方
 
