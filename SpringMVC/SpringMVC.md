@@ -506,13 +506,13 @@ Spring MVC是建立在IoC容器基础上的。
 
 ContextLoaderListener被定义为一个监听器，这个监听器是与Web服务器的生命周期相关联的，由ContextLoaderListener监听器负责完成IoC容器在Web环境中的启动工作
 
-在建立起一个IoC体系后，把DispatcherServlet作为Spring MVC处理Web请求的转发器建立起来，从而完成响应HTTP请求的准备。
+在建立起一个**IoC**体系后，把DispatcherServlet作为Spring MVC处理Web请求的转发器建立起来，从而完成响应HTTP请求的准备。
 
 # 五、上下文在Web容器中的启动
 
 ## 5.1 IoC容器启动的基本过程
 
-ContextLoaderListener启动的上下文为根上下文。在根上下文的基础上，还有一个与Web MVC相关的上下文用来保存控制器（DispatcherServlet）需要的MVC对象，作为根上下文的子上下文，构成一个层次化的上下文体系。
+**ContextLoaderListener启动的上下文为根上下文**。在根上下文的基础上，还有一个与Web MVC相关的上下文用来保存控制器（DispatcherServlet）需要的MVC对象，作为根上下文的子上下文，构成一个层次化的上下文体系。
 
 ![](http://mycsdnblog.work/201919201447-R.png)
 
@@ -647,7 +647,7 @@ ContextLoaderListener通过使用ContextLoader来完成实际的WebApplicationCo
 
 ### 5.3.1 ContextLoaderListener的context初始化
 
-ContextLoaderListener实现的是ServletContextListener接口。ServletContextListener监听的是ServletContext，那么ServletContext发生变化就会触发相应的事件。
+**ContextLoaderListener实现的是ServletContextListener接口。ServletContextListener监听的是ServletContext，那么ServletContext发生变化就会触发相应的事件。**
 
 服务启动时contextInitialized方法被调用，服务关闭时contextDestroyed方法被调用。
 
@@ -1417,7 +1417,7 @@ public class HandlerExecutionChain {
 }
 ```
 
-HandlerExecutionChain中定义的Handler和Interceptor需要在定义HandlerMapping时配置好。具体什么时候配置好的，这个需要一个注册过程，这个注册过程在容器对Bean进行依赖注入时发生，它实际上是通过一个Bean的postProcessor来完成的。
+HandlerExecutionChain中定义的**Handler和Interceptor**需要在定义HandlerMapping时配置好。具体什么时候配置好的，这个需要一个注册过程，这个注册过程在容器对Bean进行依赖注入时发生，它实际上是通过一个Bean的postProcessor来完成的。
 
 > **SimpleUrlHandlerMapping的注册过程**
 

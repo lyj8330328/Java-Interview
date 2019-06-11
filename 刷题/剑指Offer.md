@@ -1124,7 +1124,7 @@ public class Solution {
 
 # 二十九、最小的k个数
 
-思路：建小顶堆，然后输出前k个数
+思路一：建小顶堆，然后输出前k个数
 
 ```java
 package com.example.problem29;
@@ -1169,6 +1169,64 @@ public class Solution {
             }
             root = left;
             left = 2 * root + 1;
+        }
+    }
+}
+```
+
+思路二：利用快排的思想，找到枢轴为k时的数组状态，然后直接输出0~k-1的元素即可。
+
+```java
+package com.example.problem29;
+
+import java.util.ArrayList;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-06-08 15:07
+ * @Feature:
+ */
+public class Solution2 {
+    public ArrayList<Integer> GetLeastNumbers_Solution(int [] input, int k) {
+        ArrayList<Integer> result = new ArrayList<>();
+        if (k > input.length){
+            return result;
+        }
+        sort(input,0,input.length - 1,k - 1);
+        for (int i = 0; i < k; i++) {
+            result.add(input[i]);
+        }
+        return result;
+    }
+
+    private void sort(int[] input, int low, int high, int k) {
+        int i = low,j = high;
+        if (low < high){
+            int temp = input[low];
+            while (i != j){
+                while (i < j && input[j] >= temp){
+                    j--;
+                }
+                if (i < j){
+                    input[i] = input[j];
+                    i++;
+                }
+                while (i < j && input[i] <= temp){
+                    i++;
+                }
+                if (i < j){
+                    input[j] = input[i];
+                    j--;
+                }
+            }
+            input[i] = temp;
+            if (i == k){
+                return;
+            }else if (i > k){
+                sort(input, low, i - 1, k);
+            }else {
+                sort(input, i + 1, high, k);
+            }
         }
     }
 }

@@ -1351,9 +1351,9 @@ class Solution {
 }
 ```
 
-# 56、Merge Intervals
+# *56、Merge Intervals
 
-思路：什么情况下进行合并？a=[1,3]，b=[2,4]，只要a[1]>=b[0]，那么就可以合并。先将`intervals`按第一列排序，然后进行合并。
+思路：什么情况下进行合并？a=[1,3]，b=[2,4]，只要a[1]>=b[0]，那么就可以合并，所以取右边最大的值就可以得到最终的区间。先将`intervals`按第一列排序，然后进行合并。
 
 ```java
 package com.problem56;
@@ -1373,7 +1373,7 @@ class Solution {
         }
         Arrays.sort(intervals, Comparator.comparingInt(a -> a[0]));
         int i = 0;
-        while (i < row){
+        while (i < row){ 
             int left = intervals[i][0];
             int right = intervals[i][1];
             int j = i + 1;

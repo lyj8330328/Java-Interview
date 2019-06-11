@@ -475,7 +475,7 @@ public void registerBeanDefinition(String beanName, BeanDefinition beanDefinitio
 
 ## 2.4 IoC容器完成依赖注入
 
-依赖注入发生在用户第一次向IoC容器索要Bean的时候
+**依赖注入发生在用户第一次向IoC容器索要Bean的时候**
 
 从DefaultListableBeanFactory的基类AbstractBeanFactory入手去理解getBean的实现：
 
