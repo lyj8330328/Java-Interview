@@ -206,7 +206,9 @@ public class Test {
 
 # 七、Object中的方法
 
-![1551439525914](../../../%E6%9E%B6%E6%9E%84/Java%E9%9D%A2%E8%AF%95%E5%AE%9D%E5%85%B8/%E7%AA%81%E5%87%BB/assets/1551439525914.png)
+![1551439525914](assets/1561973717974.png)
+
+
 
 # 八、Java中的对象拷贝
 
@@ -311,6 +313,8 @@ hashCode是jdk根据对象的地址或者字符串或者数字算出来的int类
 
 # 十五：自动装箱与拆箱
 
+## 15.1 基本概念
+
 装箱：将基本类型用他们对应的引用类型包装起来
 
 拆箱：将包装类型转换为基本数据类型
@@ -336,6 +340,157 @@ int i = integer; //拆箱
 2. **Integer与Integer比较的时候，由于直接赋值的时候会进行自动的装箱，那么这里就需要注意两个问题，一个是-128<= x<=127的整数，将会直接缓存在IntegerCache中，那么当赋值在这个区间的时候，不会创建新的Integer对象，而是从缓存中获取已经创建好的Integer对象。二：当大于这个范围的时候，直接new Integer来创建Integer对象。**
 
 3. new Integer(1) 和Integer a = 1不同，前者会创建对象，存储在堆中，而后者因为在-128到127的范围内，不会创建新的对象，而是从IntegerCache中获取的。那么Integer a = 128, 大于该范围的话才会直接通过new Integer（128）创建对象，进行装箱。
+
+## 15.2 实战
+
+### 15.2.1 示例1
+
+```java
+package com.example.test;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-01 20:11
+ * @Feature:
+ */
+public class Main {
+
+    public static void main(String[] args) {
+        Integer a = 100;
+        Integer b = 100;
+        Integer c = 200;
+        Integer d = 200;
+
+        System.out.println(a == b);
+        System.out.println(c == d);
+    }
+}
+```
+
+返回结果为：
+
+> true
+> false
+
+```java
+public static Integer valueOf(int i) {
+    if (i >= IntegerCache.low && i <= IntegerCache.high)
+        return IntegerCache.cache[i + (-IntegerCache.low)];
+    return new Integer(i);
+}
+```
+
+```java
+private static class IntegerCache {
+    static final int low = -128;
+    static final int high;
+    static final Integer cache[];
+
+    static {
+        // high value may be configured by property
+        int h = 127;
+        String integerCacheHighPropValue =
+            sun.misc.VM.getSavedProperty("java.lang.Integer.IntegerCache.high");
+        if (integerCacheHighPropValue != null) {
+            try {
+                int i = parseInt(integerCacheHighPropValue);
+                i = Math.max(i, 127);
+                // Maximum array size is Integer.MAX_VALUE
+                h = Math.min(i, Integer.MAX_VALUE - (-low) -1);
+            } catch( NumberFormatException nfe) {
+                // If the property cannot be parsed into an int, ignore it.
+            }
+        }
+        high = h;
+
+        cache = new Integer[(high - low) + 1];
+        int j = low;
+        for(int k = 0; k < cache.length; k++)
+            cache[k] = new Integer(j++);
+
+        // range [-128, 127] must be interned (JLS7 5.1.7)
+        assert IntegerCache.high >= 127;
+    }
+
+    private IntegerCache() {}
+}
+```
+
+### 15.2.2 示例2
+
+```java
+package com.example.test;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-01 20:11
+ * @Feature:
+ */
+public class Main {
+
+    public static void main(String[] args) {
+        Double a = 100.0;
+        Double b = 100.0;
+        Double c = 200.0;
+        Double d = 200.0;
+        
+
+        System.out.println(a == b);
+        System.out.println(c == d);
+    }
+}
+```
+
+结果：
+
+> false
+> false
+
+```java
+public static Double valueOf(double d) {
+    return new Double(d);
+}
+```
+
+在这里只解释一下为什么Double类的valueOf方法会采用与Integer类的valueOf方法不同的实现。
+
+很简单：**在某个范围内的整型数值的个数是有限的，而浮点数却不是**。
+
+注意：
+
+- Integer、Short、Byte、Character、Long这几个类的valueOf方法的实现是类似的。
+
+```java
+public static Short valueOf(short s) {
+    final int offset = 128;
+    int sAsInt = s;
+    if (sAsInt >= -128 && sAsInt <= 127) { // must cache
+        return ShortCache.cache[sAsInt + offset];
+    }
+    return new Short(s);
+}
+```
+
+```java
+public static Character valueOf(char c) {
+    if (c <= 127) { // must cache
+        return CharacterCache.cache[(int)c];
+    }
+    return new Character(c);
+}
+```
+
+```java
+public static Long valueOf(long l) {
+    final int offset = 128;
+    if (l >= -128 && l <= 127) { // will cache
+        return LongCache.cache[(int)l + offset];
+    }
+    return new Long(l);
+}
+```
+
+- Double、Float的valueOf方法的实现是类似的。
 
 # 十六、equals和==
 
@@ -584,11 +739,70 @@ public enum Singleton6 {
 
 # 二十八、Java数组复制的方法
 
+## 28.1 for循环
+
+代码灵活，效率低
+
+## 28.2 System.arraycopy()方法
+
+通过源码可以看到，其为native方法，即原生态方法。自然效率更高
+
+```java
+* @param      src      the source array.
+* @param      srcPos   starting position in the source array.
+* @param      dest     the destination array.
+* @param      destPos  starting position in the destination data.
+* @param      length   the number of array elements to be copied.
+```
+
+```java
+public static native void arraycopy(Object src,  int  srcPos,
+                                    Object dest, int destPos,
+                                    int length);
+```
+
+## 28.3 Arrays.copyOf()
+
+实现还是基于System.arraycopy()，所以效率自然低于System.arraycpoy()。
+
+```java
+public static int[] copyOf(int[] original, int newLength) {
+    int[] copy = new int[newLength];
+    System.arraycopy(original, 0, copy, 0,
+                     Math.min(original.length, newLength));
+    return copy;
+}
+```
+
+## 28.4 Object.clone()
+
+从源码来看同样也是native方法，但返回为Object类型，所以赋值时将发生强转，所以效率不如之前两种。
+
+```java
+protected native Object clone() throws CloneNotSupportedException;
+```
+
 # 二十九、Java中的泛型
 
 # 三十、Java中的迭代器
 
+迭代器模式：就是提供一种方法对一个容器对象中的各个元素进行访问，而又不暴露该对象容器的内部细节。
+
+Iterator遍历时不可以删除集合中的元素问题
+
 # 三十一、Java中的内部类作用
+
+**1.内部类可以很好的实现隐藏**
+
+ **一般的非内部类，是不允许有 private 与protected权限的，但内部类可以**
+
+**2.内部类拥有外围类的所有元素的访问权限**
+
+**3.可是实现多重继承**
+
+**4.可以避免修改接口而实现同一个类中两种同名方法的调用。**
+
+如果，你的类要继承一个类，还要实现一个接口，可是你发觉你继承的类和接口里面有两个同名的方法怎么办？你怎么区分它们？？这就需要我们的内部类了。
 
 # 三十二、如何解析JSON
 
@@ -604,7 +818,7 @@ a= a ^ b b = a ^ b a = a ^ b
 
 ![](http://mycsdnblog.work/201919111010-0.png)
 
-1. Mark Word：存储对象运行时记录信息，占用内存大小与机器位数一样，即**32位机占4字节，64位机占8字节**
+1. Mark Word：存储对象运行时记录信息（**存储对象的HashCode、分代年龄和锁标记位**），占用内存大小与机器位数一样，即**32位机占4字节，64位机占8字节**
 2. 元数据指针：指向描述类型的Klass对象（Java类的C++对等体）的指针，Klass对象包含了实例对象所属类型的元数据，因此该字段被称为元数据指针，JVM在运行时将频繁使用这个指针定位到位于方法区内的类型信息。占用内存大小与机器位数一样。
 3. 数组长度：数组对象特有，4个字节
 4. 实例数据：实例数据就是8大基本数据类型byte、short、int、long、float、double、char、boolean（对象类型也是由这8大基本数据类型复合而成），每种数据类型占多少字节就不一一例举了
@@ -613,6 +827,13 @@ a= a ^ b b = a ^ b a = a ^ b
 为了保证效率，Java编译期在编译Java对象的时候，通过字段类型对Java对象的字段会进行排序，具体顺序如下表所示：
 
 ![](http://mycsdnblog.work/201919111012-s.png)
+
+元数据指针的大小。元数据指针是一个引用类型，因此正常来说64位机元数据指针应当为8字节，32位机元数据指针应当为4字节，但是HotSpot中有一项优化是对元数据类型指针进行压缩存储，使用JVM参数：
+
+- -XX:+UseCompressedOops开启压缩
+- -XX:-UseCompressedOops关闭压缩
+
+HotSpot默认是前者，即开启元数据指针压缩，当开启压缩的时候，64位机上的元数据指针将占据4个字节的大小。换句话说就是**当开启压缩的时候，64位机上的引用将占据4个字节，否则是正常的8字节**。
 
 ## 34.2 Java对象内存大小计算
 
@@ -687,3 +908,17 @@ static {
 }
 ```
 
+# 三十六、序列化版本号serialVersionUID的作用
+
+Java中序列化，实现Serializable接口
+
+serialVersionUID的主要作用有以下两个：
+
+1、能够成功反序列化
+
+2、版本控制
+
+- 在某些场合，希望类的不同版本对序列化兼容，因此需要确保类的不同版本具有相同的serialVersionUID；在某些场合，不希望类的不同版本对序列化兼容，因此需要确保类的不同版本具有不同的serialVersionUID。 
+- 当你序列化了一个类实例后，希望更改一个字段或添加一个字段，不设置serialVersionUID，所做的任何更改都将导致无法反序化旧有实例，并在反序列化时抛出一个异常。如果你添加了serialVersionUID，在反序列旧有实例时，新添加或更改的字段值将设为初始化值（对象为null，基本类型为相应的初始默认值），字段被删除将不设置。 
+
+# 三十七、MVC和MVVM

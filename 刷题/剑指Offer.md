@@ -1085,6 +1085,49 @@ public class Solution {
 }
 ```
 
+思路二：回溯
+
+```java
+package com.example.problem27;
+
+import java.util.ArrayList;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-06-30 14:41
+ * @Feature:
+ */
+public class Solution2 {
+
+    public ArrayList<String> Permutation(String str) {
+        ArrayList<String> result = new ArrayList<>();
+        if (str.length() == 0){
+            return result;
+        }
+        boolean[] tag = new boolean[str.length()];
+        solve(str,new StringBuilder(),result,tag);
+        return result;
+    }
+
+    private void solve(String str, StringBuilder sb, ArrayList<String> result, boolean[] tag) {
+        if (sb.length() == str.length()){
+            result.add(sb.toString());
+            return;
+        }
+        for (int i = 0; i < tag.length; i++) {
+            if ((i != 0 && str.charAt(i) == str.charAt(i - 1) && !tag[i - 1]) || tag[i]){
+                continue;
+            }
+            tag[i] = true;
+            sb.append(str.charAt(i));
+            solve(str, sb, result, tag);
+            sb.deleteCharAt(sb.length() - 1);
+            tag[i] = false;
+        }
+    }
+}
+```
+
 # 二十八、数组中出现次数超过一半的数字
 
 思路：使用选举法，确定一个候选人，票数初始值为1，遍历数组，遇到相同的数字票数加一，不同的话就票数减一，当票数为0时重新确定候选人。最后统计数组中等于候选人的个数。
@@ -3092,13 +3135,23 @@ public ArrayList<Integer> maxInWindows2(int [] num, int size){
 ```java
 package com.example.problem65;
 
-public class Solution {
-    public boolean hasPath(char[] matrix, int rows, int cols, char[] str)
-    {
-        int[] flag = new int[matrix.length];
+/**
+ * @Author: 98050
+ * @Time: 2019-07-02 09:36
+ * @Feature:
+ */
+public class Solution2 {
+
+    int row = 0;
+    int col = 0;
+
+    public boolean hasPath(char[] matrix, int rows, int cols, char[] str) {
+        row = rows;
+        col = cols;
+        boolean[] tag = new boolean[matrix.length];
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                if (find(matrix,rows,cols,i,j,str,0,flag)){
+                if (dfs(0,i,j,matrix,str,tag)){
                     return true;
                 }
             }
@@ -3106,27 +3159,19 @@ public class Solution {
         return false;
     }
 
-    private boolean find(char[] matrix, int rows, int cols, int i, int j, char[] str, int k, int[] flag) {
-        int index = i * cols + j;
-        if (i >= rows || i < 0 || j >= cols || j < 0 || matrix[index] != str[k] || flag[index] == 1){
+    private boolean dfs(int k, int i, int j, char[] matrix, char[] str, boolean[] tag) {
+        int index = i * col + j;
+        if (k == str.length){
+            return true;
+        }
+        if (i < 0 || i >= row || j < 0 || j >= col || str[k] != matrix[index] || tag[index]){
             return false;
         }
-        if (k == str.length - 1){
-            return true;
-        }
-        flag[index] = 1;
-        boolean tag = find(matrix, rows, cols, i - 1, j, str, k + 1, flag) ||
-                      find(matrix, rows, cols, i + 1, j, str, k + 1, flag) ||
-                      find(matrix, rows, cols, i, j - 1, str, k + 1, flag) ||
-                      find(matrix, rows, cols, i, j + 1, str, k + 1, flag) ;
-        if (tag){
-            return true;
-        }
-        flag[index] = 0;
-        return false;
+        tag[index] = true;
+        boolean result = dfs(k + 1, i - 1, j, matrix, str, tag) || dfs(k + 1, i + 1, j, matrix, str, tag) || dfs(k + 1, i, j - 1, matrix, str, tag) || dfs(k + 1, i, j + 1, matrix, str, tag);
+        tag[index] = false;
+        return result;
     }
-
-
 }
 ```
 
