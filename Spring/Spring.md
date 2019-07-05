@@ -16,7 +16,7 @@ AOP: Aspect Oriented Programming 面向切面编程。
 
 **1.通知（Advice）**
 
-　　 切面的工作被称为通知。通知定义了切面是什么以及何时使用。除了描述切面要完成的工作， 通知还解决了何时执行这个工作的问题。它应该应用在某个方法被调 用之前？之后？之前和之后都调                    用？还是只在方法抛出异常时调用？　
+　　 切面的工作被称为通知。通知定义了切面是什么以及何时使用。除了描述切面要完成的工作， 通知还解决了何时执行这个工作的问题。它应该应用在某个方法被调 用之前？之后？之前和之后都调用？还是只在方法抛出异常时调用？　
 
 Spring切面可以应用5种类型的通知：
 
@@ -204,12 +204,6 @@ public class Test {
 - 通过为Proxy类指定ClassLoader对象和一组interface创建动态代理类Class clazz = Proxy.getProxyClass(classLoader,new Class[]{…}); 
 - 通过反射机制获取动态代理类的构造函数，其参数类型是调用处理器接口类型Constructor constructor = clazz.getConstructor(new Class[]{InvocationHandler.class}); 
 - 通过构造函数创建代理类实例，此时需将调用处理器对象作为参数被传入Interface Proxy = (Interface)constructor.newInstance(new Object[] (handler));
-
-初试科目
-
-录取情况分析
-
-
 
 #### 3.2.2 CGLIB动态代理
 
@@ -705,7 +699,7 @@ Jdk1.5新增新技术，注解。很多框架为了简化代码，都会提供�
 
 #### 7.2.2 @Retention
 
-表示需要在什么级别保存该注释信息，用于描述注解的生命周期（即：被描述的注解在什么范围内有效）
+表示需要在什么级别保存该注解信息，用于描述注解的生命周期（即：被描述的注解在什么范围内有效）
 
 - RetentionPolicy.SOURCE —— 这种类型的Annotations只在源代码级别保留,编译时就会被忽略 
 - RetentionPolicy.CLASS —— 这种类型的Annotations编译时被保留,在class文件中存在,但JVM将会忽略 

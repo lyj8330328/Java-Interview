@@ -810,9 +810,7 @@ static {
 
 # 六、Spring MVC的设计与实现
 
-DispatcherServlet会建立自己的上下文来持有Spring MVC的Bean对象，在建立这个自己持有的IoC容器时，会从
-
-ServletContext中得到根上下文作为DispatcherServlet持有上下文的双亲上下文。
+DispatcherServlet会建立自己的上下文来持有Spring MVC的Bean对象，在建立这个自己持有的IoC容器时，会从ServletContext中得到根上下文作为DispatcherServlet持有上下文的双亲上下文。
 
 DispatcherServlet通过继承FrameworkServlet和HttpServletBean而继承了HttpServlet ，通过使用Servlet API来对HTTP请求进行响应。
 

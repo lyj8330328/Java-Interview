@@ -922,3 +922,7 @@ serialVersionUID的主要作用有以下两个：
 - 当你序列化了一个类实例后，希望更改一个字段或添加一个字段，不设置serialVersionUID，所做的任何更改都将导致无法反序化旧有实例，并在反序列化时抛出一个异常。如果你添加了serialVersionUID，在反序列旧有实例时，新添加或更改的字段值将设为初始化值（对象为null，基本类型为相应的初始默认值），字段被删除将不设置。 
 
 # 三十七、MVC和MVVM
+
+MVC，Model View Controller，是软件架构中最常见的一种框架，简单来说就是通过controller的控制去操作model层的数据，并且返回给view层展示。
+
+![](http://mycsdnblog.work/201919041924-a.png)
