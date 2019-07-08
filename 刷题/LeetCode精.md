@@ -1372,6 +1372,10 @@ class Solution {
     }
 
     public List<TreeNode> solve(int start, int end){
+        if (start > end){
+            result.add(null);
+            return result;
+        }
         List<TreeNode> result = new ArrayList<>();
         for (int i = start; i <= end; i++) {
             List<TreeNode> leftTree = solve(start, i - 1);
@@ -1384,10 +1388,6 @@ class Solution {
                     result.add(root);
                 }
             }
-        }
-        if (start > end){
-            result.add(null);
-            return result;
         }
         return result;
     }
@@ -1587,10 +1587,6 @@ public class Solution2 {
     }
 }
 ```
-
-#### 
-
-
 
 ### 1.6.2 DFS
 
@@ -2872,7 +2868,69 @@ class Solution {
 }
 ```
 
-#### 1.6.3.14 分割回文串
+#### 1.6.3.14 划分为k个相等的子集
+
+> Given an array of integers `nums` and a positive integer `k`, find whether it's possible to divide this array into `k` non-empty subsets whose sums are all equal.
+>
+>  
+>
+> **Example 1:**
+>
+> ```
+> Input: nums = [4, 3, 2, 3, 5, 2, 1], k = 4
+> Output: True
+> Explanation: It's possible to divide it into 4 subsets (5), (1, 4), (2,3), (2,3) with equal sums.
+> ```
+>
+>  
+>
+> **Note:**
+>
+> - `1 <= k <= len(nums) <= 16`.
+> - `0 < nums[i] < 10000`.
+
+```java
+package com.problem698;
+
+class Solution {
+
+    public boolean canPartitionKSubsets(int[] nums, int k) {
+        int sum = 0;
+        for (int i : nums){
+            sum += i;
+        }
+        if (sum % k != 0){
+            return false;
+        }
+        int target = sum / k;
+        boolean[] tag = new boolean[nums.length];
+        return find(nums,0,0,k,target,tag);
+    }
+
+    private boolean find(int[] nums, int now, int start, int k, int target, boolean[] tag) {
+        if (k == 0){
+            return true;
+        }
+        if (now == target){
+            return find(nums, 0, 0, k - 1, target, tag);
+        }
+        for (int i = start; i < nums.length; i++) {
+            if (!tag[i] && now + nums[i] <= target){
+                tag[i] = true;
+                if (find(nums, now + nums[i], i + 1, k, target, tag)){
+                    return true;
+                }
+                tag[i] = false;
+            }
+        }
+        return false;
+    }
+
+
+}
+```
+
+#### 1.6.3.15 分割回文串
 
 [131. Palindrome Partitioning](https://leetcode.com/problems/palindrome-partitioning/)
 
@@ -2890,6 +2948,106 @@ class Solution {
 >   ["a","a","b"]
 > ]
 > ```
+
+```java 
+package com.problem131;
+
+import java.util.ArrayList;
+import java.util.List;
+
+class Solution {
+    public List<List<String>> partition(String s) {
+        List<List<String>> result = new ArrayList<>();
+        solve(s, new ArrayList<>(),result);
+        return result;
+    }
+
+    private void solve(String s, ArrayList<String> strings, List<List<String>> result) {
+        if (s.length() == 0){
+            result.add(new ArrayList<>(strings));
+            return;
+        }
+        for (int i = 0; i < s.length(); i++) {
+            if (judge(s.substring(0, i + 1))){
+                strings.add(s.substring(0, i + 1));
+                solve(s.substring(i + 1), strings, result);
+                strings.remove(strings.size() - 1);
+            }
+        }
+    }
+
+    private boolean judge(String substring) {
+        StringBuilder sb = new StringBuilder(substring);
+        return sb.reverse().toString().equals(substring);
+    }
+}
+```
+
+#### 1.6.3.16 路径总和Ⅱ
+
+[113. Path Sum II](https://leetcode.com/problems/path-sum-ii/)
+
+> Given a binary tree and a sum, find all root-to-leaf paths where each path's sum equals the given sum.
+>
+> **Note:** A leaf is a node with no children.
+>
+> **Example:**
+>
+> Given the below binary tree and `sum = 22`,
+>
+> ```
+>       5
+>      / \
+>     4   8
+>    /   / \
+>   11  13  4
+>  /  \    / \
+> 7    2  5   1
+> ```
+>
+> Return:
+>
+> ```
+> [
+>    [5,4,11,2],
+>    [5,8,4,5]
+> ]
+> ```
+
+```java
+package com.problem113;
+
+import com.TreeNode;
+
+import java.util.ArrayList;
+import java.util.List;
+
+class Solution {
+    public List<List<Integer>> pathSum(TreeNode root, int sum) {
+        List<List<Integer>> result = new ArrayList<>();
+        solve(root,sum, new ArrayList<>(),result);
+        return result;
+    }
+
+    private void solve(TreeNode root, int sum, ArrayList<Integer> integers, List<List<Integer>> result) {
+        if (root == null){
+            return;
+        }
+        if (root.left == null && root.right == null){
+            if (root.val == sum) {
+                integers.add(root.val);
+                result.add(new ArrayList<>(integers));
+                integers.remove(integers.size() - 1);
+                return;
+            }
+        }
+        integers.add(root.val);
+        solve(root.left, sum - root.val, integers, result);
+        solve(root.right, sum - root.val, integers, result);
+        integers.remove(integers.size() - 1);
+    }
+}
+```
 
 ## 1.7 动态规划
 

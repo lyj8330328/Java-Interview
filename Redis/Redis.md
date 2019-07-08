@@ -573,6 +573,8 @@ Redis中有个设置时间过期的功能，即对存储在 redis 数据库中�
 
 # 四、Redis内存淘汰机制
 
+## 4.1 基本概念
+
 MySQL里有2000w数据，Redis中只存20w的数据，如何保证Redis中的数据都是热点数据？
 
 我们可以通过配置**redis.conf中的maxmemory**这个值来开启内存淘汰功能，至于这个值有什么意义，我们可以通过了解内存淘汰的过程来理解它的意义：
@@ -618,6 +620,8 @@ class LRUCache<K, V> extends LinkedHashMap<K, V> {
     }
 
 ```
+
+## 4.2 Redis如何实现lru
 
 # 五、Redis持久化机制
 
@@ -757,7 +761,7 @@ WATCH key [key ...]
 
 ## 6.7 CAS锁
 
-Redis使用WATCH命令实现事务的“检查再设置”（CAS）行为。
+**Redis使用WATCH命令实现事务的“检查再设置”（CAS）行为。**
 
 # 七、缓存雪崩、缓存穿透、缓存击穿
 

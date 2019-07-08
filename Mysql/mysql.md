@@ -983,6 +983,22 @@ handler_read_rnd_next:这个值越高，说明查询低效。
 - 崩溃恢复：MyISAM 崩溃后发生损坏的概率比 InnoDB 高很多，而且恢复的速度也更慢。
 - 其它特性：MyISAM 支持压缩表和空间数据索引。
 
+1).MyISAM是非事务安全型的，而InnoDB是事务安全型的。
+
+2).MyISAM锁的粒度是表级，而InnoDB支持行级锁定。
+
+3).MyISAM支持全文类型索引，而InnoDB不支持全文索引。
+
+4).MyISAM相对简单，所以在效率上要优于InnoDB，小型应用可以考虑使用MyISAM。
+
+5).MyISAM表是保存成文件的形式，在跨平台的数据转移中使用MyISAM存储会省去不少的麻烦。
+
+6).InnoDB表比MyISAM表更安全，可以在保证数据不会丢失的情况下，切换非事务表到事务表（alter table tablename type=innodb）。
+
+1、MyISAM：默认表类型，它是基于传统的ISAM类型，ISAM是Indexed Sequential Access Method (有索引的顺序访问方法) 的缩写，它是存储记录和文件的标准方法。不是事务安全的，而且不支持外键，如果执行大量的select，insert MyISAM比较适合。
+
+2、InnoDB：支持事务安全的引擎，支持外键、行锁、事务是他的最大特点。如果有大量的update和insert，建议使用InnoDB，特别是针对多个并发和QPS较高的情况。
+
 # 九、MySQL优化
 
 - 表的设计合理化(符合3NF)
