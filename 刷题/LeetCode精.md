@@ -3051,6 +3051,273 @@ class Solution {
 
 ## 1.7 动态规划
 
+### 1.7.1 斐波那契数列
+
+#### 1.7.1.1 爬楼梯
+
+[70. Climbing Stairs](https://leetcode.com/problems/climbing-stairs/)
+
+> ou are climbing a stair case. It takes *n* steps to reach to the top.
+>
+> Each time you can either climb 1 or 2 steps. In how many distinct ways can you climb to the top?
+>
+> **Note:** Given *n* will be a positive integer.
+>
+> **Example 1:**
+>
+> ```
+> Input: 2
+> Output: 2
+> Explanation: There are two ways to climb to the top.
+> 1. 1 step + 1 step
+> 2. 2 steps
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: 3
+> Output: 3
+> Explanation: There are three ways to climb to the top.
+> 1. 1 step + 1 step + 1 step
+> 2. 1 step + 2 steps
+> 3. 2 steps + 1 step
+> ```
+
+思路：第 i 个楼梯可以从第 i-1 和 i-2 个楼梯再走一步到达，走到第 i 个楼梯的方法数为走到第 i-1 和第 i-2 个楼梯的方法数之和。
+$$
+dp[i] = dp[i - 1] + dp[i - 2]
+$$
+
+```java
+package com.problem70;
+
+class Solution {
+    public int climbStairs(int n) {
+        if (n <= 2){
+            return n;
+        }
+        int[] result = new int[n + 1];
+        result[0] = 0;
+        result[1] = 1;
+        result[2] = 2;
+        for (int i = 3; i <= n; i++) {
+            result[i] = result[i - 1] + result[i - 2];
+        }
+        return result[n];
+    }
+}
+```
+
+空间优化：
+
+```java
+public int climbStairs2(int n) {
+    if (n <= 2){
+        return n;
+    }
+    int a = 1;
+    int b = 2;
+    int temp;
+    for (int i = 3; i <= n; i++) {
+        temp = a + b;
+        a = b;
+        b = temp;
+    }
+    return b;
+}
+```
+
+#### 1.7.1.2 变态爬楼梯
+
+> **剑指offer**
+
+> 一只青蛙一次可以跳上1级台阶，也可以跳上2级……它也可以跳上n级。求该青蛙跳上一个n级的台阶总共有多少种跳法。
+
+dp方程：
+$$
+dp[i] = dp[i - 1] + dp[i - 2] + ... + dp[1] + dp[0]
+$$
+
+```java
+public class Solution {
+    public int JumpFloorII(int target) {
+        int[] result = new int[target + 1];
+        if(target < 3){
+            return target;
+        }
+        result[0] = 1;
+        result[1] = 1;
+        result[2] = 2;
+        for(int i = 3; i <= target;i++){
+            for(int j = 0; j < i ; j ++){
+                result[i] += result[j];
+            }
+        }
+        return result[target];
+    }
+}
+```
+
+------
+
+因为n级台阶，第一步有n种跳法：跳1级、跳2级、到跳n级
+
+跳1级，剩下n-1级，则剩下跳法是f(n-1)
+
+跳2级，剩下n-2级，则剩下跳法是f(n-2)
+
+ 所以f(n)=f(n-1)+f(n-2)+...+f(1)
+
+ 因为f(n-1)=f(n-2)+f(n-3)+...+f(1)
+
+ 所以f(n)=2*f(n-1)
+
+```java
+public class Solution {
+    public int JumpFloorII(int target) {
+        if (target < 3){
+            return target;
+        }
+        return 2*JumpFloorII(target - 1);
+    }
+}
+```
+
+#### 1.7.1.3 打家劫舍
+
+[198. House Robber](https://leetcode.com/problems/house-robber/)
+
+> You are a professional robber planning to rob houses along a street. Each house has a certain amount of money stashed, the only constraint stopping you from robbing each of them is that adjacent houses have security system connected and **it will automatically contact the police if two adjacent houses were broken into on the same night**.
+>
+> Given a list of non-negative integers representing the amount of money of each house, determine the maximum amount of money you can rob tonight **without alerting the police**.
+>
+> **Example 1:**
+>
+> ```
+> Input: [1,2,3,1]
+> Output: 4
+> Explanation: Rob house 1 (money = 1) and then rob house 3 (money = 3).
+>              Total amount you can rob = 1 + 3 = 4.
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: [2,7,9,3,1]
+> Output: 12
+> Explanation: Rob house 1 (money = 2), rob house 3 (money = 9) and rob house 5 (money = 1).
+>              Total amount you can rob = 2 + 9 + 1 = 12.
+> ```
+
+思路：定义dp数组来存储最高金额，每一个房间的状态有两种，抢或者不抢；如果不能抢当前房间，那么说明当前房间的前一个房间被抢了，同时也说明抢前一个房间的含金量比抢当前房间的含金量高：
+$$
+dp[i] = Math.max(dp[i - 2] + nums[i],dp[i - 1])
+$$
+
+```java
+package com.problem198;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-10 10:47
+ * @Feature:
+ */
+public class Solution {
+
+    public int rob(int[] nums) {
+        int result = 0;
+        if (nums.length == 0){
+            return result;
+        }
+        if (nums.length == 1){
+            return nums[0];
+        }
+        int[] dp = new int[nums.length];
+        dp[0] = nums[0];
+        dp[1] = Math.max(nums[0],nums[1]);
+        for (int i = 2; i < nums.length; i++) {
+            if (nums[i] + dp[i - 2] > dp[i - 1]){
+                dp[i] = nums[i] + dp[i - 2];
+            }else {
+                dp[i] = dp[i - 1];
+            }
+        }
+        return dp[nums.length - 1];
+    }
+}
+```
+
+空间优化：
+
+a代表i-2，b代表i-1
+
+```java
+public int rob2(int[] nums) {
+    int a = 0;
+    int b = 0;
+    int temp = 0;
+    for (int i = 0; i < nums.length; i++) {
+        temp = Math.max(nums[i] + a,b);
+        a = b;
+        b = temp;
+    }
+    return temp;
+}
+```
+
+#### 1.7.1.4 打家劫舍Ⅱ
+
+[213. House Robber II](https://leetcode.com/problems/house-robber-ii/)
+
+> You are a professional robber planning to rob houses along a street. Each house has a certain amount of money stashed. All houses at this place are **arranged in a circle.** That means the first house is the neighbor of the last one. Meanwhile, adjacent houses have security system connected and **it will automatically contact the police if two adjacent houses were broken into on the same night**.
+>
+> Given a list of non-negative integers representing the amount of money of each house, determine the maximum amount of money you can rob tonight **without alerting the police**.
+>
+> **Example 1:**
+>
+> ```
+> Input: [2,3,2]
+> Output: 3
+> Explanation: You cannot rob house 1 (money = 2) and then rob house 3 (money = 2),
+>              because they are adjacent houses.
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: [1,2,3,1]
+> Output: 4
+> Explanation: Rob house 1 (money = 1) and then rob house 3 (money = 3).
+>              Total amount you can rob = 1 + 3 = 4.
+> ```
+
+思路：需要额外考虑的问题就是是否抢第一个房间和最后一个房间，所以需要对两种情况进行计算，然后取最大值即可。
+
+```java
+package com.problem213;
+
+class Solution {
+    public int rob(int[] nums) {
+        if (nums.length == 1){
+            return nums[0];
+        }
+        return Math.max(solve(nums,0,nums.length - 2), solve(nums,1,nums.length - 1));
+    }
+
+    private int solve(int[] nums, int start, int end) {
+        int a = 0,b = 0;
+        int temp;
+        for (int i = start; i <= end; i++) {
+            temp = Math.max(a + nums[i],b);
+            a = b;
+            b = temp;
+        }
+        return b;
+    }
+}
+```
+
 ### *1.7.1 不同的二叉搜索树
 
 [96. Unique Binary Search Trees](https://leetcode.com/problems/unique-binary-search-trees/)
