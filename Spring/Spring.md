@@ -1776,3 +1776,51 @@ public interface DisposableBean {
 
 # 十四、IOC注入方式
 
+# 十五、注解
+
+@Configuration和@Bean来配合使用，目的是加载一些第三方的类库。
+
+用@Bean注解的方法：会实例化、配置并初始化一个新的对象，这个对象会由spring IoC 容器管理。
+
+```java
+@Configuration
+public class AppConfig {
+
+    @Bean
+    public MyService myService() {
+        return new MyServiceImpl();
+    }
+}
+```
+
+@Component倾向于组件扫描和自动装配。
+
+在Component中（@Component标注的类，包括@Service、@Repository、@Controller）使用@Bean注解和在@Configuration中使用是不同的。
+
+在@Component中使用方法或字段时不会使用CGLIB增强（不使用代理），从Spring容器中获取
+
+在@Configuration中使用方法或字段时则使用CGLIB创造协作对象（即使用代理），调用@Bean注解的方法和字段是普通的Java语义，不经过CGLIB处理
+
+
+
+自动化装配Bean
+
+@Component注解。这个简 单的注解表明该类会作为组件类，并告知Spring要为这个类创建 bean
+
+@Bean注解会告诉Spring这个方法将会返回一个对象，该对象要注册 为Spring应用上下文中的bean。方法体中包含了最终产生bean实例的逻辑。 
+
+
+
+尽管在很多场景下通过组件扫描和自动装配实现Spring的自动化配置 
+
+是更为推荐的方式，但有时候自动化配置的方案行不通，因此需要明 
+
+确配置Spring。比如说，你想要将第三方库中的组件装配到你的应用 
+
+中，在这种情况下，是没有办法在它的类上添加@Component和 
+
+@Autowired注解的，因此就不能使用自动化装配的方案了
+
+@Configuration注解表明这个类是一个配置类，该类应该包 
+
+含在Spring应用上下文中如何创建bean的细节

@@ -3318,6 +3318,213 @@ class Solution {
 }
 ```
 
+### 1.7.2 矩阵路径
+
+#### 1.7.2.1 最小路径和
+
+[64. Minimum Path Sum](https://leetcode.com/problems/minimum-path-sum/)
+
+> Given a *m* x *n* grid filled with non-negative numbers, find a path from top left to bottom right which *minimizes* the sum of all numbers along its path.
+>
+> **Note:** You can only move either down or right at any point in time.
+>
+> **Example:**
+>
+> ```
+> Input:
+> [
+>   [1,3,1],
+>   [1,5,1],
+>   [4,2,1]
+> ]
+> Output: 7
+> Explanation: Because the path 1→3→1→1→1 minimizes the sum.
+> ```
+
+思路：因为只能向右或者向下运动，那么转移方程如下：
+
+当`i!=0&&j!=0`的时候：
+$$
+grid[i][j] = Math.min(grid[i][j] + grid[i - 1][j],grid[i][j] + grid[i][j - 1])
+$$
+当`i == 0`的时候：
+$$
+grid[i][j] = grid[i][j] + grid[i][j - 1]
+$$
+当`j == 0`的时候：
+$$
+grid[i][j] = grid[i][j] + grid[i - 1][j]
+$$
+
+```java
+package com.problem64;
+
+class Solution {
+    public int minPathSum(int[][] grid) {
+        int row = grid.length;
+        if (row == 0){
+            return 0;
+        }
+        int col = grid[0].length;
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; j++) {
+                if (i == 0 || j == 0){
+                    if (i > 0){
+                        grid[i][j] += grid[i - 1][j];
+                    }
+                    if (j > 0){
+                        grid[i][j] += grid[i][j - 1];
+                    }
+                }else {
+                    grid[i][j] = Math.min(grid[i][j] + grid[i - 1][j], grid[i][j] + grid[i][j - 1]);
+                }
+            }
+        }
+        return grid[row - 1][col - 1];
+    }
+}
+```
+
+#### 1.7.2.2 不同路径
+
+[62. Unique Paths](https://leetcode.com/problems/unique-paths/)
+
+> A robot is located at the top-left corner of a *m* x *n* grid (marked 'Start' in the diagram below).
+>
+> The robot can only move either down or right at any point in time. The robot is trying to reach the bottom-right corner of the grid (marked 'Finish' in the diagram below).
+>
+> How many possible unique paths are there?
+>
+> ![img](https://assets.leetcode.com/uploads/2018/10/22/robot_maze.png)
+> Above is a 7 x 3 grid. How many possible unique paths are there?
+>
+> **Note:** *m* and *n* will be at most 100.
+>
+> **Example 1:**
+>
+> ```
+> Input: m = 3, n = 2
+> Output: 3
+> Explanation:
+> From the top-left corner, there are a total of 3 ways to reach the bottom-right corner:
+> 1. Right -> Right -> Down
+> 2. Right -> Down -> Right
+> 3. Down -> Right -> Right
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: m = 7, n = 3
+> Output: 28
+> ```
+
+转移方程：
+
+当`i == 0` 或者`j == 0`时，即第一行和第一列：
+$$
+dp[i][j] = 1
+$$
+当`i != 0` 且 `j != 0`时：
+$$
+dp[i][j] = dp[i - 1][j] + dp[i][j - 1]
+$$
+
+```java
+package com.problem62;
+
+class Solution {
+    public int uniquePaths(int m, int n) {
+        int[][] dp = new int[m][n];
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (i == 0 || j == 0){
+                    dp[i][j] = 1;
+                }else {
+                    dp[i][j] = dp[i - 1][j] + dp[i][j - 1];
+                }
+            }
+        }
+        return dp[m - 1][n - 1];
+    }
+}
+```
+
+#### 1.7.2.3 不同路径Ⅱ
+
+[63. Unique Paths II](https://leetcode.com/problems/unique-paths-ii/)
+
+> A robot is located at the top-left corner of a *m* x *n* grid (marked 'Start' in the diagram below).
+>
+> The robot can only move either down or right at any point in time. The robot is trying to reach the bottom-right corner of the grid (marked 'Finish' in the diagram below).
+>
+> Now consider if some **obstacles** are added to the grids. How many unique paths would there be?
+>
+> ![img](https://assets.leetcode.com/uploads/2018/10/22/robot_maze.png)
+>
+> An obstacle and empty space is marked as `1` and `0` respectively in the grid.
+>
+> **Note:** *m* and *n* will be at most 100.
+>
+> **Example 1:**
+>
+> ```
+> Input:
+> [
+>   [0,0,0],
+>   [0,1,0],
+>   [0,0,0]
+> ]
+> Output: 2
+> Explanation:
+> There is one obstacle in the middle of the 3x3 grid above.
+> There are two ways to reach the bottom-right corner:
+> 1. Right -> Right -> Down -> Down
+> 2. Down -> Down -> Right -> Right
+> ```
+
+注意，当边界中含有障碍物时，那么障碍物以后的位置都不可达，当矩阵内部遇到障碍物时，直接跳过即可。
+
+```java
+package com.problem63;
+
+class Solution {
+
+    public int uniquePathsWithObstacles(int[][] obstacleGrid) {
+        int row = obstacleGrid.length;
+        if (row == 0){
+            return 0;
+        }
+        int col = obstacleGrid[0].length;
+        if (obstacleGrid[0][0] == 1 || obstacleGrid[row - 1][col - 1] == 1){
+            return 0;
+        }
+        int[][] dp = new int[row][col];
+        for (int i = 0; i < col; i++) {
+            if (obstacleGrid[0][i] == 1){
+                break;
+            }
+            dp[0][i] = 1;
+        }
+        for (int i = 1; i < row; i++) {
+            if (obstacleGrid[i][0] == 1){
+                break;
+            }
+            dp[i][0] = 1;
+        }
+        for (int i = 1; i < row; i++) {
+            for (int j = 1; j < col; j++) {
+                if (obstacleGrid[i][j] == 1){
+                    continue;
+                }
+                dp[i][j] = dp[i - 1][j] + dp[i][j - 1];
+            }
+        }
+        return dp[row - 1][col - 1];
+    }
+}
+```
+
 ### *1.7.1 不同的二叉搜索树
 
 [96. Unique Binary Search Trees](https://leetcode.com/problems/unique-binary-search-trees/)
