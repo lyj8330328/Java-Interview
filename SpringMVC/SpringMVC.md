@@ -533,6 +533,8 @@ ContextLoader中完成了两个IoC容器建立的基本过程：
 
 Spring为Web应用提供了上下文的扩展接口WebApplicationContext来满足启动过程的需要。
 
+在启动过程中，Spring会使用一个默认的WebApplicationContext实现作为IoC容器
+
 ```java
 package org.springframework.web.context;
 
@@ -553,7 +555,7 @@ public interface WebApplicationContext extends ApplicationContext {
 }
 ```
 
-以XmlWebApplicationContext的实现为例。
+这个默认的实现就是XmlWebApplicationContext。
 
 ```java
 package org.springframework.web.context.support;
@@ -2016,5 +2018,3 @@ View对象
 ![](http://mycsdnblog.work/201919202200-W.png)
 
 JstlView对象
-
-# 七、

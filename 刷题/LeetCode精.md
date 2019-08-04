@@ -670,6 +670,29 @@ class Solution {
 
 [121. Best Time to Buy and Sell Stock](https://leetcode.com/problems/best-time-to-buy-and-sell-stock/)
 
+> Say you have an array for which the *i*th element is the price of a given stock on day *i*.
+>
+> If you were only permitted to complete at most one transaction (i.e., buy one and sell one share of the stock), design an algorithm to find the maximum profit.
+>
+> Note that you cannot sell a stock before you buy one.
+>
+> **Example 1:**
+>
+> ```
+> Input: [7,1,5,3,6,4]
+> Output: 5
+> Explanation: Buy on day 2 (price = 1) and sell on day 5 (price = 6), profit = 6-1 = 5.
+>              Not 7-1 = 6, as selling price needs to be larger than buying price.
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: [7,6,4,3,1]
+> Output: 0
+> Explanation: In this case, no transaction is done, i.e. max profit = 0.
+> ```
+
 要想收益最大，那么就需要找到数组中的最小值和最大值，且最大值的下标必须比最小值的下标大，这样就得到了最大收益。
 
 ```java
@@ -695,6 +718,39 @@ class Solution {
 ### 1.3.6 买卖股票的最佳时机Ⅱ
 
 [122. Best Time to Buy and Sell Stock II](https://leetcode.com/problems/best-time-to-buy-and-sell-stock-ii/)
+
+> Say you have an array for which the *i*th element is the price of a given stock on day *i*.
+>
+> Design an algorithm to find the maximum profit. You may complete as many transactions as you like (i.e., buy one and sell one share of the stock multiple times).
+>
+> **Note:** You may not engage in multiple transactions at the same time (i.e., you must sell the stock before you buy again).
+>
+> **Example 1:**
+>
+> ```
+> Input: [7,1,5,3,6,4]
+> Output: 7
+> Explanation: Buy on day 2 (price = 1) and sell on day 3 (price = 5), profit = 5-1 = 4.
+>              Then buy on day 4 (price = 3) and sell on day 5 (price = 6), profit = 6-3 = 3.
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: [1,2,3,4,5]
+> Output: 4
+> Explanation: Buy on day 1 (price = 1) and sell on day 5 (price = 5), profit = 5-1 = 4.
+>              Note that you cannot buy on day 1, buy on day 2 and sell them later, as you are
+>              engaging multiple transactions at the same time. You must sell before buying again.
+> ```
+>
+> **Example 3:**
+>
+> ```
+> Input: [7,6,4,3,1]
+> Output: 0
+> Explanation: In this case, no transaction is done, i.e. max profit = 0.
+> ```
 
 对于 [a, b, c, d]，如果有 a <= b <= c <= d ，那么最大收益为 d - a。而 d - a = (d - c) + (c - b) + (b - a) ，因此当访问到一个 prices[i] 且 prices[i] - prices[i-1] > 0，那么就把 prices[i] - prices[i-1] 添加到收益中。
 
@@ -2118,7 +2174,7 @@ public class Solution3 {
 > Output: ["255.255.11.135", "255.255.111.35"]
 > ```
 
-思路：假设已经放置了一或两个点使得无法摆放其他点来生成有效IP地址。这时应该做什么？ 回溯。也就是说，回到之前，改变上一个摆放点的位置。并试着继续。如果依然不行，则继续 回溯。 
+思路：假设已经放置了一或两个点使得无法摆放其他点来生成有效IP地址。这时应该做什么？ 回溯。也就是说，回到之前，改变上一个摆放点的位置。并试着继续。如果依然不行，则继续回溯。 
 
 注意：
 
@@ -2226,7 +2282,7 @@ class Solution {
 }
 ```
 
-#### 1.6.3.5 二叉树的所有路径
+#### *1.6.3.5 二叉树的所有路径
 
 [257. Binary Tree Paths](https://leetcode.com/problems/binary-tree-paths/)
 
@@ -2239,11 +2295,11 @@ class Solution {
 > ```
 > Input:
 > 
->    1
->  /   \
+>       1
+>   /   \
 > 2     3
->  \
->   5
+>   \
+>     5
 > 
 > Output: ["1->2->5", "1->3"]
 > 
@@ -3049,6 +3105,76 @@ class Solution {
 }
 ```
 
+#### 1.6.3.17 求根到叶子节点数字之和
+
+[129. Sum Root to Leaf Numbers](https://leetcode.com/problems/sum-root-to-leaf-numbers/submissions/)
+
+> Given a binary tree containing digits from `0-9` only, each root-to-leaf path could represent a number.
+>
+> An example is the root-to-leaf path `1->2->3` which represents the number `123`.
+>
+> Find the total sum of all root-to-leaf numbers.
+>
+> **Note:** A leaf is a node with no children.
+>
+> **Example:**
+>
+> ```
+> Input: [1,2,3]
+>     1
+>    / \
+>   2   3
+> Output: 25
+> Explanation:
+> The root-to-leaf path 1->2 represents the number 12.
+> The root-to-leaf path 1->3 represents the number 13.
+> Therefore, sum = 12 + 13 = 25.
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: [4,9,0,5,1]
+>     4
+>    / \
+>   9   0
+>  / \
+> 5   1
+> Output: 1026
+> Explanation:
+> The root-to-leaf path 4->9->5 represents the number 495.
+> The root-to-leaf path 4->9->1 represents the number 491.
+> The root-to-leaf path 4->0 represents the number 40.
+> Therefore, sum = 495 + 491 + 40 = 1026.
+> ```
+
+```java
+package com.problem129;
+
+import com.TreeNode;
+
+class Solution {
+    int result = 0;
+    public int sumNumbers(TreeNode root) {
+        solve(root,new StringBuilder());
+        return result;
+    }
+
+    private void solve(TreeNode root, StringBuilder sb) {
+        if (root == null){
+            return;
+        }
+        sb.append(root.val);
+        if (root.left == null && root.right == null){
+            result += Integer.valueOf(sb.toString());
+        }
+        solve(root.left, sb);
+        solve(root.right, sb);
+        sb.deleteCharAt(sb.length() - 1);
+    }
+}
+```
+
 ## 1.7 动态规划
 
 ### 1.7.1 斐波那契数列
@@ -3184,7 +3310,73 @@ public class Solution {
 }
 ```
 
-#### 1.7.1.3 打家劫舍
+#### 1.7.1.3 使用最小花费爬楼梯
+
+[746. Min Cost Climbing Stairs](https://leetcode.com/problems/min-cost-climbing-stairs/)
+
+> On a staircase, the `i`-th step has some non-negative cost `cost[i]` assigned (0 indexed).
+>
+> Once you pay the cost, you can either climb one or two steps. You need to find minimum cost to reach the top of the floor, and you can either start from the step with index 0, or the step with index 1.
+>
+> **Example 1:**
+>
+> ```
+> Input: cost = [10, 15, 20]
+> Output: 15
+> Explanation: Cheapest is start on cost[1], pay that cost and go to the top.
+> ```
+>
+> 
+>
+> **Example 2:**
+>
+> ```
+> Input: cost = [1, 100, 1, 1, 1, 100, 1, 1, 100, 1]
+> Output: 6
+> Explanation: Cheapest is start on cost[0], and only step on 1s, skipping cost[3].
+> ```
+>
+> 
+>
+> **Note:**
+>
+> 1. `cost` will have a length in the range `[2, 1000]`.
+> 2. Every `cost[i]` will be an integer in the range `[0, 999]`.
+
+对于第i个台阶，有两种选择，要么从i - 1上来，要么从i-2上来，那么就可以得到转移方程：
+$$
+dp[i] = Math.min(dp[i - 1] + cost[i],dp[i - 2] + cost[i])
+$$
+但是对于最后一个台阶有所不同，因为可以从倒数第二个台阶直接跨两步，不经过最后一个台阶，所以转移方程如下：
+$$
+dp[i] = Math.min(dp[i - 1],dp[i- 2] + cost[i])
+$$
+
+
+```java
+package com.problem746;
+
+class Solution {
+    public int minCostClimbingStairs(int[] cost) {
+        int[] dp = new int[cost.length];
+        dp[0] = cost[0];
+        if (cost.length < 2){
+            return dp[0];
+        }
+        dp[1] = Math.min(cost[0] + cost[1],cost[1]);
+        for (int i = 2; i < cost.length; i++) {
+            if (i == cost.length - 1){
+                dp[i] = Math.min(dp[i - 1],dp[i - 2] + cost[i]);
+            }else {
+                dp[i] = Math.min(dp[i - 1] + cost[i],dp[i - 2] + cost[i]);
+            }
+        }
+        return dp[cost.length - 1];
+    }
+}
+```
+
+#### 1.7.1.4 打家劫舍
 
 [198. House Robber](https://leetcode.com/problems/house-robber/)
 
@@ -3266,7 +3458,7 @@ public int rob2(int[] nums) {
 }
 ```
 
-#### 1.7.1.4 打家劫舍Ⅱ
+#### 1.7.1.5 打家劫舍Ⅱ
 
 [213. House Robber II](https://leetcode.com/problems/house-robber-ii/)
 
@@ -3525,6 +3717,178 @@ class Solution {
 }
 ```
 
+### 1.7.3 数组区间
+
+#### 1.7.3.1 区域和检索-数组不可变
+
+[303. Range Sum Query - Immutable](https://leetcode.com/problems/range-sum-query-immutable/)
+
+> Given an integer array *nums*, find the sum of the elements between indices *i* and *j* (*i* ≤ *j*), inclusive.
+>
+> **Example:**
+>
+> ```
+> Given nums = [-2, 0, 3, -5, 2, -1]
+> 
+> sumRange(0, 2) -> 1
+> sumRange(2, 5) -> -1
+> sumRange(0, 5) -> -3
+> ```
+>
+> 
+>
+> **Note:**
+>
+> 1. You may assume that the array does not change.
+> 2. There are many calls to *sumRange* function.
+
+因为要多次调用sumRange方法，所以要计算出每个位置到初始位置的总和，然后根据索引去计算区间和。
+
+（2，5）=（0，5）-（0，1）
+
+```java
+package com.problem303;
+
+class NumArray {
+
+    private int[] dp;
+
+    public NumArray(int[] nums) {
+        dp = new int[nums.length];
+        if (nums.length >= 1){
+            dp[0] = nums[0];
+            for (int i = 1; i < nums.length; i++) {
+                dp[i] = nums[i] + dp[i - 1];
+            }
+        }
+    }
+    
+    public int sumRange(int i, int j) {
+        if (i != 0){
+            return dp[j] - dp[i - 1];
+        }else {
+            return dp[j];
+        }
+    }
+}
+```
+
+#### 1.7.3.2 区域和检索-矩阵不可变
+
+[304. Range Sum Query 2D - Immutable](https://leetcode.com/problems/range-sum-query-2d-immutable/)
+
+> Given a 2D matrix *matrix*, find the sum of the elements inside the rectangle defined by its upper left corner (*row*1, *col*1) and lower right corner (*row*2, *col*2).
+>
+> ![Range Sum Query 2D](https://leetcode.com/static/images/courses/range_sum_query_2d.png)
+> The above rectangle (with the red border) is defined by (row1, col1) = **(2, 1)** and (row2, col2) = **(4, 3)**, which contains sum = **8**.
+>
+> **Example:**
+>
+> ```
+> Given matrix = [
+>   [3, 0, 1, 4, 2],
+>   [5, 6, 3, 2, 1],
+>   [1, 2, 0, 1, 5],
+>   [4, 1, 0, 1, 7],
+>   [1, 0, 3, 0, 5]
+> ]
+> 
+> sumRegion(2, 1, 4, 3) -> 8
+> sumRegion(1, 1, 2, 2) -> 11
+> sumRegion(1, 2, 2, 4) -> 12
+> ```
+>
+> 
+>
+> **Note:**
+>
+> 1. You may assume that the matrix does not change.
+> 2. There are many calls to *sumRegion* function.
+> 3. You may assume that *row*1 ≤ *row*2 and *col*1 ≤ *col*2.
+
+```java
+package com.problem304;
+
+class NumMatrix {
+
+    private int[][] dp;
+
+    public NumMatrix(int[][] matrix) {
+        int row = matrix.length;
+        int col = 0;
+        if (row != 0){
+            col = matrix[0].length;
+        }
+        dp = new int[matrix.length][col];
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; j++) {
+                if (j == 0){
+                    dp[i][j] = matrix[i][j];
+                }else {
+                    dp[i][j] = dp[i][j - 1] + matrix[i][j];
+                }
+            }
+        }
+
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; j++) {
+                System.out.printf("%5d",matrix[i][j]);
+            }
+            System.out.println();
+        }
+    }
+    
+    public int sumRegion(int row1, int col1, int row2, int col2) {
+        int result = 0;
+        if (col1 == 0){
+            for (int i = row1; i <= row2; i++) {
+                result += dp[i][col2];
+            }
+        }else {
+            for (int i = row1; i <= row2; i++) {
+                result += dp[i][col2] - dp[i][col1 - 1];
+            }
+        }
+        return result;
+    }
+}
+```
+
+#### 1.7.3.3 等差数列划分
+
+[413. Arithmetic Slices](https://leetcode.com/problems/arithmetic-slices/)
+
+> A sequence of number is called arithmetic if it consists of at least three elements and if the difference between any two consecutive elements is the same.
+>
+> For example, these are arithmetic sequence:
+>
+> ```
+> 1, 3, 5, 7, 9
+> 7, 7, 7, 7
+> 3, -1, -5, -9
+> ```
+>
+> The following sequence is not arithmetic.
+>
+> ```
+> 1, 1, 2, 5, 7
+> ```
+>
+> A zero-indexed array A consisting of N numbers is given. A slice of that array is any pair of integers (P, Q) such that 0 <= P < Q < N.
+>
+> A slice (P, Q) of array A is called arithmetic if the sequence:
+> A[P], A[p + 1], ..., A[Q - 1], A[Q] is arithmetic. In particular, this means that P + 1 < Q.
+>
+> The function should return the number of arithmetic slices in the array A.
+>
+> **Example:**
+>
+> ```
+> A = [1, 2, 3, 4]
+> 
+> return: 3, for 3 arithmetic slices in A: [1, 2, 3], [2, 3, 4] and [1, 2, 3, 4] itself.
+> ```
+
 ### *1.7.1 不同的二叉搜索树
 
 [96. Unique Binary Search Trees](https://leetcode.com/problems/unique-binary-search-trees/)
@@ -3582,7 +3946,1174 @@ class Solution {
 }
 ```
 
-### 1.7.2 完全平方数
+### 1.7.4 分割整数
+
+#### *1.7.4.1 整数拆分
+
+[343. Integer Break](https://leetcode.com/problems/integer-break/)
+
+> Given a positive integer *n*, break it into the sum of **at least** two positive integers and maximize the product of those integers. Return the maximum product you can get.
+>
+> **Example 1:**
+>
+> ```
+> Input: 2
+> Output: 1
+> Explanation: 2 = 1 + 1, 1 × 1 = 1.
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: 10
+> Output: 36
+> Explanation: 10 = 3 + 3 + 4, 3 × 3 × 4 = 36.
+> ```
+
+思路：
+
+问题拆分，10 = 1 + 9；10 = 2 + 8； 10 = 3 + 7；10 = 4 + 6；10 = 5 + 5
+
+那么就需要计算出1~9每个数字的组合最大乘积，然后就可以计算出10的组合最大乘积
+
+所以状态转移方程为：
+
+`2 <= i <= n，1 <= j < i`
+$$
+dp[i] = Math.max(dp[i],Math.max(dp[i - j] * j,j * (i - j)))
+$$
+
+
+```java
+package com.problem343;
+
+class Solution {
+    public int integerBreak(int n) {
+        int[] dp = new int[n + 1];
+        dp[1] = 1;
+        for (int i = 2; i <= n; i++) {
+            for (int j = 1; j < i; j++) {
+               dp[i] = Math.max(dp[i],Math.max(dp[i - j] * j,j * (i - j)));
+            }
+        }
+        return dp[n];
+    }
+}
+```
+
+
+#### *1.7.4.2 解码方法
+
+[91. Decode Ways](https://leetcode.com/problems/decode-ways/)
+
+> A message containing letters from `A-Z` is being encoded to numbers using the following mapping:
+>
+> ```
+> 'A' -> 1
+> 'B' -> 2
+> ...
+> 'Z' -> 26
+> ```
+>
+> Given a **non-empty** string containing only digits, determine the total number of ways to decode it.
+>
+> **Example 1:**
+>
+> ```
+> Input: "12"
+> Output: 2
+> Explanation: It could be decoded as "AB" (1 2) or "L" (12).
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: "226"
+> Output: 3
+> Explanation: It could be decoded as "BZ" (2 26), "VF" (22 6), or "BBF" (2 2 6).
+> ```
+
+思路：后一个字符与前缀若干个字符的组合可以通过公式
+$$
+dp[i] = dp[i - 1] + dp[ i - 2]  
+$$
+计算出来。原因很简单，如果后一个字符可以和前一个字符构成一个合法的字母序列，那么必存在两种情况：第一种情况下，仅选择当前字符生成字母，那么很明显组合数应当等于前一个字符的组合数 dp[i - 1]；
+
+第二种情况，选择前一个字符和当前字符共通构成一个字母，那么其组合数应当等于上上个字符的组合数 dp[i - 2]。
+
+```java
+package com.problem91;
+
+class Solution {
+
+    public int numDecodings(String s) {
+        int length = s.length();
+        int[] dp = new int[length + 1];
+        if (s.length() == 0){
+            return 0;
+        }
+        dp[0] = 1;
+        dp[1] = s.charAt(0) == '0' ? 0 : 1;
+        for (int i = 2; i < length + 1; i++) {
+            int t1 = s.charAt(i - 1) - '0';
+            if (t1 != 0){
+                dp[i] += dp[i - 1];
+            }
+            int t2 = Integer.valueOf(s.substring(i - 2, i));
+            if (t2 >= 10 && t2 <= 26){
+                dp[i] += dp[i - 2];
+            }
+        }
+        return dp[length];
+    }
+}
+```
+
+### 1.7.5 子串和子序列
+
+#### 1.7.5.1 最长公共子串
+
+问题：有两个字符串str1和str2，求出两个字符串中最长公共子串长度。
+
+例子：str1=acbcbcef，str2=abcbced，则str和str2的最长公共子串为bcbce，最长公共子串长度为5。
+
+**思路：**
+
+1、把两个字符串分别以行和列组成一个二维矩阵。
+
+2、比较二维矩阵中每个点对应行列字符中否相等，相等的话值设置为1，否则设置为0。
+
+3、通过查找出值为1的最长对角线就能找到最长公共子串。
+
+矩阵：
+
+![](http://mycsdnblog.work/201919151944-Q.png)
+
+从上图可以看到，str1和str2共有5个公共子串，但最长的公共子串长度为5。
+
+为了进一步优化算法的效率，我们可以再计算某个二维矩阵的值的时候顺便计算出来当前最长的公共子串的长度，这样就避免了后续查找对角线长度的操作了。修改后的二维矩阵如下：
+
+![](http://mycsdnblog.work/201919151945-i.png)
+
+代码：
+
+```java
+package com.test;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-14 11:12
+ * @Feature: 最长公共子串
+ */
+public class Solution2 {
+
+    public static void main(String[] args) {
+        String s1 = "acbcbcef";
+        String s2 = "abcbced";
+        System.out.println(findMaxLenSubStr(s1,s2));
+    }
+
+    private static String findMaxLenSubStr(String s1, String s2) {
+        int row = s1.length();
+        int col = s2.length();
+        int[][] dp = new int[row][col];
+        int start = 0;
+        int len = 0;
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; j++) {
+                if (s1.charAt(i) == s2.charAt(j)){
+                    if (i == 0 || j == 0){
+                        dp[i][j] = 1;
+                    }else {
+                        dp[i][j] = dp[i - 1][j - 1] + 1;
+                    }
+                }
+                if (dp[i][j] > len){
+                    start = i - dp[i][j] + 1;
+                    len = dp[i][j];
+                }
+            }
+        }
+        return s1.substring(start, start + len);
+    }
+}
+```
+
+#### 1.7.5.2 最长公共子序列
+
+子序列和子串的不同之处在于子序列可以不连续，所以在状态转移方程上有所改变：
+
+![](http://mycsdnblog.work/201919152028-0.png)
+
+如果两个对应字符相等，那么依然是C[i-1,j-1]+1，如果不相同的话，为了保持上一个相同的状态，那么就需要复制上一个状态，上一个状态在哪里？就是在当前位置的**左侧和上侧**，这两个里面取最大的即可。
+
+![](http://mycsdnblog.work/201919152102-b.png)
+
+```java
+private static int findSubSequence(String s1, String s2) {
+        int row = s1.length() + 1;
+        int col = s2.length() + 1;
+        int[][] dp = new int[row][col];
+        for (int i = 1; i < row; i++) {
+            for (int j = 1; j < col; j++) {
+                if (s1.charAt(i - 1) == s2.charAt(j - 1)){
+                    dp[i][j] = dp[i - 1][j - 1] + 1;
+                }else {
+                    dp[i][j] = Math.max(dp[i - 1][j],dp[i][j - 1]);
+                }
+            }
+        }
+        return dp[row - 1][col - 1];
+    }
+```
+
+#### *1.7.5.3 最长递增子序列
+
+[300. Longest Increasing Subsequence](https://leetcode.com/problems/longest-increasing-subsequence/)
+
+> Given an unsorted array of integers, find the length of longest increasing subsequence.
+>
+> **Example:**
+>
+> ```
+> Input: [10,9,2,5,3,7,101,18]
+> Output: 4 
+> Explanation: The longest increasing subsequence is [2,3,7,101], therefore the length is 4. 
+> ```
+>
+> **Note:**
+>
+> - There may be more than one LIS combination, it is only necessary for you to return the length.
+> - Your algorithm should run in O(*n2*) complexity.
+>
+> **Follow up:** Could you improve it to O(*n* log *n*) time complexity?
+
+```java
+package com.problem300;
+
+class Solution {
+    public int lengthOfLIS(int[] nums) {
+        if (nums.length == 0){
+            return 0;
+        }
+        int[] dp = new int[nums.length];
+        for (int i = 0; i < nums.length; i++) {
+            int max = 1;
+            for (int j = 0; j < i; j++) {
+                if (nums[i] > nums[j]){
+                    max = Math.max(max, dp[j] + 1);
+                }
+            }
+            dp[i] = max;
+        }
+        int result = 0;
+        for (int i : dp){
+            result = Math.max(result,i);
+        }
+        return result;
+    }
+}
+```
+
+时间复杂度是O(n^2)，优化为O(nlogn)。
+
+定义一个 tails 数组，其中 tails[i] 存储长度为 i + 1 的最长递增子序列的最后一个元素。对于一个元素 x，
+
+- 如果它大于 tails 数组所有的值，那么把它添加到 tails 后面，表示最长递增子序列长度加 1；
+- 如果 tails[i-1] < x <= tails[i]，那么更新 tails[i] = x。
+
+例如对于数组 [4,3,6,5]，有：
+
+```
+tails      len      num
+[]         0        4
+[4]        1        3
+[3]        1        6
+[3,6]      2        5
+[3,5]      2        null
+
+```
+
+可以看出 tails 数组保持有序，因此在查找 Si 位于 tails 数组的位置时就可以使用二分查找。
+
+```java
+package com.problem300;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-14 14:31
+ * @Feature:
+ */
+public class Solution2 {
+    public int lengthOfLIS(int[] nums) {
+        int length = nums.length;
+        int[] tail = new int[length];
+        int len = 0;
+        for (int i : nums){
+            int index = binarySearch(tail,len,i);
+            tail[index] = i;
+            if (index == len){
+                len++;
+            }
+        }
+        return len;
+    }
+
+    private int binarySearch(int[] tail, int len, int key) {
+        int low = 0;
+        int high = len - 1;
+        while (low <= high){
+            int mid = (low + high) / 2;
+            if (tail[mid] == key){
+                return mid;
+            }else if (tail[mid] > key){
+                high = mid - 1;
+            }else {
+                low = mid + 1;
+            }
+        }
+        return low;
+    }
+}
+```
+
+### 1.7.6 背包问题
+
+#### 1.7.6.1 0-1背包
+
+> **问题描述**
+
+有编号分别为a,b,c,d的四件物品，它们的重量分别是2，3，4，5，它们的价值分别是3，4，5，6，每件物品数量只有一个，现在给你个承重为8的背包，如何让背包里装入的物品具有最大的价值总和？
+
+|         | 1    | 2    | 3    | 4    |
+| :------ | :--- | :--- | :--- | :--- |
+| w(体积) | 2    | 3    | 4    | 5    |
+| v(价值) | 3    | 4    | 5    | 6    |
+
+> **代码**
+
+```java
+package com.packageproblem;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-16 10:31
+ * @Feature: 0-1背包
+ */
+public class Test1 {
+
+    public static void main(String[] args) {
+        int[] w = new int[]{2,3,4,5};
+        int[] v = new int[]{3,4,5,6};
+        int capacity = 8;
+        int result = 0;
+        result = solve(w,v,capacity);
+        System.out.println(result);
+    }
+
+    private static int solve(int[] w, int[] v, int capacity) {
+        int row = w.length + 1;
+        int col = capacity + 1;
+        int[][] dp = new int[row][col];
+        for (int i = 1; i < row; i++) {
+            for (int j = 1; j < col; j++) {
+                if (j < w[i - 1]){
+                    dp[i][j] = dp[i - 1][j];
+                }else {
+                    dp[i][j] = Math.max(dp[i - 1][j - w[i - 1]] + v[i - 1],dp[i - 1][j]);
+                }
+            }
+        }
+        return dp[row - 1][col - 1];
+    }
+}
+```
+
+> **回溯法求解**
+
+最优解保存在`dp[row-1][col-1]`中，解决方式：
+
+1) dp(i,j)=dp(i-1,j)时，说明没有选择第i 个商品，则回到dp(i-1,j)；
+
+2) dp(i,j)=dp(i-1,j-w(i - 1))+v(i - 1)时，说明装了第i个商品，该商品是最优解组成的一部分，随后我们得回到装该商品之前，即回到V(i-1,j-w(i - 1))；
+
+3) 一直遍历到i＝1结束为止，所有解的组成都会找到。
+
+**goods用来保存物品的选择结果**
+
+```java
+private static void find(int[][] dp, int[] w, int[] v,int[] goods, int i, int j) {
+    if (i >= 1){
+        if (j - w[i - 1] >= 0 && dp[i][j] == dp[i - 1][j - w[i - 1]] + v[i - 1]){
+            goods[i - 1] = 1;
+            find(dp, w, v, goods, i - 1, j - w[i - 1]);
+        }else if (dp[i][j] == dp[i - 1][j]){
+            goods[i - 1] = 0;
+            find(dp, w, v, goods, i - 1, j);
+        }
+    }
+
+}
+```
+
+> **空间优化**
+
+**计算当前容量对应的价值时，需要上一行的状态，因此从后向前计算就可解决这一问题，如果从前往后计算的话，那么上一行的状态就被覆盖了。**
+
+```java
+private static int solve2(int[] w, int[] v, int capacity) {
+    int length = capacity + 1;
+    int[] dp = new int[length];
+    for (int i = 0; i < w.length; i++) {
+        for (int j = capacity; j >= 1; j--) {
+            if (j - w[i] >= 0) {
+                dp[j] = Math.max(dp[j], dp[j - w[i]] + v[i]);
+            }
+        }
+    }
+    return dp[capacity];
+}
+```
+
+#### 1.7.6.2 完全背包
+
+> **问题描述**
+
+有编号分别为a,b,c,d的四件物品，它们的重量分别是2,3,4,7，它们的价值分别是1,3,5,9，每件物品数量无限个，现在给你个承重为10的背包，如何让背包里装入的物品具有最大的价值总和？
+
+|             | 1    | 2    | 3    | 4    |
+| ----------- | ---- | ---- | ---- | ---- |
+| **w(体积)** | 2    | 3    | 4    | 7    |
+| **v(价值)** | 1    | 3    | 5    | 9    |
+
+> **代码**
+
+```java
+package com.packageproblem;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-16 11:34
+ * @Feature: 多重背包
+ */
+public class Test2 {
+
+    public static void main(String[] args) {
+        int[] w = new int[]{2,3,4,7};
+        int[] v = new int[]{1,3,5,9};
+        int capacity = 10;
+        int result = 0;
+        result = solve(w,v,capacity);
+        System.out.println(result);
+    }
+
+    private static int solve(int[] w, int[] v, int capacity) {
+        int row = w.length + 1;
+        int col = capacity + 1;
+        int[][] dp = new int[row][col];
+        for (int i = 1; i < row; i++) {
+            for (int j = 1; j < col; j++) {
+                if (j < w[i - 1]){
+                    dp[i][j] = dp[i - 1][j];
+                }else {
+                    dp[i][j] = Math.max(dp[i][j - w[i - 1]] + v[i - 1],dp[i - 1][j]);
+                }
+            }
+        }
+        return dp[row - 1][col - 1];
+    }
+}
+```
+
+> **回溯法求解**
+
+最优解保存在result[row-1][col-1]中，解决方式：
+
+1)当`dp[i][j] == dp[i - 1][j]`，说明没有选择第i-1个物品
+
+2)当`dp[i][j] == dp[i][j - w[i - 1]] + v[i - 1]`，说明选择了第i个物品，上一个状态在(i, j - w[i - 1])处
+
+3) 一直遍历到i＝1结束为止，所有解的组成都会找到。
+
+```java
+private static void find(int[][] dp, int[] w, int[] v,int[] goods, int i, int j) {
+    if (i >= 1){
+        if (j - w[i - 1] >= 0 && dp[i][j] == dp[i][j - w[i - 1]] + v[i - 1]){
+            goods[i] = 1;
+            find(dp, w, v, goods, i, j - w[i - 1]);
+        }else if (dp[i][j] == dp[i - 1][j]){
+            goods[i - 1] = 0;
+            find(dp, w, v, goods, i - 1, j);
+        }
+    }
+}
+```
+
+> **空间优化**
+
+```java
+private static int solve2(int[] w, int[] v, int capacity) {
+    //优化
+    int length = capacity + 1;
+    int[] result = new int[length];
+ 
+    for (int i = 1; i < length; i++) {
+        for (int j = 0; j < w.length; j++){
+            if (i >= w[j]){
+                result[i] = Math.max(result[i],result[i - w[j]] + v[j]);
+            }
+        }
+    }
+ 
+    return result[length-1];
+}
+```
+#### 1.7.6.3 多重背包
+
+> **问题描述**
+
+有编号分别为a,b,c的三件物品，它们的重量分别是1，2，2，它们的价值分别是6，10，20，他们的数目分别是10，5，2，现在给你个承重为 8 的背包，如何让背包里装入的物品具有最大的价值总和？
+
+|               | 1     | 2      | 3      |
+| :------------ | :---- | :----- | :----- |
+| **w(重量)**   | 1     | 2      | 3      |
+| **v(价值)**   | **6** | **10** | **20** |
+| **num(数量)** | 10    | 5      | 2      |
+
+> **代码**
+
+```java
+package com.packageproblem;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-17 10:16
+ * @Feature:
+ */
+public class Test3 {
+
+    public static void main(String[] args) {
+        int[] w = new int[]{1,2,3};
+        int[] v = new int[]{6,10,20};
+        int[] num = new int[]{10,5,2};
+        int capacity = 8;
+        int result = 0;
+        result = solve(w,v,num,capacity);
+        System.out.println(result);
+    }
+
+    private static int solve(int[] w, int[] v, int[] num, int capacity) {
+        int row = w.length + 1;
+        int col = capacity + 1;
+        int[][] dp = new int[row][col];
+        for (int i = 1; i < row; i++) {
+            for (int j = 1; j < col; j++) {
+                if (j < w[i - 1]){
+                    dp[i][j] = dp[i - 1][j];
+                }else {
+                    int count = Math.min(num[i - 1],j / w[i - 1]);
+                    dp[i][j] = Math.max(dp[i - 1][j - count * w[i - 1]] + count * v[i - 1],dp[i - 1][j]);
+                }
+            }
+        }
+        return dp[row - 1][col - 1];
+    }
+
+}
+```
+
+#### 1.7.6.4 分割等和子集
+
+[416. Partition Equal Subset Sum](https://leetcode.com/problems/partition-equal-subset-sum/)
+
+> Given a **non-empty** array containing **only positive integers**, find if the array can be partitioned into two subsets such that the sum of elements in both subsets is equal.
+>
+> **Note:**
+>
+> 1. Each of the array element will not exceed 100.
+> 2. The array size will not exceed 200.
+>
+>  
+>
+> **Example 1:**
+>
+> ```
+> Input: [1, 5, 11, 5]
+> 
+> Output: true
+> 
+> Explanation: The array can be partitioned as [1, 5, 5] and [11].
+> ```
+>
+>  
+>
+> **Example 2:**
+>
+> ```
+> Input: [1, 2, 3, 5]
+> 
+> Output: false
+> 
+> Explanation: The array cannot be partitioned into equal sum subsets.
+> ```
+
+可以看成一个背包大小为 sum/2 的 0-1 背包问题。然后物品的价值与物品重量相同，最后判断最大价值与sum/2是否相等。
+
+```java
+package com.problem416;
+
+class Solution {
+
+    public static boolean canPartition(int[] nums) {
+        int sum = 0;
+        for (int i : nums){
+            sum += i;
+        }
+        int capacity = 0;
+        if (sum % 2 == 0){
+            capacity = sum / 2;
+            int row = nums.length + 1;
+            int col = capacity + 1;
+            int[][] dp = new int[row][col];
+            
+            for (int i = 1; i < row; i++) {
+                for (int j = 1; j < col; j++) {
+                    if (j >= nums[i - 1]) {
+                        dp[i][j] = Math.max(dp[i - 1][j - nums[i - 1]] + nums[i - 1],dp[i - 1][j]);
+                    } else {
+                        dp[i][j] = dp[i - 1][j];
+                    }
+                }
+            }
+            
+            return dp[row - 1][col - 1] == capacity;
+        }else {
+            return false;
+        }
+    }
+}
+```
+
+空间优化：
+
+```java
+public static boolean canPartition2(int[] nums) {
+    int sum = 0;
+    for (int i : nums){
+        sum += i;
+    }
+    int capacity = 0;
+    if (sum % 2 == 0){
+        capacity = sum / 2;
+        int row = nums.length;
+        int col = capacity + 1;
+        int[] dp = new int[col];
+        for (int i = 0; i < row; i++) {
+            for (int j = col - 1; j >= 1; j--) {
+                if (j >= nums[i]) {
+                    dp[j] = Math.max(dp[j],dp[j - nums[i]] + nums[i]);
+                }
+                if (i == row - 1){
+                    break;
+                }
+            }
+        }
+        return dp[capacity] == capacity;
+    }else {
+        return false;
+    }
+```
+
+#### *1.7.6.5 目标和
+
+[494. Target Sum](https://leetcode.com/problems/target-sum/)
+
+> You are given a list of non-negative integers, a1, a2, ..., an, and a target, S. Now you have 2 symbols `+` and `-`. For each integer, you should choose one from `+` and `-` as its new symbol.
+>
+> Find out how many ways to assign symbols to make sum of integers equal to target S.
+>
+> **Example 1:**
+>
+> ```
+> Input: nums is [1, 1, 1, 1, 1], S is 3. 
+> Output: 5
+> Explanation: 
+> 
+> -1+1+1+1+1 = 3
+> +1-1+1+1+1 = 3
+> +1+1-1+1+1 = 3
+> +1+1+1-1+1 = 3
+> +1+1+1+1-1 = 3
+> 
+> There are 5 ways to assign symbols to make the sum of nums be target 3.
+> ```
+>
+> 
+>
+> **Note:**
+>
+> 1. The length of the given array is positive and will not exceed 20.
+> 2. The sum of elements in the given array will not exceed 1000.
+> 3. Your output answer is guaranteed to be fitted in a 32-bit integer.
+
+该问题可以转换为 Subset Sum 问题，从而使用 0-1 背包的方法来求解。
+
+可以将这组数看成两部分，P 和 N，其中 P 使用正号，N 使用负号，有以下推导：
+
+```html
+sum(P) - sum(N) = target
+sum(P) + sum(N) + sum(P) - sum(N) = target + sum(P) + sum(N)
+2 * sum(P) = target + sum(nums)
+sum(P) = （target + sum(nums)）/ 2
+```
+
+0-1背包：
+
+用第i个数字：`dp[i - 1][j - nums[i - 1]]`
+
+不用第i个数字：`dp[i - 1][j]`
+
+组合数=用第i个数字 + 不用第i个数字
+
+
+```java
+package com.problem494;
+
+class Solution {
+
+    public int findTargetSumWays(int[] nums, int S) {
+        int sum = 0;
+        for (int i : nums){
+            sum += i;
+        }
+        if (sum < S || (S + sum) % 2 != 0){
+            return 0;
+        }
+        int capacity = (S + sum) / 2;
+        int col = capacity + 1;
+        int row = nums.length + 1;
+        int[][] dp = new int[row][col];
+        for (int i = 0; i < row; i++) {
+            dp[i][0] = 1;
+        }
+        for (int i = 1; i < row; i++) {
+            for (int j = 0; j < col; j++) {
+                if (j < nums[i - 1]){
+                    dp[i][j] = dp[i - 1][j];
+                }else {
+                    dp[i][j] = dp[i - 1][j] + dp[i - 1][j - nums[i - 1]];
+                }
+            }
+        }
+
+        return dp[nums.length][capacity];
+    }
+
+    public int findTargetSumWays2(int[] nums, int S) {
+        int sum = 0;
+        for (int i : nums){
+            sum += i;
+        }
+        if (sum < S || (S + sum) % 2 != 0){
+            return 0;
+        }
+        int capacity = (S + sum) / 2;
+        int col = capacity + 1;
+        int[] dp = new int[col];
+        dp[0] = 1;
+        for (int i : nums){
+            for (int j = col - 1; j >= i; j--) {
+                dp[j] = dp[j] + dp[j - i];
+            }
+        }
+        return dp[capacity];
+    }
+}
+```
+
+DFS解法：
+
+```java
+package com.problem494;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-18 09:36
+ * @Feature:
+ */
+public class Solution2 {
+
+    public int findTargetSumWays(int[] nums, int S) {
+        return find(nums, S, 0);
+    }
+
+    private int find(int[] nums, int s, int start) {
+        if (start == nums.length){
+            return s == 0 ? 1 : 0;
+        }
+        return find(nums, s + nums[start], start + 1) + find(nums, s - nums[start], start + 1);
+    }
+}
+```
+
+#### *1.7.6.6 一和零
+
+[474. Ones and Zeroes](https://leetcode.com/problems/ones-and-zeroes/)
+
+> In the computer world, use restricted resource you have to generate maximum benefit is what we always want to pursue.
+>
+> For now, suppose you are a dominator of **m** `0s` and **n** `1s` respectively. On the other hand, there is an array with strings consisting of only `0s` and `1s`.
+>
+> Now your task is to find the maximum number of strings that you can form with given **m** `0s` and **n** `1s`. Each `0` and `1`can be used at most **once**.
+>
+> **Note:**
+>
+> 1. The given numbers of `0s` and `1s` will both not exceed `100`
+> 2. The size of given string array won't exceed `600`.
+>
+>  
+>
+> **Example 1:**
+>
+> ```
+> Input: Array = {"10", "0001", "111001", "1", "0"}, m = 5, n = 3
+> Output: 4
+> 
+> Explanation: This are totally 4 strings can be formed by the using of 5 0s and 3 1s, which are “10,”0001”,”1”,”0”
+> ```
+>
+>  
+>
+> **Example 2:**
+>
+> ```
+> Input: Array = {"10", "0", "1"}, m = 1, n = 1
+> Output: 2
+> 
+> Explanation: You could form "10", but then you'd have nothing left. Better form "0" and "1".
+> ```
+
+相当于两个0-1背包，背包的**容量**分别为m和n，放入的物品的**重量**就是每个字符串0和1的个数
+
+```java
+package com.problem474;
+
+class Solution {
+    public int findMaxForm(String[] strs, int m, int n) {
+        if (strs.length == 0){
+            return 0;
+        }
+        int[][] dp = new int[m + 1][n + 1];
+        for (String s :strs){
+            int a = 0, b = 0;
+            for (char c : s.toCharArray()){
+                if (c == '0'){
+                    a ++;
+                }else {
+                    b ++;
+                }
+            }
+            for (int i = m; i >= a; i--) {
+                for (int j = n; j >= b; j--) {
+                    dp[i][j] = Math.max(dp[i][j],dp[i - a][j - b] + 1);
+                }
+            }
+        }
+        return dp[m][n];
+    }
+}
+```
+
+#### 1.7.6.7 零钱兑换
+
+[322. Coin Change](https://leetcode.com/problems/coin-change/)
+
+> You are given coins of different denominations and a total amount of money *amount*. Write a function to compute the fewest number of coins that you need to make up that amount. If that amount of money cannot be made up by any combination of the coins, return `-1`.
+>
+> **Example 1:**
+>
+> ```
+> Input: coins = [1, 2, 5], amount = 11
+> Output: 3 
+> Explanation: 11 = 5 + 5 + 1
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: coins = [2], amount = 3
+> Output: -1
+> ```
+>
+> **Note**:
+> You may assume that you have an infinite number of each kind of coin.
+
+转换为完全背包问题
+
+物品：硬币
+
+物品大小：硬币金额
+
+物品价值：硬币数量
+
+因为最后求的最小值，所以对dp数组的第一行初始化为col，最后通过判断`dp[row - 1][col - 1]`与col是否相等判断是否能兑换成功。
+
+```java
+package com.problem322;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-18 11:38
+ * @Feature:
+ */
+public class Solution {
+    
+    public int coinChange(int[] coins, int amount) {
+        int row = coins.length + 1;
+        int col = amount + 1;
+        int[][] dp = new int[row][col];
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; j++) {
+                if (j == 0){
+                    dp[i][j] = 0;
+                }else if (i == 0){
+                    dp[i][j] = col;
+                }else if (j < coins[i - 1]){
+                    dp[i][j] = dp[i - 1][j];
+                }else {
+                    dp[i][j] = Math.min(dp[i - 1][j],dp[i][j - coins[i - 1]] + 1);
+                }
+            }
+        }
+        return dp[row - 1][col - 1] == col ? -1 : dp[row - 1][col - 1];
+    }
+}
+```
+
+#### 1.7.6.8 零钱兑换Ⅱ
+
+[518. Coin Change 2](https://leetcode.com/problems/coin-change-2/)
+
+> You are given coins of different denominations and a total amount of money. Write a function to compute the number of combinations that make up that amount. You may assume that you have infinite number of each kind of coin.
+>
+> **Example 1:**
+>
+>  ```
+>Input: amount = 5, coins = [1, 2, 5]
+> Output: 4
+>Explanation: there are four ways to make up the amount:
+> 5=5
+> 5=2+2+1
+> 5=2+1+1+1
+> 5=1+1+1+1+1
+> ```
+> 
+> **Example 2:**
+> 
+> ```
+>Input: amount = 3, coins = [2]
+> Output: 0
+>Explanation: the amount of 3 cannot be made up just with coins of 2.
+> ```
+> 
+> **Example 3:**
+> 
+> ```
+>Input: amount = 10, coins = [10] 
+> Output: 1
+>```
+
+完全背包：
+
+用第i个硬币：`dp[i][j - coins[i - 1]]`
+
+不用第i个硬币：`dp[i - 1][j]`
+
+截止当前金额的组合数量=用第i个硬币 + 不用第i个硬币
+
+```java
+package com.problem518;
+
+
+class Solution {
+
+    public int change(int amount, int[] coins) {
+        int row = coins.length + 1;
+        int col = amount + 1;
+        int[][] dp = new int[row][col];
+
+        for (int i = 1; i < row; i++) {
+            dp[i][0] = 1;
+        }
+        for (int i = 1; i < row; i++) {
+            for (int j = 1; j < col; j++) {
+                if (j < coins[i - 1]){
+                    dp[i][j] = dp[i - 1][j];
+                }else {
+                    dp[i][j] = dp[i - 1][j] + dp[i][j - coins[i - 1]];
+                }
+            }
+        }
+        return dp[row - 1][col - 1];
+    }
+
+    public int change2(int amount, int[] coins) {
+
+        int row = coins.length + 1;
+        int col = amount + 1;
+        int[] dp = new int[col];
+        dp[0] = 1;
+
+        for (int i = 1; i < row; i++) {
+            for (int j = coins[i - 1]; j < col; j++) {
+                dp[j] += dp[j - coins[i - 1]];
+            }
+        }
+        return dp[amount];
+    }
+}
+```
+
+#### 1.7.6.9 单词拆分
+
+[139. Word Break](https://leetcode.com/problems/word-break/)
+
+> Given a **non-empty** string *s* and a dictionary *wordDict* containing a list of **non-empty** words, determine if *s* can be segmented into a space-separated sequence of one or more dictionary words.
+>
+> **Note:**
+>
+> - The same word in the dictionary may be reused multiple times in the segmentation.
+> - You may assume the dictionary does not contain duplicate words.
+>
+> **Example 1:**
+>
+> ```
+> Input: s = "leetcode", wordDict = ["leet", "code"]
+> Output: true
+> Explanation: Return true because "leetcode" can be segmented as "leet code".
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: s = "applepenapple", wordDict = ["apple", "pen"]
+> Output: true
+> Explanation: Return true because "applepenapple" can be segmented as "apple pen apple".
+>              Note that you are allowed to reuse a dictionary word.
+> ```
+>
+> **Example 3:**
+>
+> ```
+> Input: s = "catsandog", wordDict = ["cats", "dog", "sand", "and", "cat"]
+> Output: false
+> ```
+
+```java
+package com.problem139;
+
+import java.util.List;
+
+class Solution {
+
+    public boolean wordBreak(String s, List<String> wordDict) {
+        int n = s.length() + 1;
+        boolean[] tag = new boolean[n];
+        tag[0] = true;
+        for (int i = 1; i < n; i++) {
+            for (String temp : wordDict){
+                int len = temp.length();
+                if (len <= i && temp.equals(s.substring(i - temp.length(), i))){
+                    tag[i] = tag[i] || tag[i - len];
+                }
+            }
+        }
+        return tag[s.length()];
+    }
+}
+```
+
+#### 1.7.6.10 单词拆分Ⅱ
+
+[140. Word Break II](https://leetcode.com/problems/word-break-ii/)
+
+> Given a **non-empty** string *s* and a dictionary *wordDict* containing a list of **non-empty** words, add spaces in *s* to construct a sentence where each word is a valid dictionary word. Return all such possible sentences.
+>
+> **Note:**
+>
+> - The same word in the dictionary may be reused multiple times in the segmentation.
+> - You may assume the dictionary does not contain duplicate words.
+>
+> **Example 1:**
+>
+> ```
+> Input:
+> s = "catsanddog"
+> wordDict = ["cat", "cats", "and", "sand", "dog"]
+> Output:
+> [
+>   "cats and dog",
+>   "cat sand dog"
+> ]
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input:
+> s = "pineapplepenapple"
+> wordDict = ["apple", "pen", "applepen", "pine", "pineapple"]
+> Output:
+> [
+>   "pine apple pen apple",
+>   "pineapple pen apple",
+>   "pine applepen apple"
+> ]
+> Explanation: Note that you are allowed to reuse a dictionary word.
+> ```
+>
+> **Example 3:**
+>
+> ```
+> Input:
+> s = "catsandog"
+> wordDict = ["cats", "dog", "sand", "and", "cat"]
+> Output:
+> []
+> ```
+
+回溯法（超时）
+
+```java
+package com.problem140;
+
+import java.util.ArrayList;
+import java.util.List;
+
+class Solution {
+    public List<String> wordBreak(String s, List<String> wordDict) {
+        List<String> result = new ArrayList<>();
+        solve(s,wordDict,result,new StringBuilder());
+        return result;
+    }
+
+    private void solve(String s, List<String> wordDict, List<String> result, StringBuilder stringBuilder) {
+        if (s.length() == 0){
+            result.add(stringBuilder.toString().trim());
+        }
+        for (int i = 0; i < s.length(); i++) {
+            if (wordDict.contains(s.substring(0, i + 1))){
+                int len = s.substring(0, i + 1).length();
+                stringBuilder.append(" ").append(s, 0, i + 1);
+                solve(s.substring(i + 1), wordDict, result, stringBuilder);
+                stringBuilder.delete(stringBuilder.length() - len - 1, stringBuilder.length());
+            }
+        }
+    }
+}
+```
+
+#### 1.7.6.11 完全平方数
 
 [279. Perfect Squares](https://leetcode.com/problems/perfect-squares/)
 
@@ -3604,7 +5135,7 @@ class Solution {
 > Explanation: 13 = 4 + 9.
 > ```
 
-思路：将小于n的所有完全平方数找出来，然后转换成背包问题
+思路：将小于n的所有完全平方数找出来，然后转换成完全背包问题
 
 ```java
 package com.problem279;
@@ -3619,18 +5150,19 @@ class Solution {
             return n;
         }
         List<Integer> squareList = generateSquareList(n);
-        int[] result = new int[n + 1];
+        int[] dp = new int[n + 1];
         for (int i = 1; i <= n; i++) {
-            int min = Integer.MAX_VALUE;
-            for (int num : squareList){
-                if (i < num){
-                    break;
+            for (int num : list){
+                if (num <= i){
+                    if (dp[i] == 0){
+                        dp[i] = dp[i - num] +  1;
+                    }else {
+                        dp[i] = Math.min(dp[i], dp[i - num] + 1);
+                    }
                 }
-                min = Math.min(min, result[i - num] + 1);
             }
-            result[i] = min;
         }
-        return result[n];
+        return dp[n];
     }
 
     private List<Integer> generateSquareList(int n) {
@@ -3647,13 +5179,2723 @@ class Solution {
 }
 ```
 
+#### 1.7.6.12 最长回文子串
+
+[5. Longest Palindromic Substring](https://leetcode.com/problems/longest-palindromic-substring/)
+
+> Given a string **s**, find the longest palindromic substring in **s**. You may assume that the maximum length of **s** is 1000.
+>
+> **Example 1:**
+>
+> ```
+> Input: "babad"
+> Output: "bab"
+> Note: "aba" is also a valid answer.
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: "cbbd"
+> Output: "bb"
+> ```
+
+```java
+package com.problem5;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-20 10:30
+ * @Feature:
+ */
+public class Solution2 {
+
+    public String longestPalindrome(String s) {
+        int len = s.length();
+        if (len == 0){
+            return s;
+        }
+        boolean[][] dp = new boolean[len][len];
+        int start = 0,maxLen = 0;
+        for (int i = 0; i < len; i++) {
+            dp[i][i] = true;
+            if (i < len - 1 && s.charAt(i) == s.charAt(i + 1)){
+                dp[i][i + 1] = true;
+                start = i;
+                maxLen = 2;
+            }
+        }
+        for (int i = 3; i <= len; i++) {
+            for (int j = 0; j <= len - i; j++) {
+                int end = j + i - 1;
+                if (dp[j + 1][end - 1] && s.charAt(j) == s.charAt(end)){
+                    dp[j][end] = true;
+                    start = j;
+                    maxLen = i;
+                }
+            }
+        }
+        if (start == 0 && maxLen == 0){
+            return s.charAt(s.length() - 1) + "";
+        }else {
+            return s.substring(start, start + maxLen);
+        }
+    }
+
+}
+```
+
+### 1.7.7 股票交易
+
+
+
 ## 1.8 数学
 
 # 二、数据结构
 
 ## 2.1 链表
 
+### 2.1.1 相交链表
+
+[160. Intersection of Two Linked Lists](https://leetcode.com/problems/intersection-of-two-linked-lists/)
+
+> Write a program to find the node at which the intersection of two singly linked lists begins.
+>
+> For example, the following two linked lists:
+>
+> ![img](https://assets.leetcode.com/uploads/2018/12/13/160_statement.png)
+>
+> 
+>
+> begin to intersect at node c1.
+>
+>  
+>
+> **Example 1:**
+>
+> ![img](https://assets.leetcode.com/uploads/2018/12/13/160_example_1.png)
+>
+> 
+>
+> ```
+> Input: intersectVal = 8, listA = [4,1,8,4,5], listB = [5,0,1,8,4,5], skipA = 2, skipB = 3
+> Output: Reference of the node with value = 8
+> Input Explanation: The intersected node's value is 8 (note that this must not be 0 if the two lists intersect). From the head of A, it reads as [4,1,8,4,5]. From the head of B, it reads as [5,0,1,8,4,5]. There are 2 nodes before the intersected node in A; There are 3 nodes before the intersected node in B.
+> ```
+>
+>  
+>
+> **Example 2:**
+>
+> ![img](https://assets.leetcode.com/uploads/2018/12/13/160_example_2.png)
+>
+> 
+>
+> ```
+> Input: intersectVal = 2, listA = [0,9,1,2,4], listB = [3,2,4], skipA = 3, skipB = 1
+> Output: Reference of the node with value = 2
+> Input Explanation: The intersected node's value is 2 (note that this must not be 0 if the two lists intersect). From the head of A, it reads as [0,9,1,2,4]. From the head of B, it reads as [3,2,4]. There are 3 nodes before the intersected node in A; There are 1 node before the intersected node in B.
+> ```
+>
+>  
+>
+> **Example 3:**
+>
+> ![img](https://assets.leetcode.com/uploads/2018/12/13/160_example_3.png)
+>
+> 
+>
+> ```
+> Input: intersectVal = 0, listA = [2,6,4], listB = [1,5], skipA = 3, skipB = 2
+> Output: null
+> Input Explanation: From the head of A, it reads as [2,6,4]. From the head of B, it reads as [1,5]. Since the two lists do not intersect, intersectVal must be 0, while skipA and skipB can be arbitrary values.
+> Explanation: The two lists do not intersect, so return null.
+> ```
+>
+>  
+>
+> **Notes:**
+>
+> - If the two linked lists have no intersection at all, return `null`.
+> - The linked lists must retain their original structure after the function returns.
+> - You may assume there are no cycles anywhere in the entire linked structure.
+> - Your code should preferably run in O(n) time and use only O(1) memory.
+
+```java
+public class Solution {
+    public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+        ListNode p1 = headA;
+        ListNode p2 = headB;
+        while (p1 != p2){
+            p1 = p1 == null ? headB : p1.next;
+            p2 = p2 == null ? headA : p2.next;
+        }
+        return p1;
+    }
+}
+```
+
+### *2.1.2 反转链表
+
+[206. Reverse Linked List](https://leetcode.com/problems/reverse-linked-list/)
+
+> Reverse a singly linked list.
+>
+> **Example:**
+>
+> ```
+> Input: 1->2->3->4->5->NULL
+> Output: 5->4->3->2->1->NULL
+> ```
+>
+> **Follow up:**
+>
+> A linked list can be reversed either iteratively or recursively. Could you implement both?
+
+非递归：头插法
+
+```java
+public class Solution {
+
+    public ListNode reverseList(ListNode head) {
+        ListNode newHead = new ListNode(0);
+        newHead.next = null;
+        ListNode temp;
+        while (head != null){
+            temp = head.next;
+            head.next = newHead.next;
+            newHead.next = head;
+            head = temp;
+        }
+        return newHead.next;
+    }
+}
+```
+
+递归
+
+```java
+class Solution {
+    public ListNode reverseList(ListNode head) {
+        if (head == null || head.next == null){
+            return head;
+        }
+        ListNode root = reverseList(head.next);
+        head.next.next = head;
+        head.next = null;
+        return root;
+    }
+}
+```
+
+### 2.1.3 合并两个有序链表
+
+[21. Merge Two Sorted Lists](https://leetcode.com/problems/merge-two-sorted-lists/)
+
+> Merge two sorted linked lists and return it as a new list. The new list should be made by splicing together the nodes of the first two lists.
+>
+> **Example:**
+>
+> ```
+> Input: 1->2->4, 1->3->4
+> Output: 1->1->2->3->4->4
+> ```
+
+```java
+package com.problem21;
+
+import com.ListNode;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-20 11:47
+ * @Feature:
+ */
+public class Solution {
+
+    public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+        if (l1 == null){
+            return l2;
+        }
+        if (l2 == null){
+            return l1;
+        }
+        ListNode root;
+        if (l1.val < l2.val){
+            root = l1;
+            root.next = mergeTwoLists(l1.next, l2);
+        }else {
+            root = l2;
+            root.next = mergeTwoLists(l1,l2.next);
+        }
+        return root;
+    }
+}
+```
+
+### 2.1.4 合并K个排序列表
+
+[23. Merge k Sorted Lists](https://leetcode.com/problems/merge-k-sorted-lists/)
+
+> Merge *k* sorted linked lists and return it as one sorted list. Analyze and describe its complexity.
+>
+> **Example:**
+>
+> ```
+> Input:
+> [
+>   1->4->5,
+>   1->3->4,
+>   2->6
+> ]
+> Output: 1->1->2->3->4->4->5->6
+> ```
+
+思路一：堆排序，把每个链表的头节点入堆，构成一个小顶堆，然后将堆顶元素输出，将堆顶元素所在链表的下一个节点入堆。
+
+```java
+package com.problem23;
+
+import com.ListNode;
+
+import java.util.Comparator;
+import java.util.PriorityQueue;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-23 10:01
+ * @Feature:
+ */
+public class Solution2 {
+
+    public ListNode mergeKLists(ListNode[] lists) {
+        PriorityQueue<ListNode> heap = new PriorityQueue<>((Comparator.comparingInt(o -> o.val)));
+        if (lists.length == 0){
+            return null;
+        }
+        for (ListNode head : lists){
+            if (head != null) {
+                heap.add(head);
+            }
+        }
+        ListNode newHead = new ListNode(0);
+        ListNode p = newHead;
+        ListNode temp;
+        while (!heap.isEmpty()){
+            temp = heap.poll();
+            p.next = temp;
+            if (temp.next != null){
+                heap.add(temp.next);
+            }
+            p = p.next;
+        }
+        return newHead.next;
+    }
+
+}
+```
+
+思路二：采用归并排序的思路，先分割，然后两两合并。
+
+```java
+package com.problem23;
+
+import com.ListNode;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-23 10:21
+ * @Feature:
+ */
+public class Solution2 {
+
+    public ListNode mergeKLists(ListNode[] lists) {
+        if (lists.length == 0){
+            return null;
+        }
+        return sort(lists,0,lists.length - 1);
+    }
+
+    private ListNode sort(ListNode[] lists, int start, int end) {
+        if (start == end){
+            return lists[start];
+        }
+        int mid = (start + end) / 2;
+        ListNode left = sort(lists, start, mid);
+        ListNode right = sort(lists, mid + 1, end);
+        return merge(left,right);
+    }
+
+    private ListNode merge(ListNode l1, ListNode l2) {
+        if (l1 == null){
+            return l2;
+        }
+        if (l2 == null){
+            return l1;
+        }
+        ListNode root;
+        if (l1.val < l2.val){
+            root = l1;
+            root.next = merge(l1.next, l2);
+        }else {
+            root = l2;
+            root.next = merge(l1, l2.next);
+        }
+        return root;
+    }
+}
+```
+
+### 2.1.5 删除排序列表中的重复元素
+
+[83. Remove Duplicates from Sorted List](https://leetcode.com/problems/remove-duplicates-from-sorted-list/)
+
+> Given a sorted linked list, delete all duplicates such that each element appear only *once*.
+>
+> **Example 1:**
+>
+> ```
+> Input: 1->1->2
+> Output: 1->2
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: 1->1->2->3->3
+> Output: 1->2->3
+> ```
+
+```java
+package com.problem83;
+
+import com.ListNode;
+
+class Solution {
+
+    public ListNode deleteDuplicates(ListNode head) {
+        if (head == null || head.next == null){
+            return head;
+        }
+        ListNode p = head;
+        while (p != null){
+            if (p.next != null && p.val == p.next.val){
+                p.next = p.next.next;
+            }else {
+                p = p.next;
+            }
+        }
+        return head;
+    }
+}
+```
+
+```java
+public ListNode deleteDuplicates(ListNode head) {
+    if (head == null || head.next == null){
+        return head;
+    }
+    ListNode p1 = head;
+    ListNode p2 = head.next;
+    while (p2 != null){
+        if (p1.val == p2.val){
+            p1.next = p2.next;
+        }else {
+            p1 = p1.next;
+        }
+        p2 = p2.next;
+    }
+    return head;
+}
+```
+
+### 2.1.6 删除排序列表中的重复元素Ⅱ
+
+[82. Remove Duplicates from Sorted List II](https://leetcode.com/problems/remove-duplicates-from-sorted-list-ii/)
+
+> Given a sorted linked list, delete all nodes that have duplicate numbers, leaving only *distinct* numbers from the original list.
+>
+> **Example 1:**
+>
+> ```
+> Input: 1->2->3->3->4->4->5
+> Output: 1->2->5
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: 1->1->1->2->3
+> Output: 2->3
+> ```
+
+```java
+package com.problem82;
+
+import com.ListNode;
+
+class Solution {
+    public ListNode deleteDuplicates(ListNode head) {
+        if (head == null || head.next == null){
+            return head;
+        }
+        ListNode node = new ListNode(0);
+        node.next = head;
+        ListNode pre = node;
+        ListNode p1 = head;
+        ListNode p2 = head.next;
+        ListNode temp;
+        while (p1 != null && p2 != null){
+            if (p1.val == p2.val){
+                temp = p2.next;
+                while (temp != null && temp.val == p1.val){
+                    temp = temp.next;
+                }
+                pre.next = temp;
+                p1 = temp;
+                if (temp != null) {
+                    p2 = temp.next;
+                }
+            }else {
+                pre = pre.next;
+                p1= p1.next;
+                p2 = p2.next;
+            }
+        }
+        return node.next;
+    }
+}
+```
+
+### 2.1.7 删除链表的倒数第N个节点
+
+[19. Remove Nth Node From End of List](https://leetcode.com/problems/remove-nth-node-from-end-of-list/)
+
+> iven a linked list, remove the *n*-th node from the end of list and return its head.
+>
+> **Example:**
+>
+> ```
+> Given linked list: 1->2->3->4->5, and n = 2.
+> 
+> After removing the second node from the end, the linked list becomes 1->2->3->5.
+> ```
+>
+> **Note:**
+>
+> Given *n* will always be valid.
+>
+> **Follow up:**
+>
+> Could you do this in one pass?
+
+思路：快慢指针，找到倒数第n+1个节点，然后直接删除倒数第n个节点
+
+注意：当链表中只有一个节点的时候，那么就找不到第n + 1个节点了，所以直接返回`head.next`。
+
+```java
+package com.problem19;
+
+import com.ListNode;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-22 16:22
+ * @Feature:
+ */
+public class Solution {
+
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+        ListNode slow = head;
+        ListNode fast = head;
+        int count = 0;
+        while (fast != null){
+            if (count < n + 1){
+                count++;
+                fast = fast.next;
+            }else {
+                fast = fast.next;
+                slow = slow.next;
+            }
+        }
+        if (count == n + 1){
+            slow.next = slow.next.next;
+            return head;
+        }else {
+            return head.next;
+        }
+    }
+}
+```
+
+### *2.1.8 两两交换链表中的节点
+
+[24. Swap Nodes in Pairs](https://leetcode.com/problems/swap-nodes-in-pairs/)
+
+> Given a linked list, swap every two adjacent nodes and return its head.
+>
+> You may **not** modify the values in the list's nodes, only nodes itself may be changed.
+>
+>  
+>
+> **Example:**
+>
+> ```
+> Given 1->2->3->4, you should return the list as 2->1->4->3.
+> ```
+
+非递归：设置两个指针p1,p2，然后按照要求重新构建链表
+
+
+```java
+package com.problem24;
+
+import com.ListNode;
+
+class Solution {
+    public ListNode swapPairs(ListNode head) {
+        if (head == null || head.next == null){
+            return head;
+        }
+        ListNode newHead = new ListNode(0);
+        ListNode index = newHead;
+        ListNode p1 = head;
+        ListNode p2 = head.next;
+        ListNode temp1,temp2;
+        while (p2 != null){
+            temp1 = p2.next;
+            temp2 = temp1 != null ? temp1.next : null;
+            p2.next = p1;
+            p1.next = null;
+            index.next = p2;
+            index = p1;
+            p1= temp1;
+            p2 = temp2;
+
+        }
+        if (p1 != null){
+            index.next = p1;
+            p1.next = null;
+        }
+        return newHead.next;
+    }
+}
+```
+
+递归：好吧，我想不出来~
+
+```java
+package com.problem24;
+
+import com.ListNode;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-22 17:28
+ * @Feature:
+ */
+public class Solution2 {
+
+    public ListNode swapPairs(ListNode head) {
+        if (head == null || head.next == null){
+            return head;
+        }
+        ListNode next = head.next;
+        head.next = swapPairs(next.next);
+        next.next = head;
+        return next;
+    }
+}
+```
+
+### 2.1.8 K个一组反转链表
+
+[25. Reverse Nodes in k-Group](https://leetcode.com/problems/reverse-nodes-in-k-group/)
+
+> Given a linked list, reverse the nodes of a linked list *k* at a time and return its modified list.
+>
+> *k* is a positive integer and is less than or equal to the length of the linked list. If the number of nodes is not a multiple of *k*then left-out nodes in the end should remain as it is.
+>
+> 
+>
+> **Example:**
+>
+> Given this linked list: `1->2->3->4->5`
+>
+> For *k* = 2, you should return: `2->1->4->3->5`
+>
+> For *k* = 3, you should return: `3->2->1->4->5`
+>
+> **Note:**
+>
+> - Only constant extra memory is allowed.
+> - You may not alter the values in the list's nodes, only nodes itself may be changed.
+
+思路：统计链表长度，计算反转次数，每次反转使用头插法构造一个长度为K的链表，然后接到新链表的后面。
+
+```java
+package com.problem25;
+
+import com.ListNode;
+
+class Solution {
+
+    public ListNode reverseKGroup(ListNode head, int k) {
+        ListNode newHead = new ListNode(0);
+        ListNode index = newHead;
+        ListNode p = head;
+        int length = 0;
+        while (p != null){
+            p = p.next;
+            length++;
+        }
+        p = head;
+        int i = length / k;
+        int count = 0;
+        ListNode temp;
+        ListNode temp2;
+        ListNode temp3;
+        while (i > 0){
+            temp = new ListNode(0);
+            temp.next = null;
+            temp3 = p;
+            while (count < k){
+                temp2 = p.next;
+                p.next = temp.next;
+                temp.next = p;
+                count++;
+                p = temp2;
+            }
+            count = 0;
+            index.next = temp.next;
+            index = temp3;
+            i--;
+        }
+        if (p != null){
+            index.next = p;
+        }
+        return newHead.next;
+    }
+}
+```
+
+### *2.1.9 旋转链表
+
+[61. Rotate List](https://leetcode.com/problems/rotate-list/)
+
+> Given a linked list, rotate the list to the right by *k* places, where *k* is non-negative.
+>
+> **Example 1:**
+>
+> ```
+> Input: 1->2->3->4->5->NULL, k = 2
+> Output: 4->5->1->2->3->NULL
+> Explanation:
+> rotate 1 steps to the right: 5->1->2->3->4->NULL
+> rotate 2 steps to the right: 4->5->1->2->3->NULL
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: 0->1->2->NULL, k = 4
+> Output: 2->0->1->NULL
+> Explanation:
+> rotate 1 steps to the right: 2->0->1->NULL
+> rotate 2 steps to the right: 1->2->0->NULL
+> rotate 3 steps to the right: 0->1->2->NULL
+> rotate 4 steps to the right: 2->0->1->NULL
+> ```
+
+```java
+package com.problem61;
+
+import com.ListNode;
+
+class Solution {
+    public ListNode rotateRight(ListNode head, int k) {
+        if (head == null || head.next == null){
+            return head;
+        }
+        int length = 1;
+        ListNode p = head;
+        while (p.next != null){
+            p = p.next;
+            length++;
+        }
+        p.next = head;
+        ListNode newTail = head;
+        for (int i = 0; i < length - k % length - 1; i++) {
+            newTail = newTail.next;
+        }
+        ListNode newHead = newTail.next;
+        newTail.next = null;
+        return newHead;
+    }
+}
+```
+
+### 2.1.10 分隔链表
+
+[86. Partition List](https://leetcode.com/problems/partition-list/)
+
+> Given a linked list and a value *x*, partition it such that all nodes less than *x* come before nodes greater than or equal to *x*.
+>
+> You should preserve the original relative order of the nodes in each of the two partitions.
+>
+> **Example:**
+>
+> ```
+> Input: head = 1->4->3->2->5->2, x = 3
+> Output: 1->2->2->4->3->5
+> ```
+
+```java
+package com.problem86;
+
+import com.ListNode;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-24 10:11
+ * @Feature:
+ */
+public class Solution2 {
+
+    public ListNode partition(ListNode head, int x) {
+        ListNode head2 = new ListNode(0);
+        ListNode head3 = new ListNode(0);
+
+        ListNode p1 = head2;
+        ListNode p2 = head3;
+        ListNode temp;
+        while (head != null){
+            temp = head.next;
+            if (head.val < x){
+                p1.next = head;
+                p1 = p1.next;
+            }else {
+                p2.next = head;
+                p2 = p2.next;
+            }
+            head = temp;
+        }
+        p2.next = null;
+        p1.next = head3.next;
+        return head2.next;
+    }
+}
+```
+
+### 2.1.11 反转链表Ⅱ
+
+[92. Reverse Linked List II](https://leetcode.com/problems/reverse-linked-list-ii/)
+
+> Reverse a linked list from position *m* to *n*. Do it in one-pass.
+>
+> **Note:** 1 ≤ *m* ≤ *n* ≤ length of list.
+>
+> **Example:**
+>
+> ```
+> Input: 1->2->3->4->5->NULL, m = 2, n = 4
+> Output: 1->4->3->2->5->NULL
+> ```
+
+思路：构建3个链表，m之前和n之后使用尾插法，m到n之间的使用头插法，然后把三个链表连起来。注意，使用头插法构造链表的时候要记录最后一个节点。
+
+```java
+package com.problem92;
+
+import com.ListNode;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-24 10:24
+ * @Feature:
+ */
+public class Solution2 {
+
+    public ListNode reverseBetween(ListNode head, int m, int n) {
+        ListNode node1 = new ListNode(0);
+        ListNode node2 = new ListNode(0);
+        node2.next = null;
+        ListNode node3 = new ListNode(0);
+        ListNode p1 = node1;
+        ListNode p3 = node3;
+
+        int count = 0;
+        ListNode temp;
+        ListNode tail = null;
+        while (head != null){
+            count++;
+            temp = head.next;
+            if (count < m){
+                p1.next = head;
+                p1 = p1.next;
+            }else if (count <= n){
+                if (count == m){
+                    tail = head;
+                }
+                head.next = node2.next;
+                node2.next = head;
+            }else {
+                p3.next = head;
+                p3 = p3.next;
+            }
+            head = temp;
+        }
+        p3.next = null;
+        p1.next = node2.next;
+        tail.next = node3.next;
+        return node1.next;
+    }
+}
+```
+
+### 2.1.12 有序链表转换二叉搜索树
+
+[109. Convert Sorted List to Binary Search Tree](https://leetcode.com/problems/convert-sorted-list-to-binary-search-tree/)
+
+> Given a singly linked list where elements are sorted in ascending order, convert it to a height balanced BST.
+>
+> For this problem, a height-balanced binary tree is defined as a binary tree in which the depth of the two subtrees of *every*node never differ by more than 1.
+>
+> **Example:**
+>
+> ```
+> Given the sorted linked list: [-10,-3,0,5,9],
+> 
+> One possible answer is: [0,-3,9,-10,null,5], which represents the following height balanced BST:
+> 
+>       0
+>      / \
+>    -3   9
+>    /   /
+>  -10  5
+> ```
+
+思路一：找到链表的中间节点，即找到了根节点，则左子树就是中间节点左边的链表，右子树是中间节点右边的链表，递归构建即可。时间复杂度为O(nlogn)，
+
+```java
+package com.problem109;
+
+import com.ListNode;
+import com.TreeNode;
+
+class Solution {
+
+    public TreeNode sortedListToBST(ListNode head) {
+        if (head == null){
+            return null;
+        }
+        ListNode mid = findMid(head);
+        TreeNode root = new TreeNode(mid.val);
+        if (head == mid){
+            return root;
+        }
+        root.left = sortedListToBST(head);
+        root.right = sortedListToBST(mid.next);
+        return root;
+    }
+
+    private ListNode findMid(ListNode head) {
+        //找到中间节点
+        ListNode p1 = head;
+        ListNode p2 = head;
+        ListNode pre = null;
+        while (p2 != null && p2.next != null){
+            pre = p1;
+            p1 = p1.next;
+            p2 = p2.next.next;
+        }
+        if (pre != null) {
+            pre.next = null;
+        }
+        return p1;
+    }
+}
+```
+
+思路二：转换成数组，然后构建平衡二叉树
+
+```java
+package com.problem109;
+
+import com.ListNode;
+import com.TreeNode;
+
+import java.util.ArrayList;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-24 14:48
+ * @Feature:
+ */
+public class Solution2 {
+
+    public TreeNode sortedListToBST(ListNode head) {
+        ArrayList<Integer> nums = new ArrayList<>();
+        while (head != null){
+            nums.add(head.val);
+            head = head.next;
+        }
+        return solve(nums,0,nums.size() - 1);
+    }
+
+    private TreeNode solve(ArrayList<Integer> nums, int start, int end) {
+        if (start > end){
+            return null;
+        }
+        if (start == end){
+            return new TreeNode(nums.get(start));
+        }
+        int mid = (start + end) / 2;
+        TreeNode root = new TreeNode(nums.get(mid));
+        root.left = solve(nums, start, mid - 1);
+        root.right = solve(nums, mid + 1, end);
+        return root;
+    }
+}
+```
+
+### 2.1.13 复制带随机指针的链表
+
+[138. Copy List with Random Pointer](https://leetcode.com/problems/copy-list-with-random-pointer/)
+
+> A linked list is given such that each node contains an additional random pointer which could point to any node in the list or null.
+>
+> Return a [**deep copy**](https://en.wikipedia.org/wiki/Object_copying#Deep_copy) of the list.
+>
+>  
+>
+> **Example 1:**
+>
+> **![img](https://discuss.leetcode.com/uploads/files/1470150906153-2yxeznm.png)**
+>
+> ```
+> Input:
+> {"$id":"1","next":{"$id":"2","next":null,"random":{"$ref":"2"},"val":2},"random":{"$ref":"2"},"val":1}
+> 
+> Explanation:
+> Node 1's value is 1, both of its next and random pointer points to Node 2.
+> Node 2's value is 2, its next pointer points to null and its random pointer points to itself.
+> ```
+>
+>  
+>
+> **Note:**
+>
+> 1. You must return the **copy of the given head** as a reference to the cloned list.
+
+思路：
+
+- 将每一个节点复制一份放在原节点的后面
+
+- 然后根据原节点更新新节点的random指针
+
+- 将链表进行拆分
+
+```java
+package com.problem138;
+
+import com.Node;
+
+class Solution {
+    public Node copyRandomList(Node head) {
+        if (head == null){
+            return null;
+        }
+
+        //1.将每个节点复制一份放在原节点的后面
+        Node p = head;
+        Node temp;
+        while (p != null){
+            temp = p.next;
+            p.next = new Node(p.val,p.next,null);
+            p = temp;
+        }
+        //2.更新random节点
+        p = head;
+        while (p != null){
+            if (p.random != null){
+                p.next.random = p.random.next;
+            }
+            p = p.next.next;
+        }
+        //3.链表拆分
+        p = head;
+        Node result = p.next;
+        while (p != null){
+            temp = p.next;
+            p.next = temp.next;
+            temp.next = temp.next != null ? temp.next.next : null;
+            p = p.next;
+        }
+        return result;
+    }
+}
+```
+
+### 2.1.14 环形链表
+
+[141. Linked List Cycle](https://leetcode.com/problems/linked-list-cycle/)
+
+> Given a linked list, determine if it has a cycle in it.
+>
+> To represent a cycle in the given linked list, we use an integer `pos` which represents the position (0-indexed) in the linked list where tail connects to. If `pos` is `-1`, then there is no cycle in the linked list.
+>
+>  
+>
+> **Example 1:**
+>
+> ```
+> Input: head = [3,2,0,-4], pos = 1
+> Output: true
+> Explanation: There is a cycle in the linked list, where tail connects to the second node.
+> ```
+>
+> ![img](https://assets.leetcode.com/uploads/2018/12/07/circularlinkedlist.png)
+>
+> **Example 2:**
+>
+> ```
+> Input: head = [1,2], pos = 0
+> Output: true
+> Explanation: There is a cycle in the linked list, where tail connects to the first node.
+> ```
+>
+> ![img](https://assets.leetcode.com/uploads/2018/12/07/circularlinkedlist_test2.png)
+>
+> **Example 3:**
+>
+> ```
+> Input: head = [1], pos = -1
+> Output: false
+> Explanation: There is no cycle in the linked list.
+> ```
+>
+> ![img](https://assets.leetcode.com/uploads/2018/12/07/circularlinkedlist_test3.png)
+>
+>  
+>
+> **Follow up:**
+>
+> Can you solve it using *O(1)* (i.e. constant) memory?
+
+```java
+package com.problem141;
+
+import com.ListNode;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-25 10:07
+ * @Feature:
+ */
+public class Solution {
+
+    public boolean hasCycle(ListNode head) {
+        if (head == null || head.next == null){
+            return false;
+        }
+        ListNode slow = head;
+        ListNode fast = head;
+        while (slow != null && fast != null){
+            slow = slow.next;
+            if (fast.next == null){
+                return false;
+            }
+            fast = fast.next.next;
+            if (slow == fast){
+                return true;
+            }
+        }
+        return false;
+    }
+}
+```
+
+### 2.1.15 环形链表Ⅱ
+
+[142. Linked List Cycle II](https://leetcode.com/problems/linked-list-cycle-ii/)
+
+> Given a linked list, return the node where the cycle begins. If there is no cycle, return `null`.
+>
+> To represent a cycle in the given linked list, we use an integer `pos` which represents the position (0-indexed) in the linked list where tail connects to. If `pos` is `-1`, then there is no cycle in the linked list.
+>
+> **Note:** Do not modify the linked list.
+>
+>  
+>
+> **Example 1:**
+>
+> ```
+> Input: head = [3,2,0,-4], pos = 1
+> Output: tail connects to node index 1
+> Explanation: There is a cycle in the linked list, where tail connects to the second node.
+> ```
+>
+> ![img](https://assets.leetcode.com/uploads/2018/12/07/circularlinkedlist.png)
+>
+> **Example 2:**
+>
+> ```
+> Input: head = [1,2], pos = 0
+> Output: tail connects to node index 0
+> Explanation: There is a cycle in the linked list, where tail connects to the first node.
+> ```
+>
+> ![img](https://assets.leetcode.com/uploads/2018/12/07/circularlinkedlist_test2.png)
+>
+> **Example 3:**
+>
+> ```
+> Input: head = [1], pos = -1
+> Output: no cycle
+> Explanation: There is no cycle in the linked list.
+> ```
+>
+> ![img](https://assets.leetcode.com/uploads/2018/12/07/circularlinkedlist_test3.png)
+>
+>  
+>
+> **Follow-up**:
+> Can you solve it without using extra space?
+
+```java
+package com.problem142;
+
+import com.ListNode;
+
+public class Solution {
+    
+    public ListNode detectCycle(ListNode head) {
+        if (head == null || head.next == null){
+            return null;
+        }
+        ListNode slow = head;
+        ListNode fast = head;
+        while (slow != null && fast != null){
+            slow = slow.next;
+            if (fast.next == null){
+                break;
+            }
+            fast = fast.next.next;
+            if (slow == fast){
+                slow = head;
+                while (slow != fast){
+                    slow = slow.next;
+                    fast = fast.next;
+                }
+                return slow;
+            }
+        }
+        return null;
+    }
+}
+```
+
+### 2.1.16 重排列表
+
+[143. Reorder List](https://leetcode.com/problems/reorder-list/)
+
+> Given a singly linked list *L*: *L*0→*L*1→…→*L**n*-1→*L*n,
+> reorder it to: *L*0→*L**n*→*L*1→*L**n*-1→*L*2→*L**n*-2→…
+>
+> You may **not** modify the values in the list's nodes, only nodes itself may be changed.
+>
+> **Example 1:**
+>
+> ```
+> Given 1->2->3->4, reorder it to 1->4->2->3.
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Given 1->2->3->4->5, reorder it to 1->5->2->4->3.
+> ```
+
+思路：
+
+1、将链表从中间节点处断开
+
+2、将后半部分链表反转
+
+3、将反转后的链表逐一插入到前半部分链表中
+
+```java
+package com.problem143;
+
+import com.ListNode;
+
+class Solution {
+    public void reorderList(ListNode head) {
+        if (head == null || head.next == null){
+            return;
+        }
+        //1.找到链表中间位置
+        ListNode p1 = head;
+        ListNode p2 = head;
+        while (p2 != null && p2.next != null){
+            p1 = p1.next;
+            p2 = p2.next.next;
+        }
+        //2.将后半条链反转
+        ListNode node = new ListNode(0);
+        node.next = null;
+        ListNode index = p1.next;
+        ListNode temp;
+        p1.next = null;
+        while (index != null){
+            temp = index.next;
+            index.next = node.next;
+            node.next = index;
+            index = temp;
+        }
+        //3.将反转后的链表中的节点逐一插入到前半条链表中
+        p1 = head;
+        p2 = node.next;
+        ListNode temp2,temp3;
+        while (p1 != null && p2 != null){
+            temp2 = p1.next;
+            temp3 = p2.next;
+            p2.next = p1.next;
+            p1.next = p2;
+            p1 = temp2;
+            p2 = temp3;
+        }
+    }
+}
+```
+
+### 2.1.17 对链表进行插入排序
+
+[147. Insertion Sort List](https://leetcode.com/problems/insertion-sort-list/)
+
+> Sort a linked list using insertion sort.
+>
+> 
+>
+> ![img](https://upload.wikimedia.org/wikipedia/commons/0/0f/Insertion-sort-example-300px.gif)
+> A graphical example of insertion sort. The partial sorted list (black) initially contains only the first element in the list.
+> With each iteration one element (red) is removed from the input data and inserted in-place into the sorted list
+>
+> 
+>
+> **Algorithm of Insertion Sort:**
+>
+> 1. Insertion sort iterates, consuming one input element each repetition, and growing a sorted output list.
+> 2. At each iteration, insertion sort removes one element from the input data, finds the location it belongs within the sorted list, and inserts it there.
+> 3. It repeats until no input elements remain.
+>
+> 
+> **Example 1:**
+>
+> ```
+> Input: 4->2->1->3
+> Output: 1->2->3->4
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: -1->5->3->4->0
+> Output: -1->0->3->4->5
+> ```
+
+思路：以4->2->1->3为例进行说明
+
+一开始pre指向4，p指向2，然后从2处断开，即原来的链表变成4和1->3两条链，然后从头扫描寻找插入p的位置，找到后插入节点p，则变为2->4，然后再把两条链连起来，变为2->4->1->3。
+
+注意：
+
+- 要在原来的链表上增加一个头节点，防止在头节点处插入而找不到前一个节点
+
+
+- 因为每一次比较的是当前节点p和前一个节点pre的值的大小，如果`p.val < pre.val`，则在将p插入到合适的位置后，要将断开的链重新连接起来。所以一开始要保存p的下一个节点temp，最后让`pre.next = temp`，则链表就重新连起来了，最后再更新p指针即可。
+
+
+```java
+package com.problem147;
+
+import com.ListNode;
+
+class Solution {
+    
+    public ListNode insertionSortList(ListNode head) {
+        if (head == null || head.next == null){
+            return head;
+        }
+        ListNode node = new ListNode(0);
+        node.next = head;
+        ListNode pre = head;
+        ListNode p = head.next;
+        ListNode temp;
+        while (p != null){
+            if (p.val < pre.val){
+                temp = p.next;
+                //1.先断开节点
+                pre.next = null;
+                //插入排序
+                ListNode pre2 = node;
+                ListNode index = node.next;
+                while (index.val < p.val){
+                    index = index.next;
+                    pre2 = pre2.next;
+                }
+                p.next = index;
+                pre2.next = p;
+				//重新将两条链连接
+                pre.next = temp;
+                p = temp;
+            }else {
+                pre = pre.next;
+                p = pre.next;
+            }
+        }
+        return node.next;
+    }
+}
+```
+
+### 2.1.18 排序链表
+
+[148. Sort List](https://leetcode.com/problems/sort-list/)
+
+> Sort a linked list in *O*(*n* log *n*) time using constant space complexity.
+>
+> **Example 1:**
+>
+> ```
+> Input: 4->2->1->3
+> Output: 1->2->3->4
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: -1->5->3->4->0
+> Output: -1->0->3->4->5
+> ```
+
+```java
+package com.problem148;
+
+import com.ListNode;
+
+class Solution {
+
+    public ListNode sortList(ListNode head) {
+        if (head == null || head.next == null){
+            return head;
+        }
+        return solve(head);
+    }
+
+    private ListNode solve(ListNode head) {
+        if (head == null || head.next == null){
+            return head;
+        }
+        ListNode mid = findMid(head);
+        ListNode temp = mid.next;
+        mid.next = null;
+        ListNode left = solve(head);
+        ListNode right = solve(temp);
+        return merge(left,right);
+    }
+
+    private ListNode findMid(ListNode head) {
+        ListNode p1 = head;
+        ListNode p2 = head.next;
+        while (p2 != null && p2.next != null){
+            p1 = p1.next;
+            p2 = p2.next.next;
+        }
+        return p1;
+    }
+
+    private ListNode merge(ListNode l1, ListNode l2) {
+        if (l1 == null){
+            return l2;
+        }
+        if (l2 == null){
+            return l1;
+        }
+        ListNode node;
+        if (l1.val < l2.val){
+            node = l1;
+            node.next = merge(l1.next, l2);
+        }else {
+            node = l2;
+            node.next = merge(l1, l2.next);
+        }
+        return node;
+    }
+}
+```
+
+
+
+### 2.1.19 移除链表元素
+
+[203. Remove Linked List Elements](https://leetcode.com/problems/remove-linked-list-elements/)
+
+> Remove all elements from a linked list of integers that have value **val**.
+>
+> **Example:**
+>
+> ```
+> Input:  1->2->6->3->4->5->6, val = 6
+> Output: 1->2->3->4->5
+> ```
+
+```java
+package com.problem203;
+
+import com.ListNode;
+
+class Solution {
+    public ListNode removeElements(ListNode head, int val) {
+        ListNode node = new ListNode(0);
+        node.next = head;
+        ListNode pre = node;
+        ListNode p = node.next;
+        ListNode temp;
+        while (p != null){
+            temp = p.next;
+            if (p.val == val){
+                pre.next = p.next;
+            }else {
+                pre = pre.next;
+            }
+            p = temp;
+
+        }
+        return node.next;
+    }
+}
+```
+
+### 2.1.20 回文链表
+
+[234. Palindrome Linked List](https://leetcode.com/problems/palindrome-linked-list/)
+
+> Given a singly linked list, determine if it is a palindrome.
+>
+> **Example 1:**
+>
+> ```
+> Input: 1->2
+> Output: false
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: 1->2->2->1
+> Output: true
+> ```
+>
+> **Follow up:**
+> Could you do it in O(n) time and O(1) space?
+
+思路：将链表从中间位置断开，然后将后半部分反转，最后比较两个链表对应位置上的值是否相等。
+
+```java
+package com.problem234;
+
+import com.ListNode;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-29 10:48
+ * @Feature:
+ */
+public class Solution3 {
+
+    public boolean isPalindrome(ListNode head) {
+        if (head == null || head.next == null){
+            return true;
+        }
+
+        //1.找中间节点
+        ListNode mid = findMid(head);
+        ListNode right = mid.next;
+        mid.next = null;
+        //2.反转链表
+        ListNode l1 = reverse(right);
+        //3.比较两个链表
+        return compare(head,l1);
+    }
+
+    private boolean compare(ListNode l1, ListNode l2) {
+        while (l1 != null && l2 != null){
+            if (l1.val != l2.val){
+                return false;
+            }
+            l1 = l1.next;
+            l2 = l2.next;
+        }
+        return true;
+    }
+
+    private ListNode reverse(ListNode head) {
+        if (head == null || head.next == null){
+            return head;
+        }
+        ListNode root = reverse(head.next);
+        head.next.next = head;
+        head.next = null;
+        return root;
+    }
+
+    private ListNode findMid(ListNode head) {
+        ListNode p1 = head;
+        ListNode p2 = head.next;
+        while (p2 != null && p2.next != null){
+            p1 = p1.next;
+            p2 = p2.next.next;
+        }
+        return p1;
+    }
+}
+```
+
+### 2.1.21 删除链表中的节点
+
+[237. Delete Node in a Linked List](https://leetcode.com/problems/delete-node-in-a-linked-list/)
+
+> Write a function to delete a node (except the tail) in a singly linked list, given only access to that node.
+>
+> Given linked list -- head = [4,5,1,9], which looks like following:
+>
+> ![img](https://assets.leetcode.com/uploads/2018/12/28/237_example.png)
+>
+>  
+>
+> **Example 1:**
+>
+> ```
+> Input: head = [4,5,1,9], node = 5
+> Output: [4,1,9]
+> Explanation: You are given the second node with value 5, the linked list should become 4 -> 1 -> 9 after calling your function.
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: head = [4,5,1,9], node = 1
+> Output: [4,5,9]
+> Explanation: You are given the third node with value 1, the linked list should become 4 -> 5 -> 9 after calling your function.
+> ```
+>
+>  
+>
+> **Note:**
+>
+> - The linked list will have at least two elements.
+> - All of the nodes' values will be unique.
+> - The given node will not be the tail and it will always be a valid node of the linked list.
+> - Do not return anything from your function.
+
+```java
+package com.problem237;
+
+import com.ListNode;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-26 19:47
+ * @Feature:
+ */
+public class Solution2 {
+
+    public void deleteNode(ListNode node) {
+        ListNode pre = null;
+        while (node.next != null){
+            node.val = node.next.val;
+            pre = node;
+            node = node.next;
+        }
+        pre.next = null;
+    }
+}
+```
+
+### 2.1.22 奇偶链表
+
+[328. Odd Even Linked List](https://leetcode.com/problems/odd-even-linked-list/)
+
+> Given a singly linked list, group all odd nodes together followed by the even nodes. Please note here we are talking about the node number and not the value in the nodes.
+>
+> You should try to do it in place. The program should run in O(1) space complexity and O(nodes) time complexity.
+>
+> **Example 1:**
+>
+> ```
+> Input: 1->2->3->4->5->NULL
+> Output: 1->3->5->2->4->NULL
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: 2->1->3->5->6->4->7->NULL
+> Output: 2->3->6->7->1->5->4->NULL
+> ```
+>
+> **Note:**
+>
+> - The relative order inside both the even and odd groups should remain as it was in the input.
+> - The first node is considered odd, the second node even and so on ...
+
+```java
+package com.problem328;
+
+import com.ListNode;
+
+class Solution {
+    public ListNode oddEvenList(ListNode head) {
+        if (head == null || head.next == null){
+            return head;
+        }
+        //奇数
+        ListNode p1 = head;
+        //偶数
+        ListNode p2 = head.next;
+        ListNode q1 = p1;
+        ListNode q2 = p2;
+
+        ListNode index = p2.next;
+        ListNode temp;
+        int count = 1;
+        while (index != null){
+            temp = index.next;
+            if (count % 2 != 0){
+                q1.next = index;
+                q1 = q1.next;
+            }else {
+                q2.next = index;
+                q2 = q2.next;
+            }
+            index.next = null;
+            count++;
+            index = temp;
+        }
+        q2.next = null;
+        q1.next = p2;
+        return p1;
+    }
+}
+```
+
 ## 2.2 树
+
+### 2.2.1 递归
+
+#### 2.2.1.1 树的高度
+
+[104. Maximum Depth of Binary Tree](https://leetcode.com/problems/maximum-depth-of-binary-tree/)
+
+> Given a binary tree, find its maximum depth.
+>
+> The maximum depth is the number of nodes along the longest path from the root node down to the farthest leaf node.
+>
+> **Note:** A leaf is a node with no children.
+>
+> **Example:**
+>
+> Given binary tree `[3,9,20,null,null,15,7]`,
+>
+> ```
+>     3
+>    / \
+>   9  20
+>     /  \
+>    15   7
+> ```
+>
+> return its depth = 3.
+
+```java
+package com.problem104;
+
+import com.TreeNode;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-29 11:19
+ * @Feature:
+ */
+public class Solution {
+
+    public int maxDepth(TreeNode root) {
+        if (root == null){
+            return 0;
+        }
+        return Math.max(maxDepth(root.left), maxDepth(root.right)) + 1;
+    }
+}
+```
+
+#### *2.2.1.2 平衡二叉树
+
+[110. Balanced Binary Tree](https://leetcode.com/problems/balanced-binary-tree/)
+
+> Given a binary tree, determine if it is height-balanced.
+>
+> For this problem, a height-balanced binary tree is defined as:
+>
+> > a binary tree in which the depth of the two subtrees of *every* node never differ by more than 1.
+>
+> **Example 1:**
+>
+> Given the following tree `[3,9,20,null,null,15,7]`:
+>
+> ```
+>     3
+>    / \
+>   9  20
+>     /  \
+>    15   7
+> ```
+>
+> Return true.
+>
+> **Example 2:**
+>
+> Given the following tree `[1,2,2,3,3,null,null,4,4]`:
+>
+> ```
+>        1
+>       / \
+>      2   2
+>     / \
+>    3   3
+>   / \
+>  4   4
+> ```
+> Return false.
+
+```java
+package com.problem110;
+
+import com.TreeNode;
+
+class Solution {
+    public boolean isBalanced(TreeNode root) {
+        return judge(root) != -1;
+    }
+
+    private int judge(TreeNode root) {
+        if (root == null){
+            return 0;
+        }
+        int left = judge(root.left);
+        if (left == -1){
+            return -1;
+        }
+        int right = judge(root.right);
+        if (right == -1){
+            return -1;
+        }
+        return Math.abs(left - right) > 1 ? -1 : 1 + Math.max(left, right);
+    }
+}
+```
+
+#### *2.2.1.3 二叉树的直径
+
+[543. Diameter of Binary Tree](https://leetcode.com/problems/diameter-of-binary-tree/)
+
+> Given a binary tree, you need to compute the length of the diameter of the tree. The diameter of a binary tree is the length of the **longest** path between any two nodes in a tree. This path may or may not pass through the root.
+>
+> **Example:**
+> Given a binary tree 
+>
+> ```
+>           1
+>          / \
+>         2   3
+>        / \     
+>       4   5    
+> ```
+>
+> 
+>
+> Return **3**, which is the length of the path [4,2,1,3] or [5,2,1,3].
+>
+> **Note:** The length of path between two nodes is represented by the number of edges between them.
+
+**一个节点的最大直径 = 左树的高度 +  右树的高度**
+
+```java
+package com.problem543;
+
+import com.TreeNode;
+
+class Solution {
+    int max;
+    public int diameterOfBinaryTree(TreeNode root) {
+        depth(root);
+        return max;
+    }
+
+    private int depth(TreeNode root) {
+        if (root == null){
+            return 0;
+        }
+        int left = depth(root.left);
+        int right = depth(root.right);
+        max = Math.max(max, left + right);
+        return Math.max(left,right) + 1;
+    }
+}
+```
+
+#### 2.2.1.4 反转二叉树
+
+[226. Invert Binary Tree](https://leetcode.com/problems/invert-binary-tree/)
+
+> Invert a binary tree.
+>
+> **Example:**
+>
+> Input:
+>
+> ```
+>      4
+>    /   \
+>   2     7
+>  / \   / \
+> 1   3 6   9
+> ```
+>
+> Output:
+>
+> ```
+>      4
+>    /   \
+>   7     2
+>  / \   / \
+> 9   6 3   1
+> ```
+
+```java
+package com.problem226;
+
+import com.TreeNode;
+
+class Solution {
+    public TreeNode invertTree(TreeNode root) {
+        if (root == null){
+            return null;
+        }
+        invertTree(root.left);
+        invertTree(root.right);
+        TreeNode temp = root.left;
+        root.left = root.right;
+        root.right = temp;
+        return root;
+    }
+}
+```
+
+#### *2.2.1.5 合并二叉树
+
+[617. Merge Two Binary Trees](https://leetcode.com/problems/merge-two-binary-trees/)
+
+> Given two binary trees and imagine that when you put one of them to cover the other, some nodes of the two trees are overlapped while the others are not.
+>
+> You need to merge them into a new binary tree. The merge rule is that if two nodes overlap, then sum node values up as the new value of the merged node. Otherwise, the NOT null node will be used as the node of new tree.
+>
+> **Example 1:**
+>
+> ```
+> Input: 
+> 	Tree 1                     Tree 2                  
+>           1                         2                             
+>          / \                       / \                            
+>         3   2                     1   3                        
+>        /                           \   \                      
+>       5                             4   7                  
+> Output: 
+> Merged tree:
+> 	     3
+> 	    / \
+> 	   4   5
+> 	  / \   \ 
+> 	 5   4   7
+> ```
+>
+>  
+>
+> **Note:** The merging process must start from the root nodes of both trees.
+
+**类比合并排序链表**
+
+```java
+package com.problem617;
+
+import com.TreeNode;
+
+class Solution {
+    public TreeNode mergeTrees(TreeNode t1, TreeNode t2) {
+        if (t1 == null && t2 == null){
+            return null;
+        }
+        if (t1 == null){
+            return t2;
+        }
+        if (t2 == null){
+            return t1;
+        }
+        TreeNode root = new TreeNode(t1.val + t2.val);
+        root.left = mergeTrees(t1.left, t2.left);
+        root.right = mergeTrees(t1.right, t2.right);
+        return root;
+    }
+}
+```
+
+#### 2.2.1.6 路径总合
+
+[112. Path Sum](https://leetcode.com/problems/path-sum/)
+
+> Given a binary tree and a sum, determine if the tree has a root-to-leaf path such that adding up all the values along the path equals the given sum.
+>
+> **Note:** A leaf is a node with no children.
+>
+> **Example:**
+>
+> Given the below binary tree and `sum = 22`,
+>
+> ```
+>       5
+>      / \
+>     4   8
+>    /   / \
+>   11  13  4
+>  /  \      \
+> 7    2      1
+> ```
+>
+> return true, as there exist a root-to-leaf path `5->4->11->2` which sum is 22.
+
+```java
+package com.problem112;
+
+import com.TreeNode;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-30 11:02
+ * @Feature:
+ */
+public class Solution {
+
+    public boolean hasPathSum(TreeNode root, int sum) {
+        if (root == null){
+            return false;
+        }
+        if (root.left == null && root.right == null){
+            return root.val == sum;
+        }
+        return hasPathSum(root.left, sum - root.val) || hasPathSum(root.right, sum - root.val);
+    }
+}
+```
+
+#### 2.2.1.7 路径总合Ⅱ
+
+思路：回溯法
+
+```java
+package com.problem113;
+
+import com.TreeNode;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-30 11:21
+ * @Feature:
+ */
+public class Solution2 {
+
+    public List<List<Integer>> pathSum(TreeNode root, int sum) {
+        List<List<Integer>> result = new ArrayList<>();
+        solve(root,sum,new ArrayList<Integer>(),result);
+        return result;
+    }
+
+    private void solve(TreeNode root, int sum, ArrayList<Integer> integers, List<List<Integer>> result) {
+        if (root == null){
+            return;
+        }
+        if (root.left == null && root.right == null){
+            if (root.val == sum){
+                integers.add(root.val);
+                result.add(new ArrayList<>(integers));
+                integers.remove(integers.size() - 1);
+                return;
+            }
+        }
+        integers.add(root.val);
+        solve(root.left, sum - root.val, integers, result);
+        solve(root.right, sum - root.val, integers, result);
+        integers.remove(integers.size() - 1);
+    }
+}
+```
+
+#### *2.2.1.8 路径总合Ⅲ
+
+[437. Path Sum III](https://leetcode.com/problems/path-sum-iii/)
+
+> You are given a binary tree in which each node contains an integer value.
+>
+> Find the number of paths that sum to a given value.
+>
+> The path does not need to start or end at the root or a leaf, but it must go downwards (traveling only from parent nodes to child nodes).
+>
+> The tree has no more than 1,000 nodes and the values are in the range -1,000,000 to 1,000,000.
+>
+> **Example:**
+>
+> ```
+> root = [10,5,-3,3,2,null,11,3,-2,null,1], sum = 8
+> 
+>       10
+>      /  \
+>     5   -3
+>    / \    \
+>   3   2   11
+>  / \   \
+> 3  -2   1
+> 
+> Return 3. The paths that sum to 8 are:
+> 
+> 1.  5 -> 3
+> 2.  5 -> 2 -> 1
+> 3. -3 -> 11
+> ```
+
+思路一：以每个节点为根节点，都算一遍路径和为sum的有几条，然后加起来
+
+```java
+package com.problem437;
+
+import com.TreeNode;
+
+class Solution {
+    public int pathSum(TreeNode root, int sum) {
+        if (root == null){
+            return 0;
+        }
+        return solve(root,sum) + pathSum(root.left, sum) + pathSum(root.right, sum);
+    }
+
+    private int solve(TreeNode root, int sum) {
+        if (root == null){
+            return 0;
+        }
+        int count = 0;
+        if (root.val == sum){
+            count++;
+        }
+        count += (solve(root.left, sum - root.val) + solve(root.right, sum - root.val));
+        return count;
+    }
+}
+```
+
+思路二：DFS+回溯
+
+```java
+package com.problem437;
+
+import com.TreeNode;
+
+import java.util.HashMap;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-08-01 10:34
+ * @Feature:
+ */
+public class Solution2 {
+
+
+    public int pathSum(TreeNode root, int sum) {
+        HashMap<Integer,Integer> map = new HashMap<>();
+        map.put(0, 1);
+        return solve(root,map,sum,0);
+    }
+
+    private int solve(TreeNode root, HashMap<Integer, Integer> map, int sum, int pathSum) {
+        int res = 0;
+        if (root == null){
+            return 0;
+        }
+        pathSum += root.val;
+        res += map.getOrDefault(pathSum - sum, 0);
+        map.put(pathSum, map.getOrDefault(pathSum, 0) + 1);
+        res = solve(root.left, map, sum, pathSum) + solve(root.right, map, sum, pathSum) + res;
+        map.put(pathSum, map.get(pathSum) - 1);
+        return res;
+    }
+}
+```
+
+#### 2.2.1.9 另一个树的子树
+
+[572. Subtree of Another Tree](https://leetcode.com/problems/subtree-of-another-tree/)
+
+> Given two non-empty binary trees **s** and **t**, check whether tree **t** has exactly the same structure and node values with a subtree of **s**. A subtree of **s** is a tree consists of a node in **s** and all of this node's descendants. The tree **s** could also be considered as a subtree of itself.
+>
+> **Example 1:**
+> Given tree s:
+>
+> ```
+>      3
+>     / \
+>    4   5
+>   / \
+>  1   2
+> ```
+>
+> Given tree t:
+>
+> ```
+>    4 
+>   / \
+>  1   2
+> ```
+>
+> Return **true**
+>
+> 
+>
+> **Example 2:**
+> Given tree s:
+>
+> ```
+>      3
+>     / \
+>    4   5
+>   / \
+>  1   2
+>     /
+>    0
+> ```
+>
+> Given tree t:
+>
+> ```
+>    4
+>   / \
+>  1   2
+> ```
+>
+> Return **false**
+
+```java
+package com.problem572;
+
+import com.TreeNode;
+
+class Solution {
+    public boolean isSubtree(TreeNode s, TreeNode t) {
+        if (s == null){
+            return false;
+        }
+        return solve(s, t) || isSubtree(s.left, t) || isSubtree(s.right, t);
+    }
+
+    private boolean solve(TreeNode s, TreeNode t) {
+        if (s == null && t == null){
+            return true;
+        }
+        if (s == null || t == null){
+            return false;
+        }
+        return s.val == t.val && solve(s.left, t.left) && solve(s.right, t.right);
+    }
+}
+```
+
+**子树和子结构一定要区分清楚**
+
+剑指offer第17题
+
+> 输入两棵二叉树A，B，判断B是不是A的子结构。（ps：我们约定空树不是任意一个树的子结构）
+
+```java
+public class Solution {
+    public boolean HasSubtree(TreeNode root1,TreeNode root2) {
+        if(root1 == null || root2 == null){
+            return false;
+        }
+        return compare(root1,root2) || HasSubtree(root1.left,root2) || HasSubtree(root1.right,root2);
+    }
+
+    private boolean compare(TreeNode root1, TreeNode root2) {
+        if (root2 == null){
+            return true;
+        }
+        if (root1 == null){
+            return false;
+        }
+        if (root1.val != root2.val){
+            return false;
+        }
+        return compare(root1.left, root2.left) && compare(root1.right, root2.right);
+    }
+}
+```
+
+#### 2.2.1.10 对称二叉树
+
+[101. Symmetric Tree](https://leetcode.com/problems/symmetric-tree/)
+
+> Given a binary tree, check whether it is a mirror of itself (ie, symmetric around its center).
+>
+> For example, this binary tree `[1,2,2,3,4,4,3]` is symmetric:
+>
+> ```
+>        1
+>       / \
+>     2   2
+>   / \ / \
+> 3  4 4  3
+> ```
+>
+>  
+>
+> But the following `[1,2,2,null,3,null,3]` is not:
+>
+> ```
+>      1
+>     / \
+>   2   2
+>     \   \
+>     3    3
+> ```
+>
+>  
+>
+> **Note:**
+> Bonus points if you could solve it both recursively and iteratively.
+
+```java
+package com.problem101;
+
+import com.TreeNode;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-08-01 12:05
+ * @Feature:
+ */
+public class Solution {
+
+    public boolean isSymmetric(TreeNode root) {
+        if (root == null){
+            return true;
+        }
+        return solve(root.left,root.right);
+    }
+
+    private boolean solve(TreeNode left, TreeNode right) {
+        if (left == null && right == null){
+            return true;
+        }
+        if (left == null || right == null){
+            return false;
+        }
+        return left.val == right.val && solve(left.left, right.right) && solve(left.right, right.left);
+    }
+}
+```
+
+#### *2.2.1.11 二叉树的最小深度
+
+[111. Minimum Depth of Binary Tree](https://leetcode.com/problems/minimum-depth-of-binary-tree/)
+
+> Given a binary tree, find its minimum depth.
+>
+> The minimum depth is the number of nodes along the shortest path from the root node down to the nearest leaf node.
+>
+> **Note:** A leaf is a node with no children.
+>
+> **Example:**
+>
+> Given binary tree `[3,9,20,null,null,15,7]`,
+>
+> ```
+>     3
+>    / \
+>   9  20
+>     /  \
+>    15   7
+> ```
+>
+> return its minimum depth = 2.
+
+```java
+package com.problem111;
+
+import com.TreeNode;
+
+class Solution {
+    public int minDepth(TreeNode root) {
+        if (root == null){
+            return 0;
+        }
+        if (root.left == null && root.right == null){
+            return 1;
+        }
+        if (root.left == null){
+            return minDepth(root.right) + 1;
+        }
+        if (root.right == null){
+            return minDepth(root.left) + 1;
+        }
+        return Math.min(minDepth(root.left),minDepth(root.right) ) + 1;
+    }
+}
+```
+
+#### 2.2.1.12 左叶子之和
+
+[404. Sum of Left Leaves](https://leetcode.com/problems/sum-of-left-leaves/)
+
+> Find the sum of all left leaves in a given binary tree.
+>
+> **Example:**
+>
+> ```
+>     3
+>    / \
+>   9  20
+>     /  \
+>    15   7
+> 
+> There are two left leaves in the binary tree, with values 9 and 15 respectively. Return 24.
+> ```
+
+```java
+package com.problem404;
+
+import com.TreeNode;
+
+class Solution {
+    int result = 0;
+    public int sumOfLeftLeaves(TreeNode root) {
+        solve(root);
+        return result;
+    }
+
+    private void solve(TreeNode root) {
+        if (root == null){
+            return;
+        }
+        TreeNode left = root.left;
+        if (left != null && left.left == null && left.right == null){
+            result += left.val;
+        }
+        solve(root.left);
+        solve(root.right);
+    }
+}
+```
+
+#### *2.2.1.13 最长同值路径
+
+[687. Longest Univalue Path](https://leetcode.com/problems/longest-univalue-path/)
+
+> Given a binary tree, find the length of the longest path where each node in the path has the same value. This path may or may not pass through the root.
+>
+> The length of path between two nodes is represented by the number of edges between them.
+>
+>  
+>
+> **Example 1:**
+>
+> **Input:**
+>
+> ```
+>               5
+>              / \
+>             4   5
+>            / \   \
+>           1   1   5
+> ```
+>
+> **Output:** 2
+>
+>  
+>
+> **Example 2:**
+>
+> **Input:**
+>
+> ```
+>               1
+>              / \
+>             4   5
+>            / \   \
+>           4   4   5
+> ```
+>
+> **Output:** 2
+>
+>  
+>
+> **Note:** The given binary tree has not more than 10000 nodes. The height of the tree is not more than 1000.
+
+```java
+package com.problem687;
+
+import com.TreeNode;
+
+class Solution {
+    int result = 0;
+    public int longestUnivaluePath(TreeNode root) {
+        solve(root);
+        return result;
+    }
+
+    private int solve(TreeNode root) {
+        if (root == null){
+            return 0;
+        }
+        int left = solve(root.left);
+        int right = solve(root.right);
+        int leftPath = root.left != null && root.left.val == root.val ? left + 1 : 0;
+        int rightPath = root.right != null && root.right.val == root.val ? right + 1 : 0;
+        result = Math.max(result, leftPath + rightPath);
+        return Math.max(leftPath, rightPath);
+    }
+}
+```
+
+#### *2.2.1.14 打家劫舍Ⅲ
+
+[337. House Robber III](https://leetcode.com/problems/house-robber-iii/)
+
+> The thief has found himself a new place for his thievery again. There is only one entrance to this area, called the "root." Besides the root, each house has one and only one parent house. After a tour, the smart thief realized that "all houses in this place forms a binary tree". It will automatically contact the police if two directly-linked houses were broken into on the same night.
+>
+> Determine the maximum amount of money the thief can rob tonight without alerting the police.
+>
+> **Example 1:**
+>
+> ```
+> Input: [3,2,3,null,3,null,1]
+> 
+>      3
+>     / \
+>    2   3
+>     \   \ 
+>      3   1
+> 
+> Output: 7 
+> Explanation: Maximum amount of money the thief can rob = 3 + 3 + 1 = 7.
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: [3,4,5,1,3,null,1]
+> 
+>      3
+>     / \
+>    4   5
+>   / \   \ 
+>  1   3   1
+> 
+> Output: 9
+> Explanation: Maximum amount of money the thief can rob = 4 + 5 = 9.
+> ```
+
+思路：每个节点有两种状态，抢或者不抢，抢当前节点的话，那么它的左右孩子节点就不能抢了；不抢当前节点，那么就从左孩子和右孩子开始抢。
+
+```java
+package com.problem337;
+
+import com.TreeNode;
+
+class Solution {
+    public int rob(TreeNode root) {
+        if (root == null){
+            return 0;
+        }
+        //抢当前节点
+        int val = root.val;
+        if (root.left != null){
+            val += rob(root.left.left) + rob(root.left.right);
+        }
+        if (root.right != null){
+            val += rob(root.right.left) + rob(root.right.right);
+        }
+        //不抢当前节点
+        int temp = rob(root.left) + rob(root.right);
+        return Math.max(val, temp);
+    }
+}
+```
+
+#### 2.2.1.15 二叉树中第二小的节点
+
+[671. Second Minimum Node In a Binary Tree](https://leetcode.com/problems/second-minimum-node-in-a-binary-tree/)
+
+> Given a non-empty special binary tree consisting of nodes with the non-negative value, where each node in this tree has exactly `two` or `zero` sub-node. If the node has two sub-nodes, then this node's value is the smaller value among its two sub-nodes. More formally, the property `root.val = min(root.left.val, root.right.val)` always holds.
+>
+> Given such a binary tree, you need to output the **second minimum** value in the set made of all the nodes' value in the whole tree.
+>
+> If no such second minimum value exists, output -1 instead.
+>
+> **Example 1:**
+>
+> ```
+> Input: 
+>     2
+>    / \
+>   2   5
+>      / \
+>     5   7
+> 
+> Output: 5
+> Explanation: The smallest value is 2, the second smallest value is 5.
+> ```
+>
+>  
+>
+> **Example 2:**
+>
+> ```
+> Input: 
+>     2
+>    / \
+>   2   2
+> 
+> Output: -1
+> Explanation: The smallest value is 2, but there isn't any second smallest value.
+> ```
+
+### 2.2.2 层次遍历
+
+#### 2.2.2.1 二叉树的层平均值
+
+[637. Average of Levels in Binary Tree](https://leetcode.com/problems/average-of-levels-in-binary-tree/)
+
+> Given a non-empty binary tree, return the average value of the nodes on each level in the form of an array.
+>
+> **Example 1:**
+>
+> ```
+> Input:
+>     3
+>    / \
+>   9  20
+>     /  \
+>    15   7
+> Output: [3, 14.5, 11]
+> Explanation:
+> The average value of nodes on level 0 is 3,  on level 1 is 14.5, and on level 2 is 11. Hence return [3, 14.5, 11].
+> ```
+>
+> 
+>
+> **Note:**
+>
+> 1. The range of node's value is in the range of 32-bit signed integer.
+
+```java
+package com.problem637;
+
+import com.TreeNode;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+class Solution {
+    public List<Double> averageOfLevels(TreeNode root) {
+        LinkedList<TreeNode> queue = new LinkedList<>();
+        queue.addLast(root);
+        List<Double> list = new ArrayList<>();
+        TreeNode temp;
+        while (!queue.isEmpty()){
+            int size = queue.size();
+            long sum = 0;
+            int len = size;
+            while (size > 0){
+                temp = queue.pollFirst();
+                if (temp.left != null){
+                    queue.addLast(temp.left);
+                }
+                if (temp.right != null){
+                    queue.addLast(temp.right);
+                }
+                sum += temp.val;
+                size--;
+            }
+            list.add((sum / (double)len));
+        }
+        return list;
+    }
+}
+```
+
+#### 2.2.2.2 找树左下角的值
+
+[513. Find Bottom Left Tree Value](https://leetcode.com/problems/find-bottom-left-tree-value/)
+
+> Given a binary tree, find the leftmost value in the last row of the tree.
+>
+> **Example 1:**
+>
+> ```
+> Input:
+> 
+>     2
+>    / \
+>   1   3
+> 
+> Output:
+> 1
+> ```
+>
+> 
+>
+> **Example 2:** 
+>
+> ```
+> Input:
+> 
+>         1
+>        / \
+>       2   3
+>      /   / \
+>     4   5   6
+>        /
+>       7
+> 
+> Output:
+> 7
+> ```
+>
+> 
+>
+> **Note:** You may assume the tree (i.e., the given root node) is not **NULL**.
+
+
 
 ## 2.3 栈和队列
 
@@ -3664,5 +7906,7 @@ class Solution {
 ## 2.6 数组与矩阵
 
 ## 2.7 图
+
+
 
 ## 2.8 位运算

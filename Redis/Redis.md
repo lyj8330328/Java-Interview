@@ -621,7 +621,84 @@ class LRUCache<K, V> extends LinkedHashMap<K, V> {
 
 ```
 
-## 4.2 Redis如何实现lru
+## *4.2 Redis如何实现LRU
+
+实现该缓存满足如下两点：
+
+get(key) - 如果该元素(总是正数)存在，将该元素移动到lru头部，并返回该元素的值，否则返回-1。
+
+set(key,value) - 设置一个key的值为value(如果该元素存在),并将该元素移动到LRU头部。否则插入一个key,且值为value。如果在设置前检查到，该key插入后，会超过cache的容量，则根据LRU策略，删除最近最少使用的key。
+
+为了支持LRU，Redis 2.8.19中使用了一个全局的LRU时钟，server.lruclock，定义如下，
+
+~~~c
+```
+#define REDIS_LRU_BITS 24
+unsigned lruclock:REDIS_LRU_BITS; /* Clock for LRU eviction */
+```
+~~~
+
+默认的LRU时钟的分辨率是1秒，可以通过改变REDIS_LRU_CLOCK_RESOLUTION宏的值来改变，Redis会在serverCron()中调用updateLRUClock定期的更新LRU时钟，更新的频率和hz参数有关，默认为100ms一次，如下
+
+```c
+#define REDIS_LRU_CLOCK_MAX ((1<lru */
+#define REDIS_LRU_CLOCK_RESOLUTION 1 /* LRU clock resolution in seconds */
+void updateLRUClock(void) {
+    server.lruclock = (server.unixtime / REDIS_LRU_CLOCK_RESOLUTION) &
+                                                REDIS_LRU_CLOCK_MAX;
+}
+```
+
+server.unixtime是系统当前的unix时间戳，当 lruclock 的值超出REDIS_LRU_CLOCK_MAX时，会从头开始计算，所以在计算一个key的最长没有访问时间时，可能key本身保存的lru访问时间会比当前的lrulock还要大，这个时候需要计算额外时间，如下，
+
+```c
+/* Given an object returns the min number of seconds the object was never
+ * requested, using an approximated LRU algorithm. */
+unsigned long estimateObjectIdleTime(robj *o) {
+    if (server.lruclock >= o->lru) {
+        return (server.lruclock - o->lru) * REDIS_LRU_CLOCK_RESOLUTION;
+    } else {
+        return ((REDIS_LRU_CLOCK_MAX - o->lru) + server.lruclock) *
+                    REDIS_LRU_CLOCK_RESOLUTION;
+    }
+}
+```
+
+Redis支持和LRU相关淘汰策略包括，
+
+volatile-lru设置了过期时间的key参与近似的lru淘汰策略
+
+allkeys-lru所有的key均参与近似的lru淘汰策略
+
+当进行LRU淘汰时，Redis按如下方式进行的
+
+```c
+/* volatile-lru and allkeys-lru policy */
+else if (server.maxmemory_policy == REDIS_MAXMEMORY_ALLKEYS_LRU ||
+         server.maxmemory_policy == REDIS_MAXMEMORY_VOLATILE_LRU)
+{
+    for (k = 0; k < server.maxmemory_samples; k++) {
+        sds thiskey;
+        long thisval;
+        robj *o;
+        de = dictGetRandomKey(dict);
+        thiskey = dictGetKey(de);
+        /* When policy is volatile-lru we need an additional lookup
+                     * to locate the real key, as dict is set to db->expires. */
+        if (server.maxmemory_policy == REDIS_MAXMEMORY_VOLATILE_LRU)
+            de = dictFind(db->dict, thiskey);
+        o = dictGetVal(de);
+        thisval = estimateObjectIdleTime(o);
+        /* Higher idle time is better candidate for deletion */
+        if (bestkey == NULL || thisval > bestval) {
+            bestkey = thiskey;
+            bestval = thisval;
+        }
+    }
+}
+```
+
+Redis会基于server.maxmemory_samples配置**选取固定数目的key**，然后比较它们的lru访问时间，然后淘汰最近最久没有访问的key，maxmemory_samples的值越大，**Redis的近似LRU算法就越接近于严格LRU算法**，但是相应消耗也变高，对性能有一定影响，样本值默认为5。
 
 # 五、Redis持久化机制
 
@@ -859,7 +936,7 @@ WATCH key [key ...]
 
 ![](http://mycsdnblog.work/201919151740-X.png)
 
-解决思路：先删除缓存，再更新数据库。如果数据库更新失败了，那么数据库中是旧数据，缓存中是空的，那么数据不会不一致。因为读的时候缓存没有，所以去读了数据库中的旧数据，然后更新到缓存中。
+**解决思路**：先删除缓存，再更新数据库。如果数据库更新失败了，那么数据库中是旧数据，缓存中是空的，那么数据不会不一致。因为读的时候缓存没有，所以去读了数据库中的旧数据，然后更新到缓存中。
 
 ## 9.3 比较复杂的数据不一致问题分析
 
@@ -921,7 +998,7 @@ WATCH key [key ...]
 
 # 十、Redis的线程模型是什么
 
-redis 内部使用文件事件处理器 `file event handler`，这个文件事件处理器是单线程的，所以 redis 才叫做单线程的模型。它采用 IO 多路复用机制同时监听多个 socket，将产生事件的 socket 压入内存队列中，事件分派器根据 socket 上的事件类型来选择对应的事件处理器进行处理。
+redis 内部使用文件事件处理器 `file event handler`，这个文件事件处理器是**单线程的**，所以 redis 才叫做单线程的模型。它采用 IO 多路复用机制同时监听多个 socket，将产生事件的 socket 压入内存队列中，事件分派器根据 socket 上的事件类型来选择对应的事件处理器进行处理。
 
 文件事件处理器的结构包含 4 个部分：
 

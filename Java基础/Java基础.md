@@ -1,17 +1,19 @@
 # 一、final、finally、finalize的区别
 
-final：java中的关键字，修饰符。
+**final：java中的关键字，修饰符**
 
 A).如果一个类被声明为final，就意味着它不能再派生出新的子类，不能作为父类被继承。因此，一个类不能同时被声明为abstract抽象类的和final的类。
 B).如果将变量或者方法声明为final，可以保证它们在使用中不被改变.
-　　1)被声明为final的变量必须在声明时给定初值，而在以后的引用中只能读取，不可修改。 
-　　2)被声明final的方法只能使用，不能重载。
 
-finally：java的一种异常处理机制。
+- 被声明为final的变量必须在声明时给定初值，而在以后的引用中只能读取，不可修改。 
+- 被声明final的方法只能使用，不能重载。
+
+**finally：java的一种异常处理机制。**
 
 finally是对Java异常处理模型的最佳补充。finally结构使代码总会执行，而不管无异常发生。使用finally可以维护对象的内部状态，并可以清理非内存资源。特别是在关闭数据库连接这方面，如果程序员把数据库连接的close()方法放到finally中，就会大大降低程序出错的几率。
 
-finalize：Java中的一个方法名。
+**finalize：Java中的一个方法名**
+
 Java技术使用finalize()方法在垃圾收集器将对象从内存中清除出去前，做必要的清理工作。这个方法是由垃圾收集器在确定这个对象没被引用时对这个对象调用的。它是在Object类中定义的，因此所的类都继承了它。子类覆盖finalize()方法以整理系统资源或者执行其他清理工作。**finalize()方法是在垃圾收集器删除对象之前对这个对象调用的。**
 
   **对象的销毁过程** 
@@ -204,19 +206,479 @@ public class Test {
 }
 ```
 
-# 七、Object中的方法
+# 七、“方法”
+
+## 7.1 Object中的方法
 
 ![1551439525914](assets/1561973717974.png)
 
+## 7.2 String中常用的方法
 
+```java
+Object类中的方法。
+length()
+isEmpty()
+equals()
+toCharArray()
+valueOf()
+intern()
+compareTo()
+subString()
+contains()
+split()
+trim()
+toLowerCase()
+toUpperCase()
+startsWith()
+```
 
-# 八、Java中的对象拷贝
+# 八、Java中的浅拷贝和深拷贝
 
-主要分为：浅拷贝(Shallow Copy)、深拷贝(Deep Copy)。
+## 8.1 浅拷贝
 
-浅拷贝：复制引用
+### 8.1.1 基本概念
 
-深拷贝：创建一个新的对象或数组，将原来的对象或数组的值拷贝过来
+①对于数据类型是基本数据类型的成员变量，浅拷贝会直接进行值传递，也就是将该属性值复制一份给新的对象。因为是两份不同的数据，所以对其中一个对象的该成员变量值进行修改，不会影响另一个对象拷贝得到的数据。
+
+②对于数据类型是引用数据类型的成员变量，比如说成员变量是某个数组、某个类的对象等，那么浅拷贝会进行引用传递，也就是只是将该成员变量的引用值（内存地址）复制一份给新的对象。因为实际上两个对象的该成员变量都指向同一个实例。在这种情况下，在一个对象中修改该成员变量会影响到另一个对象的该成员变量值
+
+具体模型如图所示：可以看到基本数据类型的成员变量，对其值创建了新的拷贝。而引用数据类型的成员变量的实例仍然是只有一份，两个对象的该成员变量都指向同一个实例。
+
+![](http://mycsdnblog.work/201919141921-T.png)
+
+### 8.1.2 实现方式
+
+> **通过拷贝构造方法实现浅拷贝**
+
+拷贝构造方法指的是该类的构造方法参数为该类的对象。使用拷贝构造方法可以很好地完成浅拷贝，直接通过一个现有的对象创建出与该对象属性相同的新的对象。
+
+```java
+package copy;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-14 19:26
+ * @Feature:
+ */
+public class Copy {
+
+    public static void main(String[] args) {
+        Age age = new Age(20);
+
+        Person p1 = new Person(age,20);
+        Person p2 = new Person(p1);
+
+        System.out.println(p1);
+        System.out.println(p2);
+
+        p1.setAge2(999);
+        age.setAge(99);
+        p1.setAge(age);
+
+        System.out.println(p1);
+        System.out.println(p2);
+    }
+
+}
+
+class Person{
+    private Age age;
+    private int age2;
+
+    public Person(Age age, int age2) {
+        this.age = age;
+        this.age2 = age2;
+    }
+
+    /**
+     * 拷贝构造方法
+     * @param person
+     */
+    public Person(Person person){
+        this.age = person.age;
+        this.age2 = person.age2;
+    }
+
+    public Age getAge() {
+        return age;
+    }
+
+    public void setAge(Age age) {
+        this.age = age;
+    }
+
+    public int getAge2() {
+        return age2;
+    }
+
+    public void setAge2(int age2) {
+        this.age2 = age2;
+    }
+
+    @Override
+    public String toString() {
+        return "Person{" +
+                "age=" + age +
+                ", age2=" + age2 +
+                '}';
+    }
+}
+class Age{
+    private int age;
+
+    public Age(int age) {
+        this.age = age;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return "Age{" +
+                "age=" + age +
+                '}';
+    }
+}
+```
+
+执行结果：
+
+![](http://mycsdnblog.work/201919141948-H.png)
+
+结果分析：
+
+**age为引用类型，age2为基本类型**
+
+修改p1的age，p2的age也随之改变
+
+修改p1的age2，p2的age2不变。
+
+> **通过重写clone()方法进行浅拷贝**
+
+```java
+package copy;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-14 19:26
+ * @Feature:
+ */
+public class Copy {
+
+    public static void main(String[] args) throws CloneNotSupportedException {
+        Age age = new Age(20);
+
+        Person p1 = new Person(age,20);
+        Person p2 = (Person) p1.clone();
+
+        System.out.println(p1);
+        System.out.println(p2);
+
+        p1.setAge2(999);
+        age.setAge(99);
+        p1.setAge(age);
+
+        System.out.println(p1);
+        System.out.println(p2);
+    }
+
+}
+
+class Person implements Cloneable{
+    private Age age;
+    private int age2;
+
+    public Person(Age age, int age2) {
+        this.age = age;
+        this.age2 = age2;
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+
+    public Age getAge() {
+        return age;
+    }
+
+    public void setAge(Age age) {
+        this.age = age;
+    }
+
+    public int getAge2() {
+        return age2;
+    }
+
+    public void setAge2(int age2) {
+        this.age2 = age2;
+    }
+
+    @Override
+    public String toString() {
+        return "Person{" +
+                "age=" + age +
+                ", age2=" + age2 +
+                '}';
+    }
+}
+class Age{
+    private int age;
+
+    public Age(int age) {
+        this.age = age;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return "Age{" +
+                "age=" + age +
+                '}';
+    }
+}
+```
+
+运行结果：
+
+![](http://mycsdnblog.work/201919141953-J.png)
+
+## 8.2 深拷贝
+
+### 8.2.1 基本概念
+
+首先介绍对象图的概念。设想一下，一个类有一个对象，其成员变量中又有一个对象，该对象指向另一个对象，另一个对象又指向另一个对象，直到一个确定的实例。这就形成了对象图。**那么，对于深拷贝来说，不仅要复制对象的所有基本数据类型的成员变量值，还要为所有引用数据类型的成员变量申请存储空间，并复制每个引用数据类型成员变量所引用的对象，直到该对象可达的所有对象**。**也就是说，对象进行深拷贝要对整个对象图进行拷贝！**
+
+**简单地说，深拷贝对引用数据类型的成员变量的对象图中所有的对象都开辟了内存空间；而浅拷贝只是传递地址指向，新的对象并没有对引用数据类型创建内存空间。**
+
+深拷贝模型如图所示：可以看到所有的成员变量都进行了复制。
+
+![](http://mycsdnblog.work/201919141955-9.png)
+
+因为创建内存空间和拷贝整个对象图，所以深拷贝相比于浅拷贝速度较慢并且花销较大。
+
+### 8.2.2 实现方式
+
+> **通过重写clone方法来实现深拷贝**
+
+```java
+package copy;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-14 19:26
+ * @Feature:
+ */
+public class Copy {
+
+    public static void main(String[] args) throws CloneNotSupportedException {
+        Age age = new Age(20);
+
+        Person p1 = new Person(age,20);
+        Person p2 = (Person) p1.clone();
+
+        System.out.println(p1);
+        System.out.println(p2);
+
+        p1.setAge2(999);
+        age.setAge(99);
+        p1.setAge(age);
+
+        System.out.println(p1);
+        System.out.println(p2);
+    }
+
+}
+
+class Person implements Cloneable{
+    private Age age;
+    private int age2;
+
+    public Person(Age age, int age2) {
+        this.age = age;
+        this.age2 = age2;
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        Object obj;
+        obj = super.clone();
+        Person person = (Person) obj;
+        person.setAge((Age) person.getAge().clone());
+        return obj;
+    }
+
+    public Age getAge() {
+        return age;
+    }
+
+    public void setAge(Age age) {
+        this.age = age;
+    }
+
+    public int getAge2() {
+        return age2;
+    }
+
+    public void setAge2(int age2) {
+        this.age2 = age2;
+    }
+
+    @Override
+    public String toString() {
+        return "Person{" +
+                "age=" + age +
+                ", age2=" + age2 +
+                '}';
+    }
+}
+class Age implements Cloneable{
+    private int age;
+
+    public Age(int age) {
+        this.age = age;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return "Age{" +
+                "age=" + age +
+                '}';
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+}
+```
+
+运行结果：
+
+![](http://mycsdnblog.work/201919142004-2.png)
+
+分析结果可以验证：进行了深拷贝之后，无论是什么类型的属性值的修改，都不会影响另一个对象的属性值。
+
+> **通过序列化的方式进行深拷贝**
+
+```java
+package copy;
+
+import java.io.*;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-14 19:26
+ * @Feature:
+ */
+public class Copy {
+
+    public static void main(String[] args) throws CloneNotSupportedException, IOException, ClassNotFoundException {
+        Age age = new Age(20);
+
+        Person p1 = new Person(age,20);
+        //序列化
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
+        outputStream.writeObject(p1);
+        outputStream.flush();
+        ObjectInputStream objectInputStream = new ObjectInputStream(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
+        Person p2 = (Person) objectInputStream.readObject();
+        
+        System.out.println(p1);
+        System.out.println(p2);
+
+        p1.setAge2(999);
+        age.setAge(99);
+        p1.setAge(age);
+
+        System.out.println(p1);
+        System.out.println(p2);
+    }
+
+}
+
+class Person implements Serializable {
+    private Age age;
+    private int age2;
+
+    public Person(Age age, int age2) {
+        this.age = age;
+        this.age2 = age2;
+    }
+
+    public Age getAge() {
+        return age;
+    }
+
+    public void setAge(Age age) {
+        this.age = age;
+    }
+
+    public int getAge2() {
+        return age2;
+    }
+
+    public void setAge2(int age2) {
+        this.age2 = age2;
+    }
+
+    @Override
+    public String toString() {
+        return "Person{" +
+                "age=" + age +
+                ", age2=" + age2 +
+                '}';
+    }
+}
+class Age implements Serializable{
+    private int age;
+
+    public Age(int age) {
+        this.age = age;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return "Age{" +
+                "age=" + age +
+                '}';
+    }
+}
+```
+
+运行结果：
+
+![](http://mycsdnblog.work/201919142017-F.png)
 
 # 九、Java中的权限
 
@@ -819,7 +1281,7 @@ a= a ^ b b = a ^ b a = a ^ b
 ![](http://mycsdnblog.work/201919111010-0.png)
 
 1. Mark Word：存储对象运行时记录信息（**存储对象的HashCode、分代年龄和锁标记位**），占用内存大小与机器位数一样，即**32位机占4字节，64位机占8字节**
-2. 元数据指针：指向描述类型的Klass对象（Java类的C++对等体）的指针，Klass对象包含了实例对象所属类型的元数据，因此该字段被称为元数据指针，JVM在运行时将频繁使用这个指针定位到位于方法区内的类型信息。占用内存大小与机器位数一样。
+2. 元数据指针：指向描述类型的Klass对象（Java类的C++对等体）的指针，Klass对象包含了实例对象所属类型的元数据，因此该字段被称为元数据指针，JVM在运行时将频繁使用这个指针定位到位于方法区内的类型信息。**占用内存大小与机器位数一样**。
 3. 数组长度：数组对象特有，4个字节
 4. 实例数据：实例数据就是8大基本数据类型byte、short、int、long、float、double、char、boolean（对象类型也是由这8大基本数据类型复合而成），每种数据类型占多少字节就不一一例举了
 5. 填充：不定，**HotSpot的对齐方式为8字节对齐，即一个对象必须为8字节的整数倍**，因此如果最后前面的数据大小为17则填充7，前面的数据大小为18则填充6，以此类推
@@ -886,7 +1348,7 @@ Class.forName(className)方法，内部实际调用的方法是  Class.forName(c
 
 一旦初始化，就会触发目标对象的 static块代码执行，static参数也也会被再次初始化。
 
-​    
+   
 
 ClassLoader.getSystemClassLoader().loadClass(className)方法，内部实际调用的方法是  ClassLoader.getSystemClassLoader().loadClass(className,false);
 
@@ -926,3 +1388,296 @@ serialVersionUID的主要作用有以下两个：
 MVC，Model View Controller，是软件架构中最常见的一种框架，简单来说就是通过controller的控制去操作model层的数据，并且返回给view层展示。
 
 ![](http://mycsdnblog.work/201919041924-a.png)
+
+# 三十八、Java中char可以表示一个汉字吗？
+
+在uft8编码下占三个字节； 
+**在GBK编码下占2个字节；** 
+但是如果 char表示英文字母： 
+在uft8编码下占一个字节； 
+**在GBK编码下还是占2个字节；** 
+
+**所以char类型的值不管是英文还是中文都是统一两个字节！** 
+
+# 三十九、Java对象的生命周期
+
+在Java中，对象的生命周期包括以下几个阶段：
+
+1. 创建阶段(Created)
+
+2. 应用阶段(In Use)
+
+3. 不可见阶段(Invisible)
+
+   当一个对象处于不可见阶段时，说明程序本身不再持有该对象的任何强引用，虽然该这些引用仍然是存在着的。
+
+4. 不可达阶段(Unreachable)
+
+   对象处于不可达阶段是指该对象不再被任何强引用所持有
+
+   与“不可见阶段”相比，“不可见阶段”是指程序不再持有该对象的任何强引用，这种情况下，该对象仍可能被JVM等系统下的某些已装载的静态变量或线程或JNI等强引用持有着，这些特殊的强引用被称为”GC root”。存在着这些GC root会导致对象的内存泄露情况，无法被回收。
+
+5. 收集阶段(Collected)
+
+   当垃圾回收器发现该对象已经处于“不可达阶段”并且垃圾回收器已经对该对象的内存空间重新分配做好准备时，则对象进入了“收集阶段”。如果该对象已经重写了finalize()方法，则会去执行该方法的终端操作。
+
+6. 终结阶段(Finalized)
+
+   当对象执行完finalize()方法后仍然处于不可达状态时，则该对象进入终结阶段。在该阶段是等待垃圾回收器对该对象空间进行回收。
+
+7. 对象空间重分配阶段(De-allocated)
+
+   垃圾回收器对该对象的所占用的内存空间进行回收或者再分配了，则该对象彻底消失了，称之为“对象空间重新分配阶段”。
+
+# 四十、理解Java中的各种O
+
+**1、PO(persistant object) 持久对象** 
+
+对应于DAO层中操作的对象
+
+- 有时也被称为Data对象，对应数据库中的entity，可以简单认为一个PO对应数据库中的一条记录，多个记录可以用PO的集合。
+- 在o/r 映射的时候出现的概念,如果没有o/r映射,就没有这个概念存在了。
+- PO中应该不包含任何对数据库的操作。
+
+**2、VO(value object) 值对象** 
+
+对应View层，用于显示的Java Bean
+
+- 主要对应页面显示（web页面(jsp...)/swt、swing界面）的数据对象，所以它可以和表对应，也可以不（大部分情况是表所有字段集合的子集），这根据业务的需要。
+
+- 与DTO的区别是：DTO用于无界面的web service传输中而VO用于界面的展示，可以把DTO转化为VO提供给前台。
+
+**3、DTO(Data Transfer Object)，数据传输对象** 
+
+在应用程序不同tie(关系)之间传输的对象 
+
+对应Controller层中，接收和返回的Java Bean。
+
+- 用在需要跨进程或远程传输时，它不应该包含业务逻辑。
+- 比如一张表有100个字段，那么对应的PO就有100个属性（大多数情况下，DTO 内的数据来自多个表）。但view层只需显示10个字段，没有必要把整个PO对象传递到client，这时我们就可以用只有这10个属性的DTO来传输数据到client，这样也不会暴露server端表结构。到达客户端以后，如果用这个对象来对应界面显示，那此时它的身份就转为VO。
+
+**4、BO(business object) 业务对象** 
+
+对应Service中的Java Bean 
+
+- 从业务模型的角度看,见UML元件领域模型中的领域对象.封装业务逻辑的java对象,通过调用DAO方法,结合PO,VO进行业务操作。
+
+- 根据业务逻辑，将封装业务逻辑为一个对象，可以包括多个PO，通常需要将BO转化成PO，才能进行数据的持久化，反之，从DB中得到的PO，需要转化成BO才能在业务层使用。
+
+关于BO主要有三种概念
+
+- 只包含业务对象的属性
+- 只包含业务方法
+- 两者都包含
+
+在实际使用中，认为哪一种概念正确并不重要，关键是实际应用中适合自己项目的需要。
+
+**5、DAO(data access object) 数据访问对象** 
+是一个sun的一个标准j2ee设计模式，这个模式中有个接口就是DAO，它负持久层的操作。为业务层提供接口。此对象用于访问数据库。通常和PO结合使用，DAO中包含了各种数据库的操作方法。通过它的方法,结合PO对数据库进行相关的操作。夹在业务逻辑与数据库资源中间。配合VO, 
+提供数据库的CRUD操作...   
+
+**6、POJO(plain ordinary java object) 简单无规则java对象** 
+纯的传统意义的java对象。就是说在一些Object/Relation 
+Mapping工具中，能够做到维护数据库表记录的persisent 
+object完全是一个符合Java Bean规范的纯Java对象，没有增加别的属性和方法。我的理解就是最基本的Java 
+Bean，只有属性字段及setter和getter方法！。 
+
+![](http://mycsdnblog.work/201919161441-u.png)
+
+# 四十一、Spring Boot中的classpath
+
+springboot项目创建完成后，会生成该项目名称+iml后缀的文件。该文件位于项目的根目录下。
+打开后，在name="NewModuleRootManager"的component声明中，会有几个默认content声明
+
+```xml
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
+      <excludeFolder url="file://$MODULE_DIR$/target" />
+    </content>
+```
+
+其中sourceFolder 中声明的就是classpath，只是类型不同。对应的工程文件目录：
+
+![](http://mycsdnblog.work/201919171559-E.png)
+
+其中蓝色的java目录：保存项目的java文件。
+ resources是项目的资源目录，里面通常包含static与templates目录
+ 绿色的test/java目录是编写的测试类的目录。
+
+- 工程编译后，会将src/main/java中的.java文件按照包文件结构编译成.class存入target/classes目录。
+- 工程编译后，会将src/main/resources中的static、templates目录里的文件分别拷贝入classes/static 与classes/template 中。结构保持一致。
+- 工程编译后，会将test/java 中的文件编译进classes/test-classes目录中。
+
+**可以根据项目需要，修改.iml文件的content，来添加不同的资源路径。**
+
+# 四十二、静态内部类的和普通内部类的区别
+
+定义在一个类内部的类叫内部类，包含内部类的类称为外部类。内部类可以声明public、protected、private等访问限制，可以声明 为abstract的供其他内部类或外部类继承与扩展，或者声明为static、final的，也可以实现特定的接口。外部类按常规的类访问方式使用内部类，唯一的差别是**外部类可以访问内部类的所有方法与属性，包括私有方法与属性**。
+
+## 42.1 创建实例
+
+```java
+package com.example.inner;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-25 21:26
+ * @Feature:
+ */
+public class OutClass {
+
+    private OutClass(){
+    }
+
+    private static volatile OutClass instance;
+
+    static OutClass getInstance(){
+        if (instance == null){
+            synchronized (OutClass.class){
+                if (instance == null){
+                    instance = new OutClass();
+                }
+            }
+        }
+        return instance;
+    }
+
+    class InnerClass{
+        InnerClass(){
+            System.out.println("内部类初始化");
+        }
+
+    }
+
+    static class StaticInnerClass{
+        StaticInnerClass(){
+            System.out.println("静态内部类初始化");
+        }
+    }
+
+}
+```
+
+测试
+
+```java
+package com.example.inner;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-25 21:36
+ * @Feature:
+ */
+public class Test {
+
+    public static void main(String[] args) {
+        OutClass.InnerClass innerClass = OutClass.getInstance().new InnerClass();
+
+        OutClass.StaticInnerClass staticInnerClass = new OutClass.StaticInnerClass();
+    }
+}
+```
+
+## 42.2 内部类中的this
+
+ 内部类中的this与其他类一样是指的本身。创建内部类对象时，它会与创造它的外围对象有了某种联系，于是能访问外围类的所有成员，不需任何特殊条件，可理 解为内部类链接到外部类。 用外部类创建内部类对象时，此内部类对象会秘密的捕获一个指向外部类的引用，于是，可以通过这个引用来访问外围类的成员。
+
+## 42.3 外部类访问内部类
+
+内部类类似外部类的属性，因此访问内部类对象时总是需要一个创建好的外部类对象。内部类对象通过‘外部类名.this.xxx’的形式访问外部类的属性与方法。如：
+
+```java
+package com.example.inner;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-25 21:26
+ * @Feature:
+ */
+public class OutClass {
+
+    private String name = "123";
+
+    private OutClass(){
+    }
+
+    private static volatile OutClass instance;
+
+    static OutClass getInstance(){
+        if (instance == null){
+            synchronized (OutClass.class){
+                if (instance == null){
+                    instance = new OutClass();
+                }
+            }
+        }
+        return instance;
+    }
+
+    class InnerClass{
+
+        public int age = 0;
+
+        InnerClass(){
+            System.out.println("内部类初始化");
+            System.out.println(name);
+            System.out.println(age);
+        }
+
+    }
+
+    static class StaticInnerClass{
+
+        public int age;
+
+        StaticInnerClass(){
+            System.out.println("静态内部类初始化");
+        }
+    }
+
+}
+```
+
+## 42.4 内部类向上转型
+
+内部类也可以和普通类一样拥有向上转型的特性。将内部类向上转型为基类型，尤其是接口时，内部类就有了用武之地。如果内部类是private的，只可以被它的外部类访问，从而完全隐藏实现的细节。
+
+## 42.5 方法内的类
+
+方法内创建的类（注意方法中也能定义类），不能加访问修饰符。另外，方法内部的类也不是在调用方法时才会创建的，它们一样也被事先编译了。
+
+```java
+public void test(){
+    class MethodInnerClass{
+        
+    }
+}
+```
+
+## 42.6 静态内部类
+
+定义静态内部类：在定义内部类的时候，可以在其前面加上一个权限修饰符static。此时这个内部类就变为了静态内部类。
+
+通常称为**嵌套类**，当内部类是static时，意味着：
+
+   [1]**要创建嵌套类的对象，并不需要其外围类的对象**；
+
+   [2]**不能从嵌套类的对象中访问非静态的外围类对象**（不能够从静态内部类的对象中访问外部类的非静态成员）；
+
+嵌套类与普通的内部类还有一个区别：普通内部类的字段与方法，只能放在类的外部层次上，**所以普通的内部类不能有static数据和static字段**， 也不能包含嵌套类。但是在嵌套类里可以包含所有这些东西。**也就是说，在非静态内部类中不可以声明静态成员，只有将某个内部类修饰为静态类，然后才能够在这 个类中定义静态的成员变量与成员方法。**
+
+另外，在创建静态内部类时不需要将静态内部类的实例绑定在外部类的实例上。普通非静态内部类的 对象是依附在外部类对象之中的，要在一个外部类中定义一个静态的内部类，不需要利用关键字new来创建内部类的实例。静态类和方法只属于类本身，并不属于 该类的对象，更不属于其他外部类的对象。
+
+## 42.7 内部类标识符
+
+每个类会产生一个.class文件，文件名即为类名。同样，内部类也会产生这么一个.class文件，但是它的名称却不是内部类的类名，而是有着严格的限制：**外围类的名字，加上$,再加上内部类名字**。
+
+## 42.8 为什么使用内部类
+
+**内部类一般只为其外部类使用；**
+
+**内部类提供了某种进入外部类的窗户；**
+
+**也是最吸引人的原因，每个内部类都能独立地继承一个接口，而无论外部类是否已经继承了某个接口。因此，内部类使多重继承的解决方案变得更加完整。**

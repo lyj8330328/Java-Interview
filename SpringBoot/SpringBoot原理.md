@@ -405,7 +405,7 @@ protected Class<?> getSpringFactoriesLoaderFactoryClass() {
 
 ### 2.4.1 默认配置类
 
-@EnableAutoConfiguration会开启SpringBoot的自动配置，并且根据你引入的依赖来生效对应的默认配置。那么问题来了：
+@EnableAutoConfiguration会开启SpringBoot的自动配置，**并且根据你引入的依赖来生效对应的默认配置**。那么问题来了：
 
 - 这些默认配置是在哪里定义的呢？
 - 为何依赖引入就会触发配置呢？
@@ -479,7 +479,7 @@ SpringBoot为我们提供了默认配置，而默认配置生效的条件一般�
 
 1）启动器
 
-所以，我们如果不想配置，只需要引入依赖即可，而依赖版本我们也不用操心，因为只要引入了SpringBoot提供的stater（启动器），就会自动管理依赖及版本了。
+**所以，我们如果不想配置，只需要引入依赖即可，而依赖版本我们也不用操心，因为只要引入了SpringBoot提供的stater（启动器），就会自动管理依赖及版本了。**
 
 因此，玩SpringBoot的第一件事情，就是找启动器，SpringBoot提供了大量的默认启动器。
 

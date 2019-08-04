@@ -190,6 +190,8 @@ protected boolean removeEldestEntry(Map.Entry<K,V> eldest) {
 
 # 四、实现LRU
 
+## 4.1 基于LinkedHashMap实现LRU
+
 页面访问序列：4，7，0，7，1，0，1，2，1，2，6
 
 进程分配的物理块大小为：5
@@ -279,3 +281,180 @@ public class Test2 {
 对比：
 
 ![](http://mycsdnblog.work/201919222053-u.png)
+
+## 4.2 基于双向链表实现LRU
+
+1、节点数据结构
+
+```java
+package com.example.lru;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-19 19:31
+ * @Feature:
+ */
+public class LinkedNode {
+
+    String key;
+    Object value;
+    LinkedNode pre;
+    LinkedNode next;
+}
+```
+
+2、实现
+
+思路：
+
+1、构建一个双向链表，为了提供查询速度，使用一个HashMap来保存每个节点
+
+2、构造函数中初始化头尾节点，计数器，缓存容量
+
+4、提供removeNode方法，删除链表中的任一节点
+
+3、提供moveHead方法，将链表中的任一节点移动到链表头部
+
+4、提供get方法，从map中查询到节点，然后把该节点移动到头部
+
+4、提供set方法，如果key值在map中不存在，那么就构造节点，然后将该节点放入到map中并且往链接头部插入一个新节点；如果key值在map中存在，那么就把对应节点移动到链接头部
+
+```java
+package com.example.lru;
+
+import java.util.*;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-19 19:32
+ * @Feature:
+ */
+public class LRUCache {
+
+    private HashMap<String,LinkedNode> map = new HashMap<String, LinkedNode>();
+
+    private int count;
+    private int capacity;
+    private LinkedNode head,tail;
+
+    public LRUCache(int capacity) {
+        this.capacity = capacity;
+        this.count = 0;
+        head = new LinkedNode();
+        head.pre = null;
+        tail = new LinkedNode();
+        tail.next = null;
+        head.next = tail;
+        tail.pre = head;
+    }
+
+    public Object get(String key){
+        LinkedNode node = map.get(key);
+        if (node == null){
+            return -1;
+        }
+        this.moveHead(node);
+        return node.value;
+    }
+
+    public void set(String key, Object o){
+        LinkedNode node = map.get(key);
+        if (node == null){
+            LinkedNode insertNode = new LinkedNode();
+            insertNode.value = o;
+            insertNode.key = key;
+            this.map.put(key, insertNode);
+            this.addNode(insertNode);
+            this.count++;
+            if (count > capacity){
+                LinkedNode tail = this.popTail();
+                this.map.remove(tail.key);
+                this.count--;
+            }
+        }else {
+            node.value = o;
+            this.moveHead(node);
+        }
+    }
+
+    private LinkedNode popTail() {
+        LinkedNode node = tail.pre;
+        this.removeNode(node);
+        return node;
+    }
+
+    private void removeNode(LinkedNode node) {
+        LinkedNode pre = node.pre;
+        LinkedNode next = node.next;
+        pre.next = next;
+        next.pre = pre;
+    }
+
+    private void addNode(LinkedNode node) {
+        node.pre = head;
+        node.next = head.next;
+        head.next.pre = node;
+        head.next = node;
+    }
+
+    private void moveHead(LinkedNode node) {
+        this.removeNode(node);
+        this.addNode(node);
+    }
+
+    public List<String> keySet(){
+        List<String> result = new ArrayList<String>();
+        if (this.count != 0) {
+            LinkedNode p = this.head.next;
+            while (p != tail) {
+                result.add(p.key);
+                p = p.next;
+            }
+        }
+        return result;
+    }
+
+
+    public boolean exists(String key){
+        return this.map.containsKey(key);
+    }
+}
+```
+
+3、测试
+
+```java
+package com.example.lru;
+
+import java.util.Arrays;
+import java.util.List;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-19 20:20
+ * @Feature:
+ */
+public class Test {
+
+    public static void main(String[] args) {
+        LRUCache cache = new LRUCache(5);
+        List<Integer> list = Arrays.asList(4,7,0,7,1,0,1,2,1,2,6);
+        for (int i : list){
+            if (cache.exists(i + "")){
+                cache.get(i + "");
+            }else {
+                cache.set(i + "", i * i);
+            }
+            System.out.println("-------------------------------");
+            for (String j : cache.keySet()){
+                System.out.printf("%5s",j);
+            }
+            System.out.println();
+        }
+    }
+}
+```
+
+4、结果
+
+![](http://mycsdnblog.work/201919192056-c.png)

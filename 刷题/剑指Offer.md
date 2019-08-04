@@ -386,7 +386,7 @@ public int NumberOf12(int n) {
 
 最优解：
 
-```class
+```java
 public class Solution {
     // you need to treat n as an unsigned value
     public int hammingWeight(int n) {

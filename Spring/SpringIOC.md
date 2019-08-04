@@ -1,3 +1,7 @@
+**Spring通过定义BeanDefinition来管理基于Spring的应用中的各种对象以及它们之间的互相依赖关系。**
+
+**BeanDefinition抽象了对Bean的定义，是让容器起作用的主要数据类型。**
+
 # 一、Spring IoC容器的设计
 
 Inversion of Control
@@ -55,31 +59,15 @@ public interface BeanFactory {
 
 ### 1.1.2 BeanFactory容器设计原理
 
-以XmlBeanFactory的实现为例：它只提供最基本的IoC容器的功能。
+以XmlBeanFactory的实现为例：**它只提供最基本的IoC容器的功能**。
 
 BeanFactory是实现IoC容器的基本形式
 
-DefaultListableBeanFactory是一个默认的功能完整的IoC容器
+**DefaultListableBeanFactory是一个默认的功能完整的IoC容器**
 
 XmlBeanFactory的功能是建立在DefaultListableBeanFactory这个基本容器的基础上的，并在这个容器的基础上实现了诸如XML读取的附加功能。
 
 ```java
-/*
- * Copyright 2002-2018 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.springframework.beans.factory.xml;
 
 import org.springframework.beans.BeansException;
@@ -87,35 +75,6 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.core.io.Resource;
 
-/**
- * Convenience extension of {@link DefaultListableBeanFactory} that reads bean definitions
- * from an XML document. Delegates to {@link XmlBeanDefinitionReader} underneath; effectively
- * equivalent to using an XmlBeanDefinitionReader with a DefaultListableBeanFactory.
- *
- * <p>The structure, element and attribute names of the required XML document
- * are hard-coded in this class. (Of course a transform could be run if necessary
- * to produce this format). "beans" doesn't need to be the root element of the XML
- * document: This class will parse all bean definition elements in the XML file.
- *
- * <p>This class registers each bean definition with the {@link DefaultListableBeanFactory}
- * superclass, and relies on the latter's implementation of the {@link BeanFactory} interface.
- * It supports singletons, prototypes, and references to either of these kinds of bean.
- * See {@code "spring-beans-3.x.xsd"} (or historically, {@code "spring-beans-2.0.dtd"}) for
- * details on options and configuration style.
- *
- * <p><b>For advanced needs, consider using a {@link DefaultListableBeanFactory} with
- * an {@link XmlBeanDefinitionReader}.</b> The latter allows for reading from multiple XML
- * resources and is highly configurable in its actual XML parsing behavior.
- *
- * @author Rod Johnson
- * @author Juergen Hoeller
- * @author Chris Beams
- * @since 15 April 2001
- * @see org.springframework.beans.factory.support.DefaultListableBeanFactory
- * @see XmlBeanDefinitionReader
- * @deprecated as of Spring 3.1 in favor of {@link DefaultListableBeanFactory} and
- * {@link XmlBeanDefinitionReader}
- */
 @Deprecated
 @SuppressWarnings({"serial", "all"})
 public class XmlBeanFactory extends DefaultListableBeanFactory {
@@ -166,7 +125,7 @@ reader.loadBeanDefinitions(resource);
 ApplicationContext提供了BeanFactory不具备的新特性：
 
 - 支持不同的信息源
-- 访问资源
+- 访问资源：从不同的I/O途径获取Bean定义信息
 - 支持应用事件
 - 在ApplicationContext中提供附加服务
 
@@ -203,75 +162,9 @@ protected Resource getResourceByPath(String path) {
 
 # 二、IoC容器的初始化过程
 
-通过调用refresh()方法来启动整个初始化过程：BeanDefinition的Resouce定位、载入和注册。
+## 2.1 refresh方法
 
-Resource定位过程：这个Resource定位指的是BeanDefinition的资源定位，它由ResourceLoader通过统一的Resource接口来完成，这个Resource对各种形式的BeanDefinition的使用都提供了统一的接口。
-
-BeanDefinition的载入：把用户定义好的Bean表示成IoC容器内部的数据结构，这个是数据结构就是BeanDefinition。
-
-注册过程：向IoC容器中注册这些BeanDefinition的过程，在这个过程中，一般不包含Bean依赖注入的实现。Bean定义的载入和依赖注入是两个独立的过程。依赖注入一般发生在应用第一次通过getBean向容器索取Bean的时候（预实例化配置：lazyinit，注入在容器初始化的时候就完成）
-
-## 2.1 BeanDefinition的Resouce定位
-
-```java
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by Fernflower decompiler)
-//
-
-package org.springframework.context.support;
-
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
-
-public class FileSystemXmlApplicationContext extends AbstractXmlApplicationContext {
-    public FileSystemXmlApplicationContext() {
-    }
-
-    public FileSystemXmlApplicationContext(ApplicationContext parent) {
-        super(parent);
-    }
-	//configLocation就是配置文件(BeanDefinition)的路径
-    public FileSystemXmlApplicationContext(String configLocation) throws BeansException {
-        this(new String[]{configLocation}, true, (ApplicationContext)null);
-    }
-	//包含多个配置文件
-    public FileSystemXmlApplicationContext(String... configLocations) throws BeansException {
-        this(configLocations, true, (ApplicationContext)null);
-    }
-	//允许指定双亲IOC容器
-    public FileSystemXmlApplicationContext(String[] configLocations, ApplicationContext parent) throws BeansException {
-        this(configLocations, true, parent);
-    }
-
-    public FileSystemXmlApplicationContext(String[] configLocations, boolean refresh) throws BeansException {
-        this(configLocations, refresh, (ApplicationContext)null);
-    }
-	//在对象的初始化过程中，调用refresh方法载入BeanDefinition
-    public FileSystemXmlApplicationContext(String[] configLocations, boolean refresh, ApplicationContext parent) throws BeansException {
-        super(parent);
-        this.setConfigLocations(configLocations);
-        if (refresh) {
-            this.refresh();
-        }
-
-    }
-	//系统中BeanDefinition的路径，在BeanDefinitionReader的loadBeanDefintion中被调用
-    protected Resource getResourceByPath(String path) {
-        if (path != null && path.startsWith("/")) {
-            path = path.substring(1);
-        }
-
-        return new FileSystemResource(path);
-    }
-}
-```
-
-定位BeanDefinition的位置
-
-## 2.2 BeanDefinition的载入和解析
+`FileSystemXmlApplicationContext`构造函数中调用的refresh方法在`AbstractApplicationContext`中：
 
 ```java
 @Override
@@ -342,6 +235,215 @@ public void refresh() throws BeansException, IllegalStateException {
 }
 ```
 
+通过调用**refresh()**方法来启动整个初始化过程：BeanDefinition的Resouce定位、载入和注册。
+
+**Resource定位过程**：这个Resource定位指的是BeanDefinition的资源定位，它由**ResourceLoader**通过统一的Resource接口来完成，这个Resource对各种形式的BeanDefinition的使用都提供了统一的接口。
+
+**BeanDefinition的载入**：把用户定义好的Bean表示成IoC容器内部的数据结构，这个是数据结构就是BeanDefinition。
+
+**注册过程**：向IoC容器中注册这些BeanDefinition的过程，这个过程是通过调用BeanDefinitionRegister接口的实现来完成的。这个注册过程就是把解析得到的BeanDefinition注册到IOC容器中的一个HashMap中去。
+
+**在这个过程中，一般不包含Bean依赖注入的实现。Bean定义的载入和依赖注入是两个独立的过程。依赖注入一般发生在应用第一次通过getBean向容器索取Bean的时候（预实例化配置：lazyinit，注入在容器初始化的时候就完成）**
+
+------
+
+**Spring将这三个过程分开，使用不同的模块来完成，如相应的ResourceLoader和BeanDefinitionReader等模块，通过这样的设计方式，可以让用户更加灵活地对这三个过程进行裁剪或扩展，定义出最合适自己的IOC容器的初始化过程。**
+
+## 2.2 BeanDefinition的Resouce定位
+
+```java
+ClassPathResource resource = new ClassPathResource("spring.xml");
+```
+
+根据传入的路径去寻找以文件形式存在的BeanDefinition信息。
+
+关注refresh()方法中的这一句代码：
+
+```java
+ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
+```
+
+`obtainFreshBeanFactory`如下：
+
+```java
+protected ConfigurableListableBeanFactory obtainFreshBeanFactory() {
+   refreshBeanFactory();
+   return getBeanFactory();
+}
+```
+
+调用`AbstractRefreshableApplicationContext`中的`refreshBeanFactory`方法：
+
+```java
+@Override
+protected final void refreshBeanFactory() throws BeansException {
+   if (hasBeanFactory()) {
+      destroyBeans();
+      closeBeanFactory();
+   }
+   try {
+      DefaultListableBeanFactory beanFactory = createBeanFactory();
+      beanFactory.setSerializationId(getId());
+      customizeBeanFactory(beanFactory);
+      loadBeanDefinitions(beanFactory);
+      synchronized (this.beanFactoryMonitor) {
+         this.beanFactory = beanFactory;
+      }
+   }
+   catch (IOException ex) {
+      throw new ApplicationContextException("I/O error parsing bean definition source for " + getDisplayName(), ex);
+   }
+}
+```
+
+在这个方法中，通过createBeanFactory构建了一个IOC容器（DefaultListableBeanFactory），然后调用`loadBeanDefinitions`方法来载入Bean。
+
+```java
+/**
+ * Load bean definitions into the given bean factory, typically through
+ * delegating to one or more bean definition readers.
+ * @param beanFactory the bean factory to load bean definitions into
+ * @throws BeansException if parsing of the bean definitions failed
+ * @throws IOException if loading of bean definition files failed
+ * @see org.springframework.beans.factory.support.PropertiesBeanDefinitionReader
+ * @see org.springframework.beans.factory.xml.XmlBeanDefinitionReader
+ */
+protected abstract void loadBeanDefinitions(DefaultListableBeanFactory beanFactory)
+      throws BeansException, IOException;
+```
+
+查看子类`XmlWebApplicationContext`中的实现
+
+```java
+/**
+	 * Loads the bean definitions via an XmlBeanDefinitionReader.
+	 * @see org.springframework.beans.factory.xml.XmlBeanDefinitionReader
+	 * @see #initBeanDefinitionReader
+	 * @see #loadBeanDefinitions
+	 */
+@Override
+protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws BeansException, IOException {
+    // Create a new XmlBeanDefinitionReader for the given BeanFactory.
+    XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
+
+    // Configure the bean definition reader with this context's
+    // resource loading environment.
+    beanDefinitionReader.setEnvironment(getEnvironment());
+    beanDefinitionReader.setResourceLoader(this);
+    beanDefinitionReader.setEntityResolver(new ResourceEntityResolver(this));
+
+    // Allow a subclass to provide custom initialization of the reader,
+    // then proceed with actually loading the bean definitions.
+    initBeanDefinitionReader(beanDefinitionReader);
+    loadBeanDefinitions(beanDefinitionReader);
+}
+```
+
+```java
+protected void loadBeanDefinitions(XmlBeanDefinitionReader reader) throws IOException {
+   String[] configLocations = getConfigLocations();
+   if (configLocations != null) {
+      for (String configLocation : configLocations) {
+         reader.loadBeanDefinitions(configLocation);
+      }
+   }
+}
+```
+
+查看XmlBeanDefinitionReader中的loadBeanDefinitions方法：
+
+```java
+public int loadBeanDefinitions(String location, @Nullable Set<Resource> actualResources) throws BeanDefinitionStoreException {
+    //首先获取ResourceLoader
+   ResourceLoader resourceLoader = getResourceLoader();
+   if (resourceLoader == null) {
+      throw new BeanDefinitionStoreException(
+            "Cannot load bean definitions from location [" + location + "]: no ResourceLoader available");
+   }
+	//根据不同的路径模式进行解析，主要调用ResourceLoader的getResources方法
+   if (resourceLoader instanceof ResourcePatternResolver) {
+      // Resource pattern matching available.
+      try {
+         Resource[] resources = ((ResourcePatternResolver) resourceLoader).getResources(location);
+         int count = loadBeanDefinitions(resources);
+         if (actualResources != null) {
+            Collections.addAll(actualResources, resources);
+         }
+         if (logger.isTraceEnabled()) {
+            logger.trace("Loaded " + count + " bean definitions from location pattern [" + location + "]");
+         }
+         return count;
+      }
+      catch (IOException ex) {
+         throw new BeanDefinitionStoreException(
+               "Could not resolve bean definition resource pattern [" + location + "]", ex);
+      }
+   }
+   else {
+      // Can only load single resources by absolute URL.
+      Resource resource = resourceLoader.getResource(location);
+      int count = loadBeanDefinitions(resource);
+      if (actualResources != null) {
+         actualResources.add(resource);
+      }
+      if (logger.isTraceEnabled()) {
+         logger.trace("Loaded " + count + " bean definitions from location [" + location + "]");
+      }
+      return count;
+   }
+}
+```
+
+主要关注`DefaultResourceLoader`中的`getResource`方法：
+
+```java
+	@Override
+	public Resource getResource(String location) {
+		Assert.notNull(location, "Location must not be null");
+
+		for (ProtocolResolver protocolResolver : this.protocolResolvers) {
+			Resource resource = protocolResolver.resolve(location, this);
+			if (resource != null) {
+				return resource;
+			}
+		}
+
+		if (location.startsWith("/")) {
+			return getResourceByPath(location);
+		}
+		else if (location.startsWith(CLASSPATH_URL_PREFIX)) {
+			return new ClassPathResource(location.substring(CLASSPATH_URL_PREFIX.length()), getClassLoader());
+		}
+		else {
+			try {
+				// Try to parse the location as a URL...
+				URL url = new URL(location);
+				return (ResourceUtils.isFileURL(url) ? new FileUrlResource(url) : new UrlResource(url));
+			}
+			catch (MalformedURLException ex) {
+				// No URL -> resolve as resource path.
+				return getResourceByPath(location);
+			}
+		}
+	}
+```
+
+在`FileSystemXmlApplicationContext`中实现了getResourceByPath：
+
+```java
+@Override
+protected Resource getResourceByPath(String path) {
+   if (path.startsWith("/")) {
+      path = path.substring(1);
+   }
+   return new FileSystemResource(path);
+}
+```
+
+在BeanDefinition定位完成的基础上，就可以通过返回的Resource对象来进行BeanDefinition的载入
+
+## 2.2 BeanDefinition的载入和解析
+
 重点关注obtainFreshBeanFactory()方法：
 
 ```java
@@ -373,7 +475,26 @@ protected final void refreshBeanFactory() throws BeansException {
 }
 ```
 
-在loadBeanDefinitions方法中完成BeanDefinitions的载入：
+在AbstractXmlApplicationContext中的loadBeanDefinitions方法中完成BeanDefinitions的载入：
+
+```java
+@Override
+protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws BeansException, IOException {
+   // Create a new XmlBeanDefinitionReader for the given BeanFactory.
+   XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
+
+   // Configure the bean definition reader with this context's
+   // resource loading environment.
+   beanDefinitionReader.setEnvironment(this.getEnvironment());
+   beanDefinitionReader.setResourceLoader(this);
+   beanDefinitionReader.setEntityResolver(new ResourceEntityResolver(this));
+
+   // Allow a subclass to provide custom initialization of the reader,
+   // then proceed with actually loading the bean definitions.
+   initBeanDefinitionReader(beanDefinitionReader);
+   loadBeanDefinitions(beanDefinitionReader);
+}
+```
 
 首先通过调用XML解析器得到document对象，然后再按照Spring的Bean规则进行解析，在documentReader中完成的。
 
@@ -386,7 +507,28 @@ public int registerBeanDefinitions(Document doc, Resource resource) throws BeanD
 }
 ```
 
-通过解析，在XML中定义的BeanDefinition就被整个载入到IoC容器中，并在容器中建立了数据映射
+**具体的Spring BeanDefinition在DefaultBeanDefinitionDocumentReader中完成的。**
+
+```java
+protected void processBeanDefinition(Element ele, BeanDefinitionParserDelegate delegate) {
+   BeanDefinitionHolder bdHolder = delegate.parseBeanDefinitionElement(ele);
+   if (bdHolder != null) {
+      bdHolder = delegate.decorateBeanDefinitionIfRequired(ele, bdHolder);
+      try {
+         // Register the final decorated instance.
+         BeanDefinitionReaderUtils.registerBeanDefinition(bdHolder, getReaderContext().getRegistry());
+      }
+      catch (BeanDefinitionStoreException ex) {
+         getReaderContext().error("Failed to register bean definition with name '" +
+               bdHolder.getBeanName() + "'", ele, ex);
+      }
+      // Send registration event.
+      getReaderContext().fireComponentRegistered(new BeanComponentDefinition(bdHolder));
+   }
+}
+```
+
+**通过解析，在XML中定义的BeanDefinition就被整个载入到IoC容器中，并在容器中建立了数据映射**
 
 ## 2.3 BeanDefinition在IoC容器中的注册
 
@@ -924,11 +1066,13 @@ InstantiationStrategy是实例化Bean策略的接口，有以下两个实现类�
 
 **默认策略是使用CGLIB对Bean进行实例化**
 
+**这里面采用的是策略模式**
+
 ### 2.4.2 提前曝光到三级缓存
 
 addSingletonFactory方法
 
-这样做的目的是为了解决注入时产生循环依赖
+**这样做的目的是为了解决注入时产生循环依赖**
 
 ```java
 protected void addSingletonFactory(String beanName, ObjectFactory<?> singletonFactory) {
@@ -1087,3 +1231,462 @@ AbstractBeanFactory中doGetBean方法
 BeanDefinitionValueResolver中的resolveReference方法
 
 ![1557750800454](assets/1557750800454.png)
+
+### 2.4.4 Bean的初始化
+
+在doCreateBean中，完成依赖注入后，就开始Bean的初始化
+
+![](http://mycsdnblog.work/201919191525-E.png)
+
+```java
+protected Object initializeBean(final String beanName, final Object bean, @Nullable RootBeanDefinition mbd) {
+   if (System.getSecurityManager() != null) {
+      AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
+         invokeAwareMethods(beanName, bean);
+         return null;
+      }, getAccessControlContext());
+   }
+   else {
+      invokeAwareMethods(beanName, bean);
+   }
+
+   Object wrappedBean = bean;
+   if (mbd == null || !mbd.isSynthetic()) {
+      wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);
+   }
+
+   try {
+      invokeInitMethods(beanName, wrappedBean, mbd);
+   }
+   catch (Throwable ex) {
+      throw new BeanCreationException(
+            (mbd != null ? mbd.getResourceDescription() : null),
+            beanName, "Invocation of init method failed", ex);
+   }
+   if (mbd == null || !mbd.isSynthetic()) {
+      wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
+   }
+
+   return wrappedBean;
+}
+```
+
+在调用Bean的初始化方法之前，会调用一系列的aware接口实现，把相关的BeanName、BeanClassLoader，以及BeanFactory注入到Bean中去。
+
+```java
+private void invokeAwareMethods(final String beanName, final Object bean) {
+   if (bean instanceof Aware) {
+      if (bean instanceof BeanNameAware) {
+         ((BeanNameAware) bean).setBeanName(beanName);
+      }
+      if (bean instanceof BeanClassLoaderAware) {
+         ClassLoader bcl = getBeanClassLoader();
+         if (bcl != null) {
+            ((BeanClassLoaderAware) bean).setBeanClassLoader(bcl);
+         }
+      }
+      if (bean instanceof BeanFactoryAware) {
+         ((BeanFactoryAware) bean).setBeanFactory(AbstractAutowireCapableBeanFactory.this);
+      }
+   }
+}
+```
+
+然后调用invokeInitMethods：
+
+```java
+protected void invokeInitMethods(String beanName, final Object bean, @Nullable RootBeanDefinition mbd)
+      throws Throwable {
+
+   boolean isInitializingBean = (bean instanceof InitializingBean);
+   if (isInitializingBean && (mbd == null || !mbd.isExternallyManagedInitMethod("afterPropertiesSet"))) {
+      if (logger.isTraceEnabled()) {
+         logger.trace("Invoking afterPropertiesSet() on bean with name '" + beanName + "'");
+      }
+      if (System.getSecurityManager() != null) {
+         try {
+            AccessController.doPrivileged((PrivilegedExceptionAction<Object>) () -> {
+               ((InitializingBean) bean).afterPropertiesSet();
+               return null;
+            }, getAccessControlContext());
+         }
+         catch (PrivilegedActionException pae) {
+            throw pae.getException();
+         }
+      }
+      else {
+         ((InitializingBean) bean).afterPropertiesSet();
+      }
+   }
+
+   if (mbd != null && bean.getClass() != NullBean.class) {
+      String initMethodName = mbd.getInitMethodName();
+      if (StringUtils.hasLength(initMethodName) &&
+            !(isInitializingBean && "afterPropertiesSet".equals(initMethodName)) &&
+            !mbd.isExternallyManagedInitMethod(initMethodName)) {
+         invokeCustomInitMethod(beanName, bean, mbd);
+      }
+   }
+}
+```
+
+如果Bean实现了`InitializingBean`接口，那么就启动`afterPropertiesSet`过程
+
+# 三、IoC容器的关闭
+
+```java
+protected void doClose() {
+   // Check whether an actual close attempt is necessary...
+   if (this.active.get() && this.closed.compareAndSet(false, true)) {
+      if (logger.isDebugEnabled()) {
+         logger.debug("Closing " + this);
+      }
+
+      LiveBeansView.unregisterApplicationContext(this);
+
+      try {
+         // Publish shutdown event.
+         publishEvent(new ContextClosedEvent(this));
+      }
+      catch (Throwable ex) {
+         logger.warn("Exception thrown from ApplicationListener handling ContextClosedEvent", ex);
+      }
+
+      // Stop all Lifecycle beans, to avoid delays during individual destruction.
+      if (this.lifecycleProcessor != null) {
+         try {
+            this.lifecycleProcessor.onClose();
+         }
+         catch (Throwable ex) {
+            logger.warn("Exception thrown from LifecycleProcessor on context close", ex);
+         }
+      }
+
+      // Destroy all cached singletons in the context's BeanFactory.
+      destroyBeans();
+
+      // Close the state of this context itself.
+      closeBeanFactory();
+
+      // Let subclasses do some final clean-up if they wish...
+      onClose();
+
+      // Reset local application listeners to pre-refresh state.
+      if (this.earlyApplicationListeners != null) {
+         this.applicationListeners.clear();
+         this.applicationListeners.addAll(this.earlyApplicationListeners);
+      }
+
+      // Switch to inactive.
+      this.active.set(false);
+   }
+}
+```
+
+最终调用DisposableBeanAdapter中的destory对Bean进行销毁：
+
+```java
+@Override
+public void destroy() {
+    if (!CollectionUtils.isEmpty(this.beanPostProcessors)) {
+        for (DestructionAwareBeanPostProcessor processor : this.beanPostProcessors) {
+            processor.postProcessBeforeDestruction(this.bean, this.beanName);
+        }
+    }
+
+    if (this.invokeDisposableBean) {
+        if (logger.isTraceEnabled()) {
+            logger.trace("Invoking destroy() on bean with name '" + this.beanName + "'");
+        }
+        try {
+            if (System.getSecurityManager() != null) {
+                AccessController.doPrivileged((PrivilegedExceptionAction<Object>) () -> {
+                    ((DisposableBean) this.bean).destroy();
+                    return null;
+                }, this.acc);
+            }
+            else {
+                ((DisposableBean) this.bean).destroy();
+            }
+        }
+        catch (Throwable ex) {
+            String msg = "Invocation of destroy method failed on bean with name '" + this.beanName + "'";
+            if (logger.isDebugEnabled()) {
+                logger.info(msg, ex);
+            }
+            else {
+                logger.info(msg + ": " + ex);
+            }
+        }
+    }
+
+    if (this.destroyMethod != null) {
+        invokeCustomDestroyMethod(this.destroyMethod);
+    }
+    else if (this.destroyMethodName != null) {
+        Method methodToCall = determineDestroyMethod(this.destroyMethodName);
+        if (methodToCall != null) {
+            invokeCustomDestroyMethod(methodToCall);
+        }
+    }
+}
+```
+
+判断Bean是否实现了DisposableBean，然后执行相应的destory方法。
+
+# 四、FactoryBean
+
+## 4.1 FactoryBean的使用
+
+1、接口
+
+```java
+package com.example.service;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-19 16:28
+ * @Feature:
+ */
+public interface FactoryBeanService {
+
+    void testFactoryService();
+}
+```
+
+2、实现
+
+```java
+package com.example.service;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-19 16:37
+ * @Feature:
+ */
+public class FactoryBeanServiceImpl implements FactoryBeanService {
+    @Override
+    public void testFactoryService() {
+        System.out.println("测试类");
+    }
+}
+```
+
+3、自定义实例化Bean
+
+```java
+package com.example.compoment;
+
+import com.example.service.FactoryBeanService;
+import com.example.service.FactoryBeanServiceImpl;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.stereotype.Component;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-19 16:38
+ * @Feature:
+ */
+@Component
+public class FactoryBeanLearn implements FactoryBean {
+    @Override
+    public Object getObject() {
+        return new FactoryBeanServiceImpl();
+    }
+
+    @Override
+    public Class<?> getObjectType() {
+        return FactoryBeanService.class;
+    }
+
+    @Override
+    public boolean isSingleton() {
+        return true;
+    }
+}
+```
+
+4、测试
+
+```java
+package com.example.test;
+
+import com.example.compoment.ApplicationContextProvider;
+import com.example.service.FactoryBeanService;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
+import org.springframework.test.context.junit4.SpringRunner;
+
+
+/**
+ * @Author: 98050
+ * @Time: 2019-07-19 16:45
+ * @Feature:
+ */
+@SpringBootTest
+@RunWith(SpringRunner.class)
+public class BeanFactoryTest {
+
+    @Autowired
+    private ApplicationContext context;
+
+    @Test
+    public void test(){
+        FactoryBeanService bean = context.getBean(FactoryBeanService.class);
+        bean.testFactoryService();
+    }
+}
+```
+
+5、结果
+
+![](http://mycsdnblog.work/201919191714-m.png)
+
+## 4.2 FactoryBean的实现
+
+FactoryBean的生产特性是在doGetBean中起作用：
+
+![](http://mycsdnblog.work/201919191613-j.png)
+
+重点关注`getObjectForBeanInstance`方法：
+
+```java
+protected Object getObjectForBeanInstance(
+      Object beanInstance, String name, String beanName, @Nullable RootBeanDefinition mbd) {
+
+   // Don't let calling code try to dereference the factory if the bean isn't a factory.
+   if (BeanFactoryUtils.isFactoryDereference(name)) {
+      if (beanInstance instanceof NullBean) {
+         return beanInstance;
+      }
+      if (!(beanInstance instanceof FactoryBean)) {
+         throw new BeanIsNotAFactoryException(transformedBeanName(name), beanInstance.getClass());
+      }
+   }
+
+   // Now we have the bean instance, which may be a normal bean or a FactoryBean.
+   // If it's a FactoryBean, we use it to create a bean instance, unless the
+   // caller actually wants a reference to the factory.
+   if (!(beanInstance instanceof FactoryBean) || BeanFactoryUtils.isFactoryDereference(name)) {
+      return beanInstance;
+   }
+
+   Object object = null;
+   if (mbd == null) {
+      object = getCachedObjectForFactoryBean(beanName);
+   }
+   if (object == null) {
+      // Return bean instance from factory.
+      FactoryBean<?> factory = (FactoryBean<?>) beanInstance;
+      // Caches object obtained from FactoryBean if it is a singleton.
+      if (mbd == null && containsBeanDefinition(beanName)) {
+         mbd = getMergedLocalBeanDefinition(beanName);
+      }
+      boolean synthetic = (mbd != null && mbd.isSynthetic());
+       //这里从FactoryBean中得到Bean
+      object = getObjectFromFactoryBean(factory, beanName, !synthetic);
+   }
+   return object;
+}
+```
+
+```java 
+protected Object getObjectFromFactoryBean(FactoryBean<?> factory, String beanName, boolean shouldPostProcess) {
+   if (factory.isSingleton() && containsSingleton(beanName)) {
+      synchronized (getSingletonMutex()) {
+         Object object = this.factoryBeanObjectCache.get(beanName);
+         if (object == null) {
+            object = doGetObjectFromFactoryBean(factory, beanName);
+            // Only post-process and store if not put there already during getObject() call above
+            // (e.g. because of circular reference processing triggered by custom getBean calls)
+            Object alreadyThere = this.factoryBeanObjectCache.get(beanName);
+            if (alreadyThere != null) {
+               object = alreadyThere;
+            }
+            else {
+               if (shouldPostProcess) {
+                  if (isSingletonCurrentlyInCreation(beanName)) {
+                     // Temporarily return non-post-processed object, not storing it yet..
+                     return object;
+                  }
+                  beforeSingletonCreation(beanName);
+                  try {
+                     object = postProcessObjectFromFactoryBean(object, beanName);
+                  }
+                  catch (Throwable ex) {
+                     throw new BeanCreationException(beanName,
+                           "Post-processing of FactoryBean's singleton object failed", ex);
+                  }
+                  finally {
+                     afterSingletonCreation(beanName);
+                  }
+               }
+               if (containsSingleton(beanName)) {
+                  this.factoryBeanObjectCache.put(beanName, object);
+               }
+            }
+         }
+         return object;
+      }
+   }
+   else {
+      Object object = doGetObjectFromFactoryBean(factory, beanName);
+      if (shouldPostProcess) {
+         try {
+            object = postProcessObjectFromFactoryBean(object, beanName);
+         }
+         catch (Throwable ex) {
+            throw new BeanCreationException(beanName, "Post-processing of FactoryBean's object failed", ex);
+         }
+      }
+      return object;
+   }
+}
+```
+
+```java 
+private Object doGetObjectFromFactoryBean(final FactoryBean<?> factory, final String beanName)
+      throws BeanCreationException {
+
+   Object object;
+   try {
+      if (System.getSecurityManager() != null) {
+         AccessControlContext acc = getAccessControlContext();
+         try {
+            object = AccessController.doPrivileged((PrivilegedExceptionAction<Object>) factory::getObject, acc);
+         }
+         catch (PrivilegedActionException pae) {
+            throw pae.getException();
+         }
+      }
+      else {
+          //这里调用factory的getObject方法从FactoryBean中得到Bean
+         object = factory.getObject();
+      }
+   }
+   catch (FactoryBeanNotInitializedException ex) {
+      throw new BeanCurrentlyInCreationException(beanName, ex.toString());
+   }
+   catch (Throwable ex) {
+      throw new BeanCreationException(beanName, "FactoryBean threw exception on object creation", ex);
+   }
+
+   // Do not accept a null value for a FactoryBean that's not fully
+   // initialized yet: Many FactoryBeans just return null then.
+   if (object == null) {
+      if (isSingletonCurrentlyInCreation(beanName)) {
+         throw new BeanCurrentlyInCreationException(
+               beanName, "FactoryBean which is currently in creation returned null from getObject");
+      }
+      object = new NullBean();
+   }
+   return object;
+}
+```
+
+这里面返回的就是作为工厂的FactoryBean生产的产品。采用工厂模式
