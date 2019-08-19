@@ -513,6 +513,40 @@ class Solution {
 
 ### 1.3.1 Assign Cookies（455）
 
+[455. Assign Cookies](https://leetcode.com/problems/assign-cookies/)
+
+> Assume you are an awesome parent and want to give your children some cookies. But, you should give each child at most one cookie. Each child i has a greed factor gi, which is the minimum size of a cookie that the child will be content with; and each cookie j has a size sj. If sj >= gi, we can assign the cookie j to the child i, and the child i will be content. Your goal is to maximize the number of your content children and output the maximum number.
+>
+> **Note:**
+> You may assume the greed factor is always positive. 
+> You cannot assign more than one cookie to one child.
+>
+> **Example 1:**
+>
+> ```
+> Input: [1,2,3], [1,1]
+> 
+> Output: 1
+> 
+> Explanation: You have 3 children and 2 cookies. The greed factors of 3 children are 1, 2, 3. 
+> And even though you have 2 cookies, since their size is both 1, you could only make the child whose greed factor is 1 content.
+> You need to output 1.
+> ```
+>
+> 
+>
+> **Example 2:**
+>
+> ```
+> Input: [1,2], [1,2,3]
+> 
+> Output: 2
+> 
+> Explanation: You have 2 children and 3 cookies. The greed factors of 2 children are 1, 2. 
+> You have 3 cookies and their sizes are big enough to gratify all of the children, 
+> You need to output 2.
+> ```
+
 思路：首先将g和s排序，然后从大到小进行分配
 
 ```java
@@ -545,6 +579,67 @@ class Solution {
 [435. Non-overlapping Intervals](https://leetcode.com/problems/non-overlapping-intervals/)
 
 和56题类似，只不过56题是对重叠区间进行合并：a=[1,3]，b=[2,4]，只要a[1]>=b[0]，那么就可以合并，所以取右边最大的值就可以得到最终的区间，先将`intervals`按第一列排序，然后进行合并。
+
+[56. Merge Intervals](https://leetcode.com/problems/merge-intervals/)
+
+> Given a collection of intervals, merge all overlapping intervals.
+>
+> **Example 1:**
+>
+> ```
+> Input: [[1,3],[2,6],[8,10],[15,18]]
+> Output: [[1,6],[8,10],[15,18]]
+> Explanation: Since intervals [1,3] and [2,6] overlaps, merge them into [1,6].
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: [[1,4],[4,5]]
+> Output: [[1,5]]
+> Explanation: Intervals [1,4] and [4,5] are considered overlapping.
+> ```
+>
+> **NOTE:** input types have been changed on April 15, 2019. Please reset to default code definition to get new method signature.
+
+```java
+package com.problem56;
+
+import com.exam.hashmap.Main;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-08-16 10:30
+ * @Feature:
+ */
+public class Solution {
+
+    public int[][] merge(int[][] intervals) {
+        List<int[]> list = new ArrayList<>();
+        Arrays.sort(intervals,(o1,o2) ->{
+            return o1[0] - o2[0];
+        });
+        int i = 0;
+        int row = intervals.length;
+        while (i < row){
+            int left = intervals[i][0];
+            int right = intervals[i][1];
+            int j = i + 1;
+            while (j < row && intervals[j][0] <= right){
+                right = Math.max(right,intervals[j][1]);
+                j++;
+            }
+            list.add(new int[]{left,right});
+            i = j;
+        }
+        return list.toArray(new int[list.size()][]);
+    }
+}
+```
 
 这道题是删除最小的区间数，使剩下的区间不再重叠，那么每回就让右边取最小，统计可以合并的**最少**区间数即可。
 
@@ -856,6 +951,20 @@ class Solution {
 ### 1.3.10 最大子序合
 
 [53. Maximum Subarray](https://leetcode.com/problems/maximum-subarray/)
+
+> Given an integer array `nums`, find the contiguous subarray (containing at least one number) which has the largest sum and return its sum.
+>
+> **Example:**
+>
+> ```
+> Input: [-2,1,-3,4,-1,2,1,-5,4],
+> Output: 6
+> Explanation: [4,-1,2,1] has the largest sum = 6.
+> ```
+>
+> **Follow up:**
+>
+> If you have figured out the O(*n*) solution, try coding another solution using the divide and conquer approach, which is more subtle.
 
 ```java
 package com.problem53;
@@ -1777,16 +1886,12 @@ class Solution {
     }
 
     private int dfs(int[][] grid, int i, int j) {
-        int result = 0;
-        if (i >= 0 && i < grid.length && j >= 0 && j < grid[0].length && grid[i][j] != 0){
-            result++;
-            grid[i][j] = 0;
-            return result + dfs(grid, i - 1, j) + dfs(grid, i + 1, j) + dfs(grid, i, j - 1) + dfs(grid, i, j + 1);
-        }else {
-            return result;
+        if (i < 0 || i == grid.length || j < 0 || j == grid[0].length || grid[i][j] == 0){
+            return 0;
         }
+        grid[i][j] = 0;
+        return dfs(grid, i - 1, j) + dfs(grid, i + 1, j) + dfs(grid, i, j - 1) + dfs(grid, i, j + 1) + 1;
     }
-
 }
 ```
 
@@ -2531,6 +2636,10 @@ public class Solution2 {
 
 因为重复的数字交换位置没有意义，所以可以先将nums先排序，然后再加一个判断条件，即：如果当前元素与前一个元素相同，并且前一个元素没有被访问
 
+数组元素可能含有相同的元素，进行排列时就有可能出现重复的排列，要求重复的排列只返回一个。
+
+在实现上，和 Permutations 不同的是要先排序，然后在添加一个元素时，判断这个元素是否等于前一个元素，如果等于，并且前一个元素还未访问，那么就跳过这个元素。
+
 
 ```java
 package com.problem47;
@@ -2765,6 +2874,8 @@ class Solution {
 ```
 
 #### 1.6.3.11 1~9数字的组合求和
+
+[216. Combination Sum III](https://leetcode.com/problems/combination-sum-iii/)
 
 > Find all possible combinations of ***k*** numbers that add up to a number ***n***, given that only numbers from 1 to 9 can be used and each combination should be a unique set of numbers.
 >
@@ -7895,9 +8006,1423 @@ class Solution {
 >
 > **Note:** You may assume the tree (i.e., the given root node) is not **NULL**.
 
+思路一：
 
+```java
+package com.problem513;
+
+import com.TreeNode;
+
+import java.util.LinkedList;
+
+class Solution {
+    public int findBottomLeftValue(TreeNode root) {
+        int res = 0;
+        LinkedList<TreeNode> queue = new LinkedList<>();
+        queue.add(root);
+        while (!queue.isEmpty()){
+            int size = queue.size();
+            res = queue.peekFirst().val;
+            while (size > 0){
+                TreeNode temp = queue.pollFirst();
+                if (temp.left != null){
+                    queue.add(temp.left);
+                }
+                if (temp.right != null){
+                    queue.add(temp.right);
+                }
+                size--;
+            }
+        }
+        return res;
+    }
+}
+```
+
+### 2.2.3 非递归遍历
+
+#### 2.2.3.1 前序
+
+[144. Binary Tree Preorder Traversal](https://leetcode.com/problems/binary-tree-preorder-traversal/)
+
+> Given a binary tree, return the *preorder* traversal of its nodes' values.
+>
+> **Example:**
+>
+> ```
+> Input: [1,null,2,3]
+>    1
+>     \
+>      2
+>     /
+>    3
+> 
+> Output: [1,2,3]
+> ```
+>
+> **Follow up:** Recursive solution is trivial, could you do it iteratively?
+
+```java
+package com.problem144;
+
+import com.TreeNode;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-08-07 08:49
+ * @Feature:
+ */
+public class Solution2 {
+
+    public List<Integer> preorderTraversal(TreeNode root) {
+        Stack<TreeNode> stack = new Stack<>();
+        List<Integer> result = new ArrayList<>();
+        if (root == null){
+            return result;
+        }
+        stack.push(root);
+        while (!stack.isEmpty()){
+            TreeNode temp = stack.pop();
+            result.add(temp.val);
+            if (temp.right != null){
+                stack.push(temp.right);
+            }
+            if (temp.left != null){
+                stack.push(temp.left);
+            }
+        }
+        return result;
+    }
+}
+```
+
+#### 2.2.3.2 中序
+
+[94. Binary Tree Inorder Traversal](https://leetcode.com/problems/binary-tree-inorder-traversal/)
+
+> Given a binary tree, return the *inorder* traversal of its nodes' values.
+>
+> **Example:**
+>
+> ```
+> Input: [1,null,2,3]
+>    1
+>     \
+>      2
+>     /
+>    3
+> 
+> Output: [1,3,2]
+> ```
+>
+> **Follow up:** Recursive solution is trivial, could you do it iteratively?
+
+```java
+package com.problem94;
+
+import com.TreeNode;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-08-07 08:59
+ * @Feature:
+ */
+public class Solution2 {
+
+    public List<Integer> inorderTraversal(TreeNode root) {
+        List<Integer> result = new ArrayList<>();
+        Stack<TreeNode> stack = new Stack<>();
+        while (!stack.isEmpty() || root != null){
+            if (root != null) {
+                stack.push(root);
+                root = root.left;
+            }else {
+                TreeNode temp = stack.pop();
+                result.add(temp.val);
+                root = temp.right;
+            }
+
+        }
+        return result;
+    }
+}
+```
+
+#### 2.2.3.3 后序
+
+[145. Binary Tree Postorder Traversal](https://leetcode.com/problems/binary-tree-postorder-traversal/)
+
+> Given a binary tree, return the *postorder* traversal of its nodes' values.
+>
+> **Example:**
+>
+> ```
+> Input: [1,null,2,3]
+>    1
+>     \
+>      2
+>     /
+>    3
+> 
+> Output: [3,2,1]
+> ```
+>
+> **Follow up:** Recursive solution is trivial, could you do it iteratively?
+
+```java
+package com.problem145;
+
+import com.TreeNode;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Stack;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-08-07 09:08
+ * @Feature:
+ */
+public class Solution2 {
+
+    public List<Integer> postorderTraversal(TreeNode root) {
+        Stack<TreeNode> stack = new Stack<>();
+        List<Integer> result = new ArrayList<>();
+        if (root == null) {
+            return result;
+        }
+        stack.push(root);
+        while (!stack.isEmpty()){
+            TreeNode temp = stack.pop();
+            result.add(temp.val);
+            if (temp.left != null){
+                stack.push(temp.left);
+            }
+            if (temp.right != null){
+                stack.push(temp.right);
+            }
+        }
+        Collections.reverse(result);
+        return result;
+    }
+}
+```
+
+### *2.2.4 BST
+
+#### 2.2.4.1 修剪二叉搜索树
+
+[669. Trim a Binary Search Tree](https://leetcode.com/problems/trim-a-binary-search-tree/)
+
+> Given a binary search tree and the lowest and highest boundaries as `L` and `R`, trim the tree so that all its elements lies in `[L, R]` (R >= L). You might need to change the root of the tree, so the result should return the new root of the trimmed binary search tree.
+>
+> **Example 1:**
+>
+> ```
+> Input: 
+>     1
+>    / \
+>   0   2
+> 
+>   L = 1
+>   R = 2
+> 
+> Output: 
+>     1
+>       \
+>        2
+> ```
+>
+> 
+>
+> **Example 2:**
+>
+> ```
+> Input: 
+>     3
+>    / \
+>   0   4
+>    \
+>     2
+>    /
+>   1
+> 
+>   L = 1
+>   R = 3
+> 
+> Output: 
+>       3
+>      / 
+>    2   
+>   /
+>  1
+> ```
+
+```java
+package com.problem669;
+
+import com.TreeNode;
+
+class Solution {
+    public TreeNode trimBST(TreeNode root, int L, int R) {
+        if (root == null){
+            return null;
+        }
+        if (root.val > R){
+            return trimBST(root.left, L, R);
+        }
+        if (root.val < L){
+            return trimBST(root.right, L, R);
+        }
+        root.left = trimBST(root.left, L, R);
+        root.right = trimBST(root.right, L, R);
+        return root;
+    }
+}
+```
+
+#### *2.2.4.2 二叉搜索树中第K小的元素
+
+[230. Kth Smallest Element in a BST](https://leetcode.com/problems/kth-smallest-element-in-a-bst/)
+
+> Given a binary search tree, write a function `kthSmallest` to find the **k**th smallest element in it.
+>
+> **Note:** 
+> You may assume k is always valid, 1 ≤ k ≤ BST's total elements.
+>
+> **Example 1:**
+>
+> ```
+> Input: root = [3,1,4,null,2], k = 1
+>    3
+>   / \
+>  1   4
+>   \
+>    2
+> Output: 1
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: root = [5,3,6,2,4,null,null,1], k = 3
+>        5
+>       / \
+>      3   6
+>     / \
+>    2   4
+>   /
+>  1
+> Output: 3
+> ```
+>
+> **Follow up:**
+> What if the BST is modified (insert/delete operations) often and you need to find the kth smallest frequently? How would you optimize the kthSmallest routine?
+
+中序遍历（非递归）
+
+```java
+package com.problem230;
+
+import com.TreeNode;
+
+import java.util.Stack;
+
+class Solution {
+
+    public int kthSmallest(TreeNode root, int k) {
+        Stack<TreeNode> stack = new Stack<>();
+        int count = 0;
+        while (!stack.isEmpty() || root != null){
+            if (root != null){
+                stack.push(root);
+                root = root.left;
+            }else {
+                count++;
+                TreeNode node = stack.pop();
+                if (count == k){
+                    return node.val;
+                }
+                root = node.right;
+            }
+        }
+        return 0;
+    }
+
+}
+```
+
+中序遍历（递归）
+
+```java
+package com.problem230;
+
+import com.TreeNode;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-08-08 11:07
+ * @Feature:
+ */
+public class Solution2 {
+
+    int count = 0;
+    int val = 0;
+
+    public int kthSmallest(TreeNode root, int k) {
+        solve(root,k);
+        return val;
+    }
+
+    private void solve(TreeNode root, int k) {
+        if (root == null){
+            return;
+        }
+        solve(root.left, k);
+        count++;
+        if (count == k){
+            val = root.val;
+            return;
+        }
+        solve(root.right, k);
+    }
+}
+```
+
+#### 2.2.4.3 把二叉搜索树转换为累加树
+
+[538. Convert BST to Greater Tree](https://leetcode.com/problems/convert-bst-to-greater-tree/description/)
+
+> Given a Binary Search Tree (BST), convert it to a Greater Tree such that every key of the original BST is changed to the original key plus sum of all keys greater than the original key in BST.
+>
+> **Example:**
+>
+> ```
+> Input: The root of a Binary Search Tree like this:
+>               5
+>             /   \
+>            2     13
+> 
+> Output: The root of a Greater Tree like this:
+>              18
+>             /   \
+>           20     13
+> ```
+
+```java
+package com.problem538;
+
+import com.TreeNode;
+
+class Solution {
+    public TreeNode convertBST(TreeNode root) {
+        solve(root);
+        return root;
+    }
+    int sum = 0;
+    private void solve(TreeNode root) {
+        if (root == null){
+            return;
+        }
+        solve(root.right);
+        sum += root.val;
+        root.val = sum;
+        solve(root.left);
+    }
+}
+```
+
+#### 2.2.4.4 二叉搜索树的最近公共祖先
+
+[235. Lowest Common Ancestor of a Binary Search Tree](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/)
+
+> Given a binary search tree (BST), find the lowest common ancestor (LCA) of two given nodes in the BST.
+>
+> According to the [definition of LCA on Wikipedia](https://en.wikipedia.org/wiki/Lowest_common_ancestor): “The lowest common ancestor is defined between two nodes p and q as the lowest node in T that has both p and q as descendants (where we allow **a node to be a descendant of itself**).”
+>
+> Given binary search tree:  root = [6,2,8,0,4,7,9,null,null,3,5]
+>
+> ![img](https://assets.leetcode.com/uploads/2018/12/14/binarysearchtree_improved.png)
+>
+> **Example 1:**
+>
+> ```
+> Input: root = [6,2,8,0,4,7,9,null,null,3,5], p = 2, q = 8
+> Output: 6
+> Explanation: The LCA of nodes 2 and 8 is 6.
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: root = [6,2,8,0,4,7,9,null,null,3,5], p = 2, q = 4
+> Output: 2
+> Explanation: The LCA of nodes 2 and 4 is 2, since a node can be a descendant of itself according to the LCA definition.
+> ```
+>
+>  
+>
+> **Note:**
+>
+> - All of the nodes' values will be unique.
+> - p and q are different and both values will exist in the BST.
+
+思路：
+
+如果 p 和 q 在 root 的两边，那么 root 就是 p 和 q 的最低的公共祖先，这种情况包含三种具体的情况：
+
+- p 和 q 在 root 的两边；
+
+- p 就是 root，q 在 root 的哪边不所谓；
+
+- q 就是 root，p 在 root 的哪边不所谓；
+
+如果不是上面的情况，p 和 q 要么全在 root 的左边，要么全在 root 的右边，这时只需递归的去 root 的左子树或右子树中找 p 和 q 的最低公共祖先；
+
+```java
+package com.problem235;
+
+import com.TreeNode;
+
+class Solution {
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        if (p.val < root.val && q.val < root.val){
+            return lowestCommonAncestor(root.left, p, q);
+        }
+        if (p.val > root.val && q.val > root.val){
+            return lowestCommonAncestor(root.right, p, q);
+        }
+        return root;
+    }
+}
+```
+
+#### 2.2.4.5 二叉树的最近公共祖先
+
+[236. Lowest Common Ancestor of a Binary Tree](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/)
+
+> Given a binary tree, find the lowest common ancestor (LCA) of two given nodes in the tree.
+>
+> According to the [definition of LCA on Wikipedia](https://en.wikipedia.org/wiki/Lowest_common_ancestor): “The lowest common ancestor is defined between two nodes p and q as the lowest node in T that has both p and q as descendants (where we allow **a node to be a descendant of itself**).”
+>
+> Given the following binary tree:  root = [3,5,1,6,2,0,8,null,null,7,4]
+>
+> ![img](https://assets.leetcode.com/uploads/2018/12/14/binarytree.png)
+>
+> **Example 1:**
+>
+> ```
+> Input: root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 1
+> Output: 3
+> Explanation: The LCA of nodes 5 and 1 is 3.
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 4
+> Output: 5
+> Explanation: The LCA of nodes 5 and 4 is 5, since a node can be a descendant of itself according to the LCA definition.
+> ```
+>
+>  
+>
+> **Note:**
+>
+> - All of the nodes' values will be unique.
+> - p and q are different and both values will exist in the binary tree.
+
+#### 2.2.4.6 有序数组转二叉搜索树
+
+[108. Convert Sorted Array to Binary Search Tree](https://leetcode.com/problems/convert-sorted-array-to-binary-search-tree/)
+
+> Given an array where elements are sorted in ascending order, convert it to a height balanced BST.
+>
+> For this problem, a height-balanced binary tree is defined as a binary tree in which the depth of the two subtrees of *every*node never differ by more than 1.
+>
+> **Example:**
+>
+> ```
+> Given the sorted array: [-10,-3,0,5,9],
+> 
+> One possible answer is: [0,-3,9,-10,null,5], which represents the following height balanced BST:
+> 
+>       0
+>      / \
+>    -3   9
+>    /   /
+>  -10  5
+> ```
+
+```Java 
+package com.problem108;
+
+import com.TreeNode;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-08-08 12:13
+ * @Feature:
+ */
+public class Solution2 {
+
+    public TreeNode sortedArrayToBST(int[] nums) {
+        return solve(nums,0,nums.length - 1);
+    }
+
+    private TreeNode solve(int[] nums, int low, int high) {
+        if (low > high){
+            return null;
+        }
+        int mid = (low + high) / 2;
+        TreeNode root = new TreeNode(nums[mid]);
+        root.left = solve(nums, low, mid - 1);
+        root.right = solve(nums, mid + 1, high);
+        return root;
+    }
+}
+```
+
+#### 2.2.4.7 有序链表转换二叉搜索树
+
+[109. Convert Sorted List to Binary Search Tree](https://leetcode.com/problems/convert-sorted-list-to-binary-search-tree/)
+
+> Given a singly linked list where elements are sorted in ascending order, convert it to a height balanced BST.
+>
+> For this problem, a height-balanced binary tree is defined as a binary tree in which the depth of the two subtrees of *every*node never differ by more than 1.
+>
+> **Example:**
+>
+> ```
+> Given the sorted linked list: [-10,-3,0,5,9],
+> 
+> One possible answer is: [0,-3,9,-10,null,5], which represents the following height balanced BST:
+> 
+>       0
+>      / \
+>    -3   9
+>    /   /
+>  -10  5
+> ```
+
+```java
+package com.problem109;
+
+import com.ListNode;
+import com.TreeNode;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-08-15 10:39
+ * @Feature:
+ */
+public class Solution3 {
+
+    public TreeNode sortedListToBST(ListNode head) {
+        return solve(head);
+    }
+
+    private TreeNode solve(ListNode head) {
+        if (head == null){
+            return null;
+        }
+        //1.找链表的中间节点
+        ListNode mid = findMid(head);
+        TreeNode root = new TreeNode(mid.val);
+        if (mid == head){
+            return root;
+        }
+        root.left = solve(head);
+        root.right = solve(mid.next);
+        return root;
+    }
+
+    private ListNode findMid(ListNode head) {
+        ListNode p1 = head;
+        ListNode p2 = head;
+        ListNode pre = null;
+        while (p2 != null && p2.next != null){
+            pre = p1;
+            p1 = p1.next;
+            p2 = p2.next.next;
+        }
+        if (pre != null) {
+            pre.next = null;
+        }
+        return p1;
+    }
+}
+```
+
+#### 2.2.4.8 两数之和Ⅳ-输入BST
+
+[653. Two Sum IV - Input is a BST](https://leetcode.com/problems/two-sum-iv-input-is-a-bst/)
+
+> Given a Binary Search Tree and a target number, return true if there exist two elements in the BST such that their sum is equal to the given target.
+>
+> **Example 1:**
+>
+> ```
+> Input: 
+>     5
+>    / \
+>   3   6
+>  / \   \
+> 2   4   7
+> 
+> Target = 9
+> 
+> Output: True
+> ```
+>
+>  
+>
+> **Example 2:**
+>
+> ```
+> Input: 
+>     5
+>    / \
+>   3   6
+>  / \   \
+> 2   4   7
+> 
+> Target = 28
+> 
+> Output: False
+> ```
+
+思路：先序遍历二叉树，然后在BST中查询目标值target。
+
+```java
+package com.problem653;
+
+import com.TreeNode;
+
+class Solution {
+    public boolean findTarget(TreeNode root, int k) {
+        TreeNode temp = root;
+        return solve(root,k,temp);
+    }
+
+    private boolean solve(TreeNode root, int k, TreeNode temp) {
+        if (root == null){
+            return false;
+        }
+        int target = k - root.val;
+        TreeNode node = find(temp,target);
+        if (node != null && node != root){
+            return true;
+        }else {
+            return solve(root.left, k, temp) || solve(root.right, k, temp);
+        }
+    }
+
+    private TreeNode find(TreeNode root, int target) {
+        if (root == null){
+            return null;
+        }
+        if (root.val == target){
+            return root;
+        }else if (root.val > target){
+            return find(root.left, target);
+        }else {
+            return find(root.right, target);
+        }
+    }
+}
+```
+
+#### 2.2.4.9 二叉搜索树的最小绝对差
+
+[530. Minimum Absolute Difference in BST](https://leetcode.com/problems/minimum-absolute-difference-in-bst/)
+
+> Given a binary search tree with non-negative values, find the minimum [absolute difference](https://en.wikipedia.org/wiki/Absolute_difference) between values of any two nodes.
+>
+> **Example:**
+>
+> ```
+> Input:
+> 
+>    1
+>     \
+>      3
+>     /
+>    2
+> 
+> Output:
+> 1
+> 
+> Explanation:
+> The minimum absolute difference is 1, which is the difference between 2 and 1 (or between 2 and 3).
+> ```
+
+```java
+package com.problem530;
+
+import com.TreeNode;
+
+class Solution {
+
+    int pre = -1;
+    int result = Integer.MAX_VALUE;
+
+    public int getMinimumDifference(TreeNode root) {
+        if (root == null){
+            return 0;
+        }
+        solve(root);
+        return result;
+    }
+
+    private void solve(TreeNode root) {
+        if (root == null){
+            return;
+        }
+        solve(root.left);
+        if (pre != -1){
+            result = Math.min(result,Math.abs(root.val - pre));
+        }
+        pre = root.val;
+        solve(root.right);
+    }
+}
+```
+
+#### 2.2.4.10 二叉搜索树中的众数
+
+[501. Find Mode in Binary Search Tree](https://leetcode.com/problems/find-mode-in-binary-search-tree/)
+
+> Given a binary search tree (BST) with duplicates, find all the [mode(s)](https://en.wikipedia.org/wiki/Mode_(statistics)) (the most frequently occurred element) in the given BST.
+>
+> Assume a BST is defined as follows:
+>
+> - The left subtree of a node contains only nodes with keys **less than or equal to** the node's key.
+> - The right subtree of a node contains only nodes with keys **greater than or equal to** the node's key.
+> - Both the left and right subtrees must also be binary search trees.
+>
+>  
+>
+> For example:
+> Given BST `[1,null,2,2]`,
+>
+> ```
+>    1
+>     \
+>      2
+>     /
+>    2
+> ```
+>
+>  
+>
+> return `[2]`.
+>
+> **Note:** If a tree has more than one mode, you can return them in any order.
+>
+> **Follow up:** Could you do that without using any extra space? (Assume that the implicit stack space incurred due to recursion does not count).
+
+```java
+package com.problem501;
+
+import com.TreeNode;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+
+    int count = 1;
+    int max = 1;
+    int pre = -1;
+
+    public int[] findMode(TreeNode root) {
+        List<Integer> list = new ArrayList<>();
+        solve(root,list);
+        int[] res = new int[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            res[i] = list.get(i);
+        }
+        return res;
+    }
+
+    private void solve(TreeNode root, List<Integer> list) {
+        if (root == null){
+            return;
+        }
+        solve(root.left, list);
+        if (pre != -1){
+            if (root.val == pre){
+                count++;
+            }else {
+                count = 1;
+            }
+        }
+        if (count > max){
+            max = count;
+            list.clear();
+            list.add(root.val);
+        }else if (count == max){
+            list.add(root.val);
+        }
+        pre = root.val;
+        solve(root.right, list);
+    }
+}
+```
+
+#### 2.2.4.11 从二叉搜索树到更大和树（同538）
+
+[1038. Binary Search Tree to Greater Sum Tree](https://leetcode.com/problems/binary-search-tree-to-greater-sum-tree/)
+
+> Given the root of a binary **search** tree with distinct values, modify it so that every `node` has a new value equal to the sum of the values of the original tree that are greater than or equal to `node.val`.
+>
+> As a reminder, a *binary search tree* is a tree that satisfies these constraints:
+>
+> - The left subtree of a node contains only nodes with keys **less than** the node's key.
+> - The right subtree of a node contains only nodes with keys **greater than** the node's key.
+> - Both the left and right subtrees must also be binary search trees.
+>
+>  
+>
+> **Example 1:**
+>
+> **![img](https://assets.leetcode.com/uploads/2019/05/02/tree.png)**
+>
+> ```
+> Input: [4,1,6,0,2,5,7,null,null,null,3,null,null,null,8]
+> Output: [30,36,21,36,35,26,15,null,null,null,33,null,null,null,8]
+> ```
+>
+>  
+>
+> **Note:**
+>
+> 1. The number of nodes in the tree is between `1` and `100`.
+> 2. Each node will have value between `0` and `100`.
+> 3. The given tree is a binary search tree.
+
+```java
+package com.problem1038;
+
+import com.TreeNode;
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    int sum = 0;
+    public TreeNode bstToGst(TreeNode root) {
+        solve(root);
+        return root;
+    }
+
+    private void solve(TreeNode root) {
+        if (root == null){
+            return;
+        }
+        solve(root.right);
+        sum += root.val;
+        root.val = sum;
+        solve(root.left);
+    }
+}
+```
 
 ## 2.3 栈和队列
+
+### 2.3.1 用栈实现队列
+
+[232. Implement Queue using Stacks](https://leetcode.com/problems/implement-queue-using-stacks/)
+
+> Implement the following operations of a queue using stacks.
+>
+> - push(x) -- Push element x to the back of queue.
+> - pop() -- Removes the element from in front of queue.
+> - peek() -- Get the front element.
+> - empty() -- Return whether the queue is empty.
+>
+> **Example:**
+>
+> ```
+> MyQueue queue = new MyQueue();
+> 
+> queue.push(1);
+> queue.push(2);  
+> queue.peek();  // returns 1
+> queue.pop();   // returns 1
+> queue.empty(); // returns false
+> ```
+>
+> **Notes:**
+>
+> - You must use *only* standard operations of a stack -- which means only `push to top`, `peek/pop from top`, `size`, and `is empty` operations are valid.
+> - Depending on your language, stack may not be supported natively. You may simulate a stack by using a list or deque (double-ended queue), as long as you use only standard operations of a stack.
+> - You may assume that all operations are valid (for example, no pop or peek operations will be called on an empty queue).
+
+```java
+package com.problem232;
+
+import java.util.Stack;
+
+class MyQueue {
+
+    Stack<Integer> stack1;
+    Stack<Integer> stack2;
+
+    /** Initialize your data structure here. */
+    public MyQueue() {
+        stack1 = new Stack<>();
+        stack2 = new Stack<>();
+    }
+
+    /** Push element x to the back of queue. */
+    public void push(int x) {
+        stack1.push(x);
+    }
+
+    /** Removes the element from in front of queue and returns that element. */
+    public int pop() {
+        judge();
+        return stack2.isEmpty() ? 0 :stack2.pop();
+    }
+
+    /** Get the front element. */
+    public int peek() {
+        judge();
+        return stack2.peek();
+    }
+
+    /** Returns whether the queue is empty. */
+    public boolean empty() {
+        return stack1.isEmpty() && stack2.isEmpty();
+    }
+
+    public void judge(){
+        if (stack2.isEmpty()){
+            while (!stack1.isEmpty()){
+                stack2.push(stack1.pop());
+            }
+        }
+    }
+}
+```
+
+### 2.3.2 用队列实现栈
+
+[225. Implement Stack using Queues](https://leetcode.com/problems/implement-stack-using-queues/)
+
+> Implement the following operations of a stack using queues.
+>
+> - push(x) -- Push element x onto stack.
+> - pop() -- Removes the element on top of the stack.
+> - top() -- Get the top element.
+> - empty() -- Return whether the stack is empty.
+>
+> **Example:**
+>
+> ```
+> MyStack stack = new MyStack();
+> 
+> stack.push(1);
+> stack.push(2);  
+> stack.top();   // returns 2
+> stack.pop();   // returns 2
+> stack.empty(); // returns false
+> ```
+>
+> **Notes:**
+>
+> - You must use *only* standard operations of a queue -- which means only `push to back`, `peek/pop from front`, `size`, and `is empty` operations are valid.
+> - Depending on your language, queue may not be supported natively. You may simulate a queue by using a list or deque (double-ended queue), as long as you use only standard operations of a queue.
+> - You may assume that all operations are valid (for example, no pop or top operations will be called on an empty stack).
+
+```java
+package com.problem225;
+
+import java.util.LinkedList;
+
+class MyStack {
+
+    LinkedList<Integer> queue1;
+    /** Initialize your data structure here. */
+    public MyStack() {
+        queue1 = new LinkedList<>();
+    }
+    
+    /** Push element x onto stack. */
+    public void push(int x) {
+        queue1.addLast(x);
+        int size = queue1.size();
+        while (size > 1){
+            queue1.addLast(queue1.pollFirst());
+            size--;
+        }
+    }
+    
+    /** Removes the element on top of the stack and returns that element. */
+    public int pop() {
+        return queue1.isEmpty() ? 0 : queue1.pollFirst();
+    }
+    
+    /** Get the top element. */
+    public int top() {
+        return queue1.isEmpty() ? 0 : queue1.peekFirst();
+    }
+    
+    /** Returns whether the stack is empty. */
+    public boolean empty() {
+        return queue1.isEmpty();
+    }
+}
+
+/**
+ * Your MyStack object will be instantiated and called as such:
+ * MyStack obj = new MyStack();
+ * obj.push(x);
+ * int param_2 = obj.pop();
+ * int param_3 = obj.top();
+ * boolean param_4 = obj.empty();
+ */
+```
+
+### 2.3.3 最小栈
+
+[155. Min Stack](https://leetcode.com/problems/min-stack/)
+
+> Design a stack that supports push, pop, top, and retrieving the minimum element in constant time.
+>
+> - push(x) -- Push element x onto stack.
+> - pop() -- Removes the element on top of the stack.
+> - top() -- Get the top element.
+> - getMin() -- Retrieve the minimum element in the stack.
+>
+>  
+>
+> **Example:**
+>
+> ```
+> MinStack minStack = new MinStack();
+> minStack.push(-2);
+> minStack.push(0);
+> minStack.push(-3);
+> minStack.getMin();   --> Returns -3.
+> minStack.pop();
+> minStack.top();      --> Returns 0.
+> minStack.getMin();   --> Returns -2.
+> ```
+
+注意：min的栈顶元素与x相等时也要把x压入min栈
+
+```java
+package com.problem155;
+
+import java.util.Stack;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-08-17 11:21
+ * @Feature:
+ */
+public class MinStack {
+
+    Stack<Integer> stack;
+    Stack<Integer> min;
+
+    /** initialize your data structure here. */
+    public MinStack() {
+        stack = new Stack<>();
+        min = new Stack<>();
+    }
+
+    public void push(int x) {
+        stack.push(x);
+        if (min.isEmpty()){
+            min.push(x);
+        }else {
+            if (x < min.peek()) {
+                min.push(x);
+            }
+        }
+    }
+
+    public void pop() {
+        if (min.peek().equals(stack.pop())){
+            min.pop();
+        }
+    }
+
+    public int top() {
+        return stack.peek();
+    }
+
+    public int getMin() {
+        return min.peek();
+    }
+}
+```
+
+### 2.3.4 括号匹配
+
+[20. Valid Parentheses](https://leetcode.com/problems/valid-parentheses/)
+
+> Given a string containing just the characters `'('`, `')'`, `'{'`, `'}'`, `'['` and `']'`, determine if the input string is valid.
+>
+> An input string is valid if:
+>
+> 1. Open brackets must be closed by the same type of brackets.
+> 2. Open brackets must be closed in the correct order.
+>
+> Note that an empty string is also considered valid.
+>
+> **Example 1:**
+>
+> ```
+> Input: "()"
+> Output: true
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: "()[]{}"
+> Output: true
+> ```
+>
+> **Example 3:**
+>
+> ```
+> Input: "(]"
+> Output: false
+> ```
+>
+> **Example 4:**
+>
+> ```
+> Input: "([)]"
+> Output: false
+> ```
+>
+> **Example 5:**
+>
+> ```
+> Input: "{[]}"
+> Output: true
+> ```
+
+```java
+package com.problem20;
+
+import java.util.*;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-08-17 11:48
+ * @Feature:
+ */
+public class Solution {
+
+    public boolean isValid(String s) {
+        Map<Character,Character> map = new HashMap<>();
+        map.put('(',')');
+        map.put('{','}');
+        map.put('[',']');
+        Stack<Character> stack = new Stack<>();
+        for (char c : s.toCharArray()){
+            if (map.keySet().contains(c)){
+                stack.push(c);
+            }else {
+                if (stack.isEmpty()){
+                    return false;
+                }
+                if (map.get(stack.peek()).equals(c)){
+                    stack.pop();
+                }else {
+                    return false;
+                }
+            }
+        }
+        return stack.isEmpty();
+    }
+}
+```
+
+
+### *2.3.5 下一个更大元素Ⅰ
+
+[496. Next Greater Element I](https://leetcode.com/problems/next-greater-element-i/)
+
+> You are given two arrays **(without duplicates)** `nums1` and `nums2` where `nums1`’s elements are subset of `nums2`. Find all the next greater numbers for `nums1`'s elements in the corresponding places of `nums2`.
+>
+> The Next Greater Number of a number **x** in `nums1` is the first greater number to its right in `nums2`. If it does not exist, output -1 for this number.
+>
+> **Example 1:**
+>
+> ```
+> Input: nums1 = [4,1,2], nums2 = [1,3,4,2].
+> Output: [-1,3,-1]
+> Explanation:
+>     For number 4 in the first array, you cannot find the next greater number for it in the second array, so output -1.
+>     For number 1 in the first array, the next greater number for it in the second array is 3.
+>     For number 2 in the first array, there is no next greater number for it in the second array, so output -1.
+> ```
+>
+> 
+>
+> **Example 2:**
+>
+> ```
+> Input: nums1 = [2,4], nums2 = [1,2,3,4].
+> Output: [3,-1]
+> Explanation:
+>     For number 2 in the first array, the next greater number for it in the second array is 3.
+>     For number 4 in the first array, there is no next greater number for it in the second array, so output -1.
+> ```
+>
+> 
+>
+> **Note:**
+>
+> 1. All elements in `nums1` and `nums2` are unique.
+> 2. The length of both `nums1` and `nums2` would not exceed 1000.
+
+```java
+package com.problem496;
+
+import java.util.HashMap;
+import java.util.Stack;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-08-19 11:24
+ * @Feature:
+ */
+public class Solution2 {
+
+    public int[] nextGreaterElement(int[] nums1, int[] nums2) {
+        Stack<Integer> stack = new Stack<>();
+        int[] res = new int[nums1.length];
+        HashMap<Integer,Integer> map = new HashMap<>();
+        for (int i = nums2.length - 1; i >= 0; i--) {
+            while (!stack.isEmpty() && stack.peek() < nums2[i]){
+                stack.pop();
+            }
+            map.put(nums2[i],stack.isEmpty() ? -1 : stack.peek());
+            stack.push(nums2[i]);
+        }
+        for (int i = 0; i < nums1.length; i++) {
+            res[i] = map.get(nums1[i]);
+        }
+        return res;
+    }
+}
+```
+
+### *2.3.6 每日温度
+
+[739. Daily Temperatures](https://leetcode.com/problems/daily-temperatures/)
+
+> Given a list of daily temperatures `T`, return a list such that, for each day in the input, tells you how many days you would have to wait until a warmer temperature. If there is no future day for which this is possible, put `0` instead.
+>
+> For example, given the list of temperatures `T = [73, 74, 75, 71, 69, 72, 76, 73]`, your output should be `[1, 1, 4, 2, 1, 1, 0, 0]`.
+>
+> **Note:** The length of `temperatures` will be in the range `[1, 30000]`. Each temperature will be an integer in the range `[30, 100]`.
+
+```java
+package com.problem739;
+
+import java.util.Stack;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-08-18 15:23
+ * @Feature:
+ */
+public class Solution2 {
+    public int[] dailyTemperatures(int[] T) {
+        Stack<Integer> stack = new Stack<>();
+        int[] result = new int[T.length];
+        for (int i = 0; i < T.length; i++) {
+            while (!stack.isEmpty() && T[stack.peek()] < T[i]){
+                int pre = stack.pop();
+                result[pre] = i - pre;
+            }
+            stack.push(i);
+        }
+        return result;
+    }
+}
+```
+
+### *2.3.7 下一个更大元素Ⅱ
+
+[503. Next Greater Element II](https://leetcode.com/problems/next-greater-element-ii/)
+
+> Given a circular array (the next element of the last element is the first element of the array), print the Next Greater Number for every element. The Next Greater Number of a number x is the first greater number to its traversing-order next in the array, which means you could search circularly to find its next greater number. If it doesn't exist, output -1 for this number.
+>
+> **Example 1:**
+>
+> ```
+> Input: [1,2,1]
+> Output: [2,-1,2]
+> Explanation: The first 1's next greater number is 2; The number 2 can't find next greater number; The second 1's next greater number needs to search circularly, which is also 2.
+> ```
+>
+> 
+>
+> **Note:** The length of given array won't exceed 10000.
+
+```java
+package com.problem503;
+
+import java.util.Stack;
+
+class Solution {
+
+    public int[] nextGreaterElements(int[] nums) {
+        int len = nums.length;
+        int[] res = new int[nums.length];
+        Stack<Integer> stack = new Stack<>();
+        for (int i = 2 * len - 1; i >= 0; i--) {
+            while (!stack.isEmpty() && stack.peek() <= nums[i % len]){
+                stack.pop();
+            }
+            res[i % len] = stack.isEmpty() ? -1 : stack.peek();
+            stack.push(nums[i % len]);
+
+            for (int s : res){
+                System.out.printf("%5d",s);
+            }
+            System.out.println();
+        }
+        return res;
+    }
+}
+```
 
 ## 2.4 哈希表
 

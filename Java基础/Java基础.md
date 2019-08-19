@@ -1112,7 +1112,7 @@ String string3 = i.toString();
 
 # 二十六、Java中的异常
 
-Java有两种异常类型：受检查异常和运行时异常
+Java有两种异常类型：**受检查异常和运行时异常**
 
 检查异常：**这些异常从程序的角度来说是必须经过捕捉处理的，否则编译通不过，**比如IOException，SQLException。
 
@@ -1120,7 +1120,7 @@ Java有两种异常类型：受检查异常和运行时异常
 
 Error是程序无法处理的，如：OutOfMemmoryError，如果出现Error，Java虚拟机就会终止线程。
 
-运行时异常：如RunTimeException，IndexOutOfBoundsException，NullPointerException，这些异常一般是由程序的逻辑错误引起的，解决此类异常应该仔细排查程序，不需要进行检查。
+**运行时异常：如RunTimeException，IndexOutOfBoundsException，NullPointerException，这些异常一般是由程序的逻辑错误引起的，解决此类异常应该仔细排查程序，不需要进行检查。**
 
 **两者的区别：**
 
@@ -1681,3 +1681,4 @@ public void test(){
 **内部类提供了某种进入外部类的窗户；**
 
 **也是最吸引人的原因，每个内部类都能独立地继承一个接口，而无论外部类是否已经继承了某个接口。因此，内部类使多重继承的解决方案变得更加完整。**
+

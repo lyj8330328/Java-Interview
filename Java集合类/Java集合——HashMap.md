@@ -163,39 +163,38 @@ jdk1.8之前的hashmap都采用上图的结构，都是基于一个数组和多�
 Node是HashMap的一个内部类，实现了Map.Entry接口，本质是就是一个映射(键值对)。上图中的每个黑色圆点就是一个Node对象。来看具体代码： 
 
 ```java
-//Node是单向链表，它实现了Map.Entry接口
-static class Node<k,v> implements Map.Entry<k,v> {
+static class Node<K,V> implements Map.Entry<K,V> {
     final int hash;
     final K key;
     V value;
-    Node<k,v> next;
-    //构造函数Hash值 键 值 下一个节点
-    Node(int hash, K key, V value, Node<k,v> next) {
+    Node<K,V> next;
+
+    Node(int hash, K key, V value, Node<K,V> next) {
         this.hash = hash;
         this.key = key;
         this.value = value;
         this.next = next;
     }
- 
+
     public final K getKey()        { return key; }
     public final V getValue()      { return value; }
-    public final String toString() { return key + = + value; }
- 
+    public final String toString() { return key + "=" + value; }
+
     public final int hashCode() {
         return Objects.hashCode(key) ^ Objects.hashCode(value);
     }
- 
+
     public final V setValue(V newValue) {
         V oldValue = value;
         value = newValue;
         return oldValue;
     }
-    //判断两个node是否相等,若key和value都相等，返回true。可以与自身比较为true
+
     public final boolean equals(Object o) {
         if (o == this)
             return true;
         if (o instanceof Map.Entry) {
-            Map.Entry<!--?,?--> e = (Map.Entry<!--?,?-->)o;
+            Map.Entry<?,?> e = (Map.Entry<?,?>)o;
             if (Objects.equals(key, e.getKey()) &&
                 Objects.equals(value, e.getValue()))
                 return true;
@@ -885,4 +884,10 @@ HashMap在jdk1.8之后引入了红黑树的概念，表示若桶中链表元素�
 还有选择6和8的原因是：
 
 　　中间有个差值7可以防止链表和树之间频繁的转换。假设一下，如果设计成链表个数超过8则链表转换成树结构，链表个数小于8则树结构转换成链表，如果一个HashMap不停的插入、删除元素，链表个数在8左右徘徊，就会频繁的发生树转链表、链表转树，效率会很低。
+
+#### 十、HashMap用对象作为Key
+
+用对象作为key一定要小心使用，因为地址变了，在map往出get时是找不到的。
+
+需在对象中快捷键生成一下equals方法和hashCode方法。
 

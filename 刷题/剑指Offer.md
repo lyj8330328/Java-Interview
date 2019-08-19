@@ -152,16 +152,12 @@ public class Solution {
     }
 
     public int pop() {
-        int result;
         if (stack2.isEmpty()){
             while (!stack1.isEmpty()){
                 stack2.push(stack1.pop());
             }
-            result = stack2.pop();
-        }else {
-            result = stack2.pop();
         }
-        return result;
+        return stack2.pop();
     }
 }
 ```

@@ -1336,6 +1336,12 @@ CMS收集器是基于“**标记-清除**”算法实现的，它的运作过程
 
  **-XX:+UseG1GC**
 
+## 6.8 JVM默认收集器
+
+**jdk1.7和jdk1.8  新生代：Parallel Scavenge 老年代：Parallel Old**
+
+**jdk1.9使用的是G1**
+
 # 七、内存分配策略
 
 ## 7.1 对象优先在Eden分配
