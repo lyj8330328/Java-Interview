@@ -1,4 +1,4 @@
-# 一、算法思想
+#  一、算法思想
 
 ## 1.1 双指针
 
@@ -1084,6 +1084,8 @@ class Solution {
 
 [69. Sqrt(x)](https://leetcode.com/problems/sqrtx/)
 
+思路一：二分
+
 ```java
 package com.problem69;
 
@@ -1107,6 +1109,33 @@ class Solution {
             }
         }
         return end;
+    }
+}
+```
+
+思路二：牛顿插值法
+
+```java
+package com.problem69;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-08-28 16:58
+ * @Feature:
+ */
+public class Solution4 {
+
+    private double mySqrt(int num) {
+        double x0 = num;
+
+        double delta = 1e-12;
+        int count = 0;
+        while(x0*x0-num>delta) {
+            count++;
+            x0 = (x0*x0+num) / (2*x0);
+        }
+        x0 = Math.round(x0*1000)/1000.0;
+        return x0;
     }
 }
 ```
@@ -6747,8 +6776,6 @@ class Solution {
 }
 ```
 
-
-
 ### 2.1.19 移除链表元素
 
 [203. Remove Linked List Elements](https://leetcode.com/problems/remove-linked-list-elements/)
@@ -7898,6 +7925,40 @@ class Solution {
 > Output: -1
 > Explanation: The smallest value is 2, but there isn't any second smallest value.
 > ```
+
+```java
+package com.problem671;
+
+import com.TreeNode;
+
+class Solution {
+
+    long res = Long.MAX_VALUE;
+
+    public int findSecondMinimumValue(TreeNode root) {
+        int min = root.val;
+        solve(root,min);
+        if (res != Long.MAX_VALUE){
+            return (int) res;
+        }else {
+            return -1;
+        }
+    }
+
+    private void solve(TreeNode root, int min) {
+        if (root == null){
+            return;
+        }
+        if (root.val > min){
+            res = Math.min(res, root.val);
+        }
+        solve(root.left, min);
+        solve(root.right, min);
+    }
+}
+```
+
+
 
 ### 2.2.2 层次遍历
 
@@ -9426,11 +9487,2328 @@ class Solution {
 
 ## 2.4 哈希表
 
+### 2.4.1 两数之和
+
+[1. Two Sum](https://leetcode.com/problems/two-sum/)
+
+> Given an array of integers, return **indices** of the two numbers such that they add up to a specific target.
+>
+> You may assume that each input would have **exactly** one solution, and you may not use the *same* element twice.
+>
+> **Example:**
+>
+> ```
+> Given nums = [2, 7, 11, 15], target = 9,
+> 
+> Because nums[0] + nums[1] = 2 + 7 = 9,
+> return [0, 1].
+> ```
+
+```java
+package com.problem1;
+
+import java.util.HashMap;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-08-20 14:31
+ * @Feature:
+ */
+public class Solution {
+
+    public int[] twoSum(int[] nums, int target) {
+        HashMap<Integer,Integer> map = new HashMap<>();
+        int[] res = new int[2];
+        int temp;
+        for (int i = 0; i < nums.length; i++) {
+            temp = target - nums[i];
+            if (map.containsKey(temp)){
+                res[0] = i;
+                res[1] = map.get(temp);
+            }else {
+                map.put(nums[i],i);
+            }
+        }
+        return res;
+    }
+}
+```
+
+### 2.4.2 存在重复元素
+
+[217. Contains Duplicate](https://leetcode.com/problems/contains-duplicate/)
+
+> Given an array of integers, find if the array contains any duplicates.
+>
+> Your function should return true if any value appears at least twice in the array, and it should return false if every element is distinct.
+>
+> **Example 1:**
+>
+> ```
+> Input: [1,2,3,1]
+> Output: true
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: [1,2,3,4]
+> Output: false
+> ```
+>
+> **Example 3:**
+>
+> ```
+> Input: [1,1,1,3,3,4,3,2,4,2]
+> Output: true
+> ```
+
+```java
+package com.problem217;
+
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-08-20 14:38
+ * @Feature:
+ */
+public class Solution2 {
+
+    public boolean containsDuplicate(int[] nums) {
+        Set<Integer> set = new HashSet<>();
+        for (int i : nums){
+            set.add(i);
+        }
+        return set.size() < nums.length;
+    }
+}
+```
+
+### *2.4.3 最长和谐子序列
+
+[594. Longest Harmonious Subsequence](https://leetcode.com/problems/longest-harmonious-subsequence/)
+
+> We define a harmounious array as an array where the difference between its maximum value and its minimum value is **exactly** 1.
+>
+> Now, given an integer array, you need to find the length of its longest harmonious subsequence among all its possible [subsequences](https://en.wikipedia.org/wiki/Subsequence).
+>
+> **Example 1:**
+>
+> ```
+> Input: [1,3,2,2,5,2,3,7]
+> Output: 5
+> Explanation: The longest harmonious subsequence is [3,2,2,2,3].
+> ```
+>
+>  
+>
+> **Note:** The length of the input array will not exceed 20,000.
+
+```java
+package com.problem594;
+
+import java.util.HashMap;
+
+class Solution {
+    public int findLHS(int[] nums) {
+        HashMap<Integer,Integer> map = new HashMap<>();
+        for (int i : nums){
+            map.put(i, map.getOrDefault(i, 0) + 1);
+        }
+        int res = 0;
+        for (int i : map.keySet()){
+            if (map.containsKey(i + 1)){
+                res = Math.max(res, map.get(i) + map.get(i + 1));
+            }
+        }
+        return res;
+    }
+}
+```
+
+### *2.4.4 最长连续序列
+
+[128. Longest Consecutive Sequence](https://leetcode.com/problems/longest-consecutive-sequence/)
+
+```java
+package com.problem128;
+
+import java.util.HashMap;
+
+
+class Solution {
+
+    public int longestConsecutive(int[] nums) {
+        HashMap<Integer,Integer> map = new HashMap<>();
+        for (int i : nums){
+            map.put(i, 1);
+        }
+        for (int i : nums){
+            getIncrease(map,i);
+        }
+        return maxCount(map);
+    }
+
+    private int maxCount(HashMap<Integer, Integer> map) {
+        int res = 0;
+        for (int i : map.keySet()){
+            res = Math.max(res, map.get(i));
+        }
+        return res;
+    }
+
+    private int getIncrease(HashMap<Integer, Integer> map, int i) {
+        if (!map.containsKey(i)){
+            return 0;
+        }
+        int count = map.get(i);
+        if (count > 1){
+            return count;
+        }
+        count = getIncrease(map, i + 1) + 1;
+        map.put(i, count);
+        return count;
+    }
+}
+```
+
 ## 2.5 字符串
+
+### 2.5.1 字符串循环移位包含
+
+```
+s1 = AABCD, s2 = CDAA
+Return : true
+```
+
+给定两个字符串 s1 和 s2，要求判定 s2 是否能够被 s1 做循环移位得到的字符串包含。
+
+s1 进行循环移位的结果是 s1s1 的子字符串，因此只要判断 s2 是否是 s1s1 的子字符串即可。
+
+### 2.5.2 字符串循环移位
+
+**剑指Offer：左旋转字符串**
+
+> 汇编语言中有一种移位指令叫做循环左移（ROL），现在有个简单的任务，就是用字符串模拟这个指令的运算结果。对于一个给定的字符序列S，请你把其循环左移K位后的序列输出。例如，字符序列S=”abcXYZdef”,要求输出循环左移3位后的结果，即“XYZdefabc”。是不是很简单？OK，搞定它！
+
+思路：以字符串”abcXYZdef“循环左移3位为例进行说明
+
+第一步反转前3位：cbaXYZdef
+
+第二步反转剩余字符：cbafedZYX
+
+第三步反转整个字符串：XYZdefabc
+
+```java
+package com.example.problem43;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-08-21 10:34
+ * @Feature:
+ */
+public class Solution2 {
+
+    public String LeftRotateString(String str,int n) {
+        char[] chars = str.toCharArray();
+        if (chars.length == 0){
+            return "";
+        }
+        reverse(chars,0,n - 1);
+        reverse(chars,n,str.length() - 1);
+        reverse(chars,0,str.length() - 1);
+        return new String(chars);
+    }
+
+    private void reverse(char[] chars, int start, int end) {
+        char c;
+        while (start < end){
+            c = chars[start];
+            chars[start] = chars[end];
+            chars[end] = c;
+            start++;
+            end--;
+        }
+    }
+}
+```
+
+### 2.5.3 无重复字符的最长子串
+
+[3. Longest Substring Without Repeating Characters](https://leetcode.com/problems/longest-substring-without-repeating-characters/)
+
+> Given a string, find the length of the **longest substring** without repeating characters.
+>
+> **Example 1:**
+>
+> ```
+> Input: "abcabcbb"
+> Output: 3 
+> Explanation: The answer is "abc", with the length of 3. 
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: "bbbbb"
+> Output: 1
+> Explanation: The answer is "b", with the length of 1.
+> ```
+>
+> **Example 3:**
+>
+> ```
+> Input: "pwwkew"
+> Output: 3
+> Explanation: The answer is "wke", with the length of 3. 
+>              Note that the answer must be a substring, "pwke" is a subsequence and not a substring.
+> ```
+
+思路：使用滑动窗口，利用HashMap直接跳过重复的字符。
+
+```java
+package com.problem3;
+
+import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-08-21 11:04
+ * @Feature:
+ */
+public class Solution {
+
+    public int lengthOfLongestSubstring(String s) {
+        HashMap<Character,Integer> map = new HashMap<>();
+        int res = 0;
+        int i = 0;
+        for (int j = 0; j < s.length(); j++) {
+            if (map.containsKey(s.charAt(j))){
+                i = Math.max(i, map.get(s.charAt(j)));
+            }
+            res = Math.max(res, j - i + 1);
+            map.put(s.charAt(j), j + 1);
+        }
+        return res;
+    }
+}
+```
+
+### 2.5.4 有效的字母异或位
+
+[242. Valid Anagram](https://leetcode.com/problems/valid-anagram/)
+
+> Given two strings *s* and *t* , write a function to determine if *t* is an anagram of *s*.
+>
+> **Example 1:**
+>
+> ```
+> Input: s = "anagram", t = "nagaram"
+> Output: true
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: s = "rat", t = "car"
+> Output: false
+> ```
+>
+> **Note:**
+> You may assume the string contains only lowercase alphabets.
+>
+> **Follow up:**
+> What if the inputs contain unicode characters? How would you adapt your solution to such case?
+
+思路：可以使用HashMap进行统计，或者直接使用桶排序
+
+```java
+package com.problem242;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-08-21 11:33
+ * @Feature:
+ */
+public class Solution2 {
+
+    public boolean isAnagram(String s, String t) {
+        if (s.length() != t.length()){
+            return false;
+        }
+        int[] nums  = new int[26];
+        for (int i = 0; i < s.length(); i++) {
+            nums[s.charAt(i) - 'a']++;
+            nums[t.charAt(i) - 'a']--;
+        }
+        for (int i : nums){
+            if (i != 0){
+                return false;
+            }
+        }
+        return true;
+    }
+}
+```
+
+### 2.5.5 最长回文串
+
+[409. Longest Palindrome](https://leetcode.com/problems/longest-palindrome/)
+
+> Given a string which consists of lowercase or uppercase letters, find the length of the longest palindromes that can be built with those letters.
+>
+> This is case sensitive, for example `"Aa"` is not considered a palindrome here.
+>
+> **Note:**
+> Assume the length of given string will not exceed 1,010.
+>
+> **Example:**
+>
+> ```
+> Input:
+> "abccccdd"
+> 
+> Output:
+> 7
+> 
+> Explanation:
+> One longest palindrome that can be built is "dccaccd", whose length is 7.
+> ```
+
+```java
+package com.problem409;
+
+class Solution {
+    public int longestPalindrome(String s) {
+        int[] nums = new int[128];
+        for (char c : s.toCharArray()){
+            nums[c]++;
+        }
+        int count = 0;
+        for (int i : nums){
+            count += (i / 2) * 2;
+        }
+        //如果count小于s的长度，那么说明还有单个字符可以使用，将其放在最中间
+        if (count < s.length()){
+            count++;
+        }
+        return count;
+    }
+}
+```
+
+### *2.5.6 同构字符串
+
+[205. Isomorphic Strings](https://leetcode.com/problems/isomorphic-strings/)
+
+> Given two strings **s** and **t**, determine if they are isomorphic.
+>
+> Two strings are isomorphic if the characters in **s** can be replaced to get **t**.
+>
+> All occurrences of a character must be replaced with another character while preserving the order of characters. No two characters may map to the same character but a character may map to itself.
+>
+> **Example 1:**
+>
+> ```
+> Input: s = "egg", t = "add"
+> Output: true
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: s = "foo", t = "bar"
+> Output: false
+> ```
+>
+> **Example 3:**
+>
+> ```
+> Input: s = "paper", t = "title"
+> Output: true
+> ```
+>
+> **Note:**
+> You may assume both **s** and **t** have the same length.
+
+思路：通过记录下标来判断两个字符串对应位置上的字符是否能被替换
+
+aba和baa
+
+ab和aa
+
+```java
+package com.problem205;
+
+class Solution {
+    public boolean isIsomorphic(String s, String t) {
+        int[] s1 = new int[128];
+        int[] s2 = new int[128];
+        char c1,c2;
+        for (int i = 0; i < s.length(); i++) {
+            c1 = s.charAt(i);
+            c2 = t.charAt(i);
+            if (s1[c1] != s2[c2]){
+                return false;
+            }
+            s1[c1] = i + 1;
+            s2[c2] = i + 1;
+        }
+        return true;
+    }
+}
+```
+
+### 2.5.7 回文子串
+
+[647. Palindromic Substrings](https://leetcode.com/problems/palindromic-substrings/)
+
+> Given a string, your task is to count how many palindromic substrings in this string.
+>
+> The substrings with different start indexes or end indexes are counted as different substrings even they consist of same characters.
+>
+> **Example 1:**
+>
+> ```
+> Input: "abc"
+> Output: 3
+> Explanation: Three palindromic strings: "a", "b", "c".
+> ```
+>
+>  
+>
+> **Example 2:**
+>
+> ```
+> Input: "aaa"
+> Output: 6
+> Explanation: Six palindromic strings: "a", "a", "a", "aa", "aa", "aaa".
+> ```
+>
+>  
+>
+> **Note:**
+>
+> 1. The input string length won't exceed 1000.
+
+思路：中心扩展法
+
+```java
+package com.problem647;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-08-22 15:50
+ * @Feature:
+ */
+public class Solution {
+
+    int count = 0;
+    public int countSubstrings(String s) {
+        for (int i = 0; i < s.length(); i++) {
+            extendsStr(s,i,i);
+            extendsStr(s,i,i + 1);
+        }
+        return count;
+    }
+
+    private void extendsStr(String s, int start, int end) {
+        while (start >= 0 && end < s.length() && s.charAt(start) == s.charAt(end)){
+            start--;
+            end++;
+            count++;
+        }
+    }
+}
+```
+
+### 2.5.8 回文数字
+
+[9. Palindrome Number](https://leetcode.com/problems/palindrome-number/)
+
+> Determine whether an integer is a palindrome. An integer is a palindrome when it reads the same backward as forward.
+>
+> **Example 1:**
+>
+> ```
+> Input: 121
+> Output: true
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: -121
+> Output: false
+> Explanation: From left to right, it reads -121. From right to left, it becomes 121-. Therefore it is not a palindrome.
+> ```
+>
+> **Example 3:**
+>
+> ```
+> Input: 10
+> Output: false
+> Explanation: Reads 01 from right to left. Therefore it is not a palindrome.
+> ```
+>
+> **Follow up:**
+>
+> Coud you solve it without converting the integer to a string?
+
+```java
+package com.problem9;
+
+class Solution {
+    public boolean isPalindrome(int x) {
+        if (x == 0){
+            return true;
+        }
+        if (x < 0 || x % 10 == 0){
+            return false;
+        }
+        int res = 0;
+        while (x > res){
+            res = res * 10 + x % 10;
+            x /= 10;
+        }
+        return res == x || res / 10 == x;
+    }
+
+}
+```
+
+### *2.5.9 计算二进制子串
+
+[696. Count Binary Substrings](https://leetcode.com/problems/count-binary-substrings/)
+
+> Give a string `s`, count the number of non-empty (contiguous) substrings that have the same number of 0's and 1's, and all the 0's and all the 1's in these substrings are grouped consecutively.
+>
+> Substrings that occur multiple times are counted the number of times they occur.
+>
+> **Example 1:**
+>
+> ```
+> Input: "00110011"
+> Output: 6
+> Explanation: There are 6 substrings that have equal number of consecutive 1's and 0's: "0011", "01", "1100", "10", "0011", and "01".
+> Notice that some of these substrings repeat and are counted the number of times they occur.
+> Also, "00110011" is not a valid substring because all the 0's (and 1's) are not grouped together.
+> ```
+>
+> 
+>
+> **Example 2:**
+>
+> ```
+> Input: "10101"
+> Output: 4
+> Explanation: There are 4 substrings: "10", "01", "10", "01" that have equal number of consecutive 1's and 0's.
+> ```
+>
+> 
+>
+> **Note:**
+>
+> `s.length` will be between 1 and 50,000.
+>
+> `s` will only consist of "0" or "1" characters.
+
+```java
+package com.problem696;
+
+class Solution {
+    
+    public int countBinarySubstrings(String s) {
+        int count = 0,preLen = 0,curLen = 1;
+        for (int i = 1; i < s.length(); i++) {
+            if (s.charAt(i) == s.charAt(i - 1)){
+                curLen++;
+            }else {
+                preLen = curLen;
+                curLen = 1;
+            }
+            if (preLen >= curLen){
+                count++;
+            }
+        }
+        return count;
+    }
+}
+```
+
+### 2.5.10 最长特殊序列I
+
+[521. Longest Uncommon Subsequence I](https://leetcode.com/problems/longest-uncommon-subsequence-i/)
+
+> Given a group of two strings, you need to find the longest uncommon subsequence of this group of two strings. The longest uncommon subsequence is defined as the longest subsequence of one of these strings and this subsequence should not be **any** subsequence of the other strings.
+>
+> A **subsequence** is a sequence that can be derived from one sequence by deleting some characters without changing the order of the remaining elements. Trivially, any string is a subsequence of itself and an empty string is a subsequence of any string.
+>
+> The input will be two strings, and the output needs to be the length of the longest uncommon subsequence. If the longest uncommon subsequence doesn't exist, return -1.
+>
+> **Example 1:**
+>
+> ```
+> Input: "aba", "cdc"
+> Output: 3
+> Explanation: The longest uncommon subsequence is "aba" (or "cdc"), because "aba" is a subsequence of "aba", but not a subsequence of any other strings in the group of two strings. 
+> ```
+>
+> 
+>
+> **Note:**
+>
+> 1. Both strings' lengths will not exceed 100.
+> 2. Only letters from a ~ z will appear in input strings.
+
+```java
+package com.problem521;
+
+class Solution {
+
+    public int findLUSlength(String a, String b) {
+        if (a.equals(b)){
+            return -1;
+        }else {
+            return Math.max(a.length(), b.length());
+        }
+    }
+}
+```
 
 ## 2.6 数组与矩阵
 
-## 2.7 图
+### 2.6.1 移动零
+
+[283. Move Zeroes](https://leetcode.com/problems/move-zeroes/)
+
+> Given an array `nums`, write a function to move all `0`'s to the end of it while maintaining the relative order of the non-zero elements.
+>
+> **Example:**
+>
+> ```
+> Input: [0,1,0,3,12]
+> Output: [1,3,12,0,0]
+> ```
+>
+> **Note**:
+>
+> 1. You must do this **in-place** without making a copy of the array.
+> 2. Minimize the total number of operations.
+
+```java
+package com.problem283;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-08-26 16:20
+ * @Feature:
+ */
+public class Solution2 {
+
+    public void moveZeroes(int[] nums) {
+        int index = 0;
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] != 0){
+                nums[index] = nums[i];
+                index++;
+            }
+        }
+        for (int i = index; i < nums.length; i++) {
+            nums[i] = 0;
+        }
+    }
+}
+```
+
+### 2.6.2 重塑矩阵
+
+[566. Reshape the Matrix](https://leetcode.com/problems/reshape-the-matrix/)
+
+> In MATLAB, there is a very useful function called 'reshape', which can reshape a matrix into a new one with different size but keep its original data.
+>
+> You're given a matrix represented by a two-dimensional array, and two **positive** integers **r** and **c** representing the **row**number and **column** number of the wanted reshaped matrix, respectively.
+>
+> The reshaped matrix need to be filled with all the elements of the original matrix in the same **row-traversing** order as they were.
+>
+> If the 'reshape' operation with given parameters is possible and legal, output the new reshaped matrix; Otherwise, output the original matrix.
+>
+> **Example 1:**
+>
+> ```
+> Input: 
+> nums = 
+> [[1,2],
+>  [3,4]]
+> r = 1, c = 4
+> Output: 
+> [[1,2,3,4]]
+> Explanation:The row-traversing of nums is [1,2,3,4]. The new reshaped matrix is a 1 * 4 matrix, fill it row by row by using the previous list.
+> ```
+>
+> 
+>
+> **Example 2:**
+>
+> ```
+> Input: 
+> nums = 
+> [[1,2],
+>  [3,4]]
+> r = 2, c = 4
+> Output: 
+> [[1,2],
+>  [3,4]]
+> Explanation:There is no way to reshape a 2 * 2 matrix to a 2 * 4 matrix. So output the original matrix.
+> ```
+>
+> 
+>
+> **Note:**
+>
+> 1. The height and width of the given matrix is in range [1, 100].
+> 2. The given r and c are all positive.
+
+```java
+package com.problem566;
+
+class Solution {
+    public int[][] matrixReshape(int[][] nums, int r, int c) {
+        int row = nums.length;
+        int col = nums[0].length;
+        if (row * col != r * c){
+            return nums;
+        }
+        int[][] res = new int[r][c];
+        int m = 0 , n = 0;
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; j++) {
+                if (n == c){
+                    m++;
+                    n = 0;
+                }
+                res[m][n] = nums[i][j];
+                n++;
+            }
+        }
+        return res;
+    }
+}
+```
+
+### 2.6.3 最大连续1的个数
+
+[485. Max Consecutive Ones](https://leetcode.com/problems/max-consecutive-ones/)
+
+> Given a binary array, find the maximum number of consecutive 1s in this array.
+>
+> **Example 1:**
+>
+> ```
+> Input: [1,1,0,1,1,1]
+> Output: 3
+> Explanation: The first two digits or the last three digits are consecutive 1s.
+>     The maximum number of consecutive 1s is 3.
+> ```
+>
+> 
+>
+> **Note:**
+>
+> - The input array will only contain `0` and `1`.
+> - The length of input array is a positive integer and will not exceed 10,000
+
+```java
+package com.problem485;
+
+class Solution {
+    public int findMaxConsecutiveOnes(int[] nums) {
+        int res = 0;
+        int count = 0;
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] == 1){
+                count++;
+            }else {
+                res = Math.max(res, count);
+                count = 0;
+            }
+        }
+        return Math.max(res, count);
+    }
+}
+```
+
+### 2.6.4 有序矩阵查找
+
+[240. Search a 2D Matrix II](https://leetcode.com/problems/search-a-2d-matrix-ii/)
+
+> Write an efficient algorithm that searches for a value in an *m* x *n* matrix. This matrix has the following properties:
+>
+> - Integers in each row are sorted in ascending from left to right.
+> - Integers in each column are sorted in ascending from top to bottom.
+>
+> **Example:**
+>
+> Consider the following matrix:
+>
+> ```
+> [
+>   [1,   4,  7, 11, 15],
+>   [2,   5,  8, 12, 19],
+>   [3,   6,  9, 16, 22],
+>   [10, 13, 14, 17, 24],
+>   [18, 21, 23, 26, 30]
+> ]
+> ```
+>
+> Given target = `5`, return `true`.
+>
+> Given target = `20`, return `false`.
+
+```java
+package com.problem240;
+
+class Solution {
+    public boolean searchMatrix(int[][] matrix, int target) {
+
+        int row = matrix.length;
+        if (row == 0){
+            return false;
+        }
+        int col = matrix[0].length;
+
+        int i = row - 1;
+        int j = 0;
+        while (i >= 0 && j < col){
+            if (matrix[i][j] == target){
+                return true;
+            }else if (matrix[i][j] < target){
+                j++;
+            }else {
+                i--;
+            }
+        }
+        return false;
+    }
+}
+```
+
+### 2.6.5 有序矩阵中第K小的元素
+
+[378. Kth Smallest Element in a Sorted Matrix](https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/)
+
+> Given a *n* x *n* matrix where each of the rows and columns are sorted in ascending order, find the kth smallest element in the matrix.
+>
+> Note that it is the kth smallest element in the sorted order, not the kth distinct element.
+>
+> **Example:**
+>
+> ```
+> matrix = [
+>    [ 1,  5,  9],
+>    [10, 11, 13],
+>    [12, 13, 15]
+> ],
+> k = 8,
+> 
+> return 13.
+> ```
+>
+> 
+>
+> **Note:** 
+> You may assume k is always valid, 1 ≤ k ≤ n2.
+
+思路一：二分查找
+
+```java
+package com.problem378;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-08-26 18:50
+ * @Feature:
+ */
+public class Solution {
+
+    public int kthSmallest(int[][] matrix, int k) {
+        int row = matrix.length;
+        int col = matrix[0].length;
+        long min = matrix[0][0],max = matrix[row - 1][col - 1];
+        while (min <= max){
+            long mid = (min + max) / 2;
+            int count = 0;
+            for (int i = 0; i < row; i++) {
+                for (int j = 0; j < col && matrix[i][j] <= mid; j++) {
+                    count++;
+                }
+            }
+            if (count < k){
+                min = mid + 1;
+            }else {
+                max = mid - 1;
+            }
+        }
+        return (int) min;
+    }
+}
+```
+
+思路二：堆排序
+
+```java
+package com.problem378;
+
+import java.util.PriorityQueue;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-08-26 19:06
+ * @Feature:
+ */
+public class Solution2 {
+
+    public int kthSmallest(int[][] matrix, int k) {
+        int row = matrix.length;
+        int col = matrix[0].length;
+        int nums = row * col;
+        int size = nums - k + 1;
+        PriorityQueue<Integer> heap = new PriorityQueue<>();
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; j++) {
+                heap.add(matrix[i][j]);
+                if (heap.size() > size){
+                    heap.poll();
+                }
+            }
+        }
+        return heap.peek();
+    }
+}
+```
+
+### 2.6.6 错误的集合
+
+[645. Set Mismatch](https://leetcode.com/problems/set-mismatch/)
+
+> The set `S` originally contains numbers from 1 to `n`. But unfortunately, due to the data error, one of the numbers in the set got duplicated to **another** number in the set, which results in repetition of one number and loss of another number.
+>
+> Given an array `nums` representing the data status of this set after the error. Your task is to firstly find the number occurs twice and then find the number that is missing. Return them in the form of an array.
+>
+> **Example 1:**
+>
+> ```
+> Input: nums = [1,2,2,4]
+> Output: [2,3]
+> ```
+>
+> 
+>
+> **Note:**
+>
+> 1. The given array size will in the range [2, 10000].
+> 2. The given array's numbers won't have any order.
+
+```java
+package com.problem645;
+
+class Solution {
+    public int[] findErrorNums(int[] nums) {
+        int[] res = new int[2];
+        int temp = -1;
+        int sum = 0;
+        int[] dp = new int[nums.length + 1];
+        for (int i : nums){
+            sum += i;
+            if (dp[i] == 0){
+                dp[i] ++;
+            }else {
+                temp = i;
+            }
+        }
+        res[0] = temp;
+        res[1] = (1 + nums.length) * nums.length / 2 - sum + temp;
+        return res;
+    }
+}
+```
+
+### 2.6.7 寻找重复的数
+
+[287. Find the Duplicate Number](https://leetcode.com/problems/find-the-duplicate-number/)
+
+> Given an array *nums* containing *n* + 1 integers where each integer is between 1 and *n* (inclusive), prove that at least one duplicate number must exist. Assume that there is only one duplicate number, find the duplicate one.
+>
+> **Example 1:**
+>
+> ```
+> Input: [1,3,4,2,2]
+> Output: 2
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: [3,1,3,4,2]
+> Output: 3
+> ```
+>
+> **Note:**
+>
+> 1. You **must not** modify the array (assume the array is read only).
+> 2. You must use only constant, *O*(1) extra space.
+> 3. Your runtime complexity should be less than *O*(*n*2).
+> 4. There is only one duplicate number in the array, but it could be repeated more than once.
+
+思路一：排序
+
+```java
+package com.problem287;
+
+import java.util.Arrays;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-08-28 11:10
+ * @Feature:
+ */
+public class Solution2 {
+
+    public int findDuplicate(int[] nums) {
+        Arrays.sort(nums);
+        for (int i = 0; i < nums.length - 1; i++) {
+            if (nums[i] == nums[i + 1]){
+                return nums[i];
+            }
+        }
+        return 0;
+    }
+
+}
+```
+
+思路二：双指针，参考`环形链表Ⅱ`
+
+
+```java
+package com.problem287;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-08-28 16:21
+ * @Feature:
+ */
+public class Solution3 {
+
+    public int findDuplicate(int[] nums) {
+        int i = nums[0];
+        int j = nums[0];
+        do {
+            i = nums[i];
+            j = nums[nums[j]];
+        }while (i != j);
+
+        int p1 = nums[0];
+        int p2 = i;
+        while (p1 != p2){
+            p1 = nums[p1];
+            p2 = nums[p2];
+        }
+        return p1;
+    }
+}
+```
+
+### 2.6.8 优美的排列
+
+[526. Beautiful Arrangement](https://leetcode.com/problems/beautiful-arrangement/)
+
+> Suppose you have **N** integers from 1 to N. We define a beautiful arrangement as an array that is constructed by these **N**numbers successfully if one of the following is true for the ith position (1 <= i <= N) in this array:
+>
+> 1. The number at the ith position is divisible by **i**.
+> 2. **i** is divisible by the number at the ith position.
+>
+>  
+>
+> Now given N, how many beautiful arrangements can you construct?
+>
+> **Example 1:**
+>
+> ```
+> Input: 2
+> Output: 2
+> Explanation: 
+> 
+> The first beautiful arrangement is [1, 2]:
+> 
+> Number at the 1st position (i=1) is 1, and 1 is divisible by i (i=1).
+> 
+> Number at the 2nd position (i=2) is 2, and 2 is divisible by i (i=2).
+> 
+> The second beautiful arrangement is [2, 1]:
+> 
+> Number at the 1st position (i=1) is 2, and 2 is divisible by i (i=1).
+> 
+> Number at the 2nd position (i=2) is 1, and i (i=2) is divisible by 1.
+> ```
+>
+>  
+>
+> **Note:**
+>
+> 1. **N** is a positive integer and will not exceed 15.
+
+思路：全排列的过程进行剪枝
+
+```java
+package com.problem526;
+
+import java.util.ArrayList;
+
+class Solution {
+
+    int count = 0;
+
+    public int countArrangement(int N) {
+
+        boolean[] tag = new boolean[N];
+        solve(N, new ArrayList<>(),tag);
+        return count;
+    }
+
+    private void solve(int n, ArrayList<Integer> integers,boolean[] tag) {
+        if (integers.size() == n){
+            count++;
+        }
+        for (int i = 0; i < n; i++) {
+            if (tag[i]){
+                continue;
+            }
+            tag[i] = true;
+            integers.add(i + 1);
+            if ((i + 1) % (integers.size()) != 0 && (integers.size()) % (i + 1) != 0){
+                tag[i] = false;
+                integers.remove(integers.size() - 1);
+                continue;
+            }
+
+            solve(n, integers, tag);
+            integers.remove(integers.size() - 1);
+            tag[i] = false;
+        }
+    }
+
+}
+```
+
+### 2.6.9 优美的序列Ⅱ
+
+[667. Beautiful Arrangement II](https://leetcode.com/problems/beautiful-arrangement-ii/)
+
+> Given two integers `n` and `k`, you need to construct a list which contains `n` different positive integers ranging from `1`to `n` and obeys the following requirement: 
+> Suppose this list is [a1, a2, a3, ... , an], then the list [|a1 - a2|, |a2 - a3|, |a3 - a4|, ... , |an-1 - an|] has exactly `k` distinct integers.
+>
+> If there are multiple answers, print any of them.
+>
+> **Example 1:**
+>
+> ```
+> Input: n = 3, k = 1
+> Output: [1, 2, 3]
+> Explanation: The [1, 2, 3] has three different positive integers ranging from 1 to 3, and the [1, 1] has exactly 1 distinct integer: 1.
+> ```
+>
+> 
+>
+> **Example 2:**
+>
+> ```
+> Input: n = 3, k = 2
+> Output: [1, 3, 2]
+> Explanation: The [1, 3, 2] has three different positive integers ranging from 1 to 3, and the [2, 1] has exactly 2 distinct integers: 1 and 2.
+> ```
+>
+> 
+>
+> **Note:**
+>
+> 1. The `n` and `k` are in the range 1 <= k < n <= 104.
+
+思路：先构造一个1~n的数组，然后从第二开始对数组进行反转，每反转一次就会新增一个差值。
+
+```java
+package com.problem667;
+
+class Solution {
+    public int[] constructArray(int n, int k) {
+        int[] res = new int[n];
+        for (int i = 0; i < n; i++) {
+            res[i] = i + 1;
+        }
+        int start = 1;
+        for (int i = 0; i < k - 1; i++) {
+            solve(res,start,n - 1);
+            start++;
+        }
+        return res;
+    }
+
+    private void solve(int[] res, int start, int end) {
+        while (start < end){
+            int temp = res[start];
+            res[start] = res[end];
+            res[end] = temp;
+            start++;
+            end--;
+        }
+    }
+}
+```
+
+### 2.6.10 数组的度
+
+[697. Degree of an Array](https://leetcode.com/problems/degree-of-an-array/)
+
+> Given a non-empty array of non-negative integers `nums`, the **degree** of this array is defined as the maximum frequency of any one of its elements.
+>
+> Your task is to find the smallest possible length of a (contiguous) subarray of `nums`, that has the same degree as `nums`.
+>
+> **Example 1:**
+>
+> ```
+> Input: [1, 2, 2, 3, 1]
+> Output: 2
+> Explanation: 
+> The input array has a degree of 2 because both elements 1 and 2 appear twice.
+> Of the subarrays that have the same degree:
+> [1, 2, 2, 3, 1], [1, 2, 2, 3], [2, 2, 3, 1], [1, 2, 2], [2, 2, 3], [2, 2]
+> The shortest length is 2. So return 2.
+> ```
+>
+> 
+>
+> **Example 2:**
+>
+> ```
+> Input: [1,2,2,3,1,4,2]
+> Output: 6
+> ```
+>
+> 
+>
+> **Note:**
+>
+> `nums.length` will be between 1 and 50,000.
+>
+> `nums[i]` will be an integer between 0 and 49,999.
+
+思路：先计算原数组的度，然后记录该度对应的数字，最后在原数组中统计包含该数字的开始和结束位置，保存最小值即可。
+
+```java
+package com.problem697;
+
+
+import java.util.ArrayList;
+import java.util.List;
+
+class Solution {
+
+    public int findShortestSubArray(int[] nums) {
+        int pre = Integer.MAX_VALUE,last = 0;
+        int max = 0;
+        for (int i : nums){
+            max = Math.max(max, i);
+        }
+        List<Integer> list = new ArrayList<>();
+        int[] dp = new int[max + 1];
+        int d = 0;
+        for (int i : nums){
+            dp[i]++;
+            d = Math.max(d, dp[i]);
+        }
+
+        for (int i = 0; i < max + 1; i++) {
+            if (dp[i] == d){
+                list.add(i);
+            }
+        }
+        int res = Integer.MAX_VALUE;
+        for (int temp : list) {
+            for (int i = 0; i < nums.length; i++) {
+                if (nums[i] == temp) {
+                    pre = Math.min(pre, i);
+                    last = Math.max(last, i);
+                }
+            }
+            res = Math.min(res, last - pre + 1);
+            pre = Integer.MAX_VALUE;
+            last = 0;
+        }
+        return res;
+    }
+
+}
+```
+
+### 2.6.11 托普利茨矩阵
+
+[766. Toeplitz Matrix](https://leetcode.com/problems/toeplitz-matrix/)
+
+> A matrix is *Toeplitz* if every diagonal from top-left to bottom-right has the same element.
+>
+> Now given an `M x N` matrix, return `True` if and only if the matrix is *Toeplitz*.
+>  
+>
+> **Example 1:**
+>
+> ```
+> Input:
+> matrix = [
+>   [1,2,3,4],
+>   [5,1,2,3],
+>   [9,5,1,2]
+> ]
+> Output: True
+> Explanation:
+> In the above grid, the diagonals are:
+> "[9]", "[5, 5]", "[1, 1, 1]", "[2, 2, 2]", "[3, 3]", "[4]".
+> In each diagonal all elements are the same, so the answer is True.
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input:
+> matrix = [
+>   [1,2],
+>   [2,2]
+> ]
+> Output: False
+> Explanation:
+> The diagonal "[1, 2]" has different elements.
+> ```
+>
+> 
+> **Note:**
+>
+> 1. `matrix` will be a 2D array of integers.
+> 2. `matrix` will have a number of rows and columns in range `[1, 20]`.
+> 3. `matrix[i][j]` will be integers in range `[0, 99]`.
+>
+> 
+> **Follow up:**
+>
+> 1. What if the matrix is stored on disk, and the memory is limited such that you can only load at most one row of the matrix into the memory at once?
+> 2. What if the matrix is so large that you can only load up a partial row into the memory at once?
+
+```java
+class Solution {
+    public boolean isToeplitzMatrix(int[][] matrix) {
+        Set<Integer> set = new HashSet<>();
+        int row = matrix.length;
+        int col = matrix[0].length;
+
+        int len = col + row - 1;
+        int x;
+        int y;
+        for (int i = 0; i < len; i++) {
+            y = i;
+            x = row - 1;
+            if (y >= col){
+                y = col - 1;
+                row--;
+            }
+            while (x >= 0 && y >= 0){
+                set.add(matrix[x][y]);
+                x--;
+                y--;
+            }
+            if (set.size() != 1){
+                return false;
+            }else {
+                set.clear();
+            }
+        }
+        return true;
+    }
+}
+```
+
+### *2.6.12 使数组唯一的最小增量
+
+[945. Minimum Increment to Make Array Unique](https://leetcode.com/problems/minimum-increment-to-make-array-unique/)
+
+> Given an array of integers A, a *move* consists of choosing any `A[i]`, and incrementing it by `1`.
+>
+> Return the least number of moves to make every value in `A` unique.
+>
+>  
+>
+> **Example 1:**
+>
+> ```
+> Input: [1,2,2]
+> Output: 1
+> Explanation:  After 1 move, the array could be [1, 2, 3].
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: [3,2,1,2,1,7]
+> Output: 6
+> Explanation:  After 6 moves, the array could be [3, 4, 1, 2, 5, 7].
+> It can be shown with 5 or less moves that it is impossible for the array to have all unique values.
+> ```
+>
+>  
+>
+> **Note:**
+>
+> 1. `0 <= A.length <= 40000`
+> 2. `0 <= A[i] < 40000`
+
+思路：
+
+将数组排完序后，我们对数组进行线性扫描，会有两种情况：
+
+如果 A[i - 1] == A[i]，我们将操作次数减去 A[i]，并将重复的数的个数增加 1；
+
+如果 A[i - 1] < A[i]，我们就可以将之前重复的数放入区间 (A[i - 1], A[i]) 中。设当前重复的数的个数为 taken，我们可以放入 give = min(taken, A[i] - A[i - 1] - 1) 个数，它们的和为
+
+$$
+A[i-1] * \mathrm{give} + (\sum_{k=1}^{\mathrm{give}})
+$$
+以1 1 2 2 3 7为例，在区间【3,7】内插入两个数，那么总合就是2 * 3 + (1+2)*2/2
+
+```java
+package com.problem945;
+
+import java.util.Arrays;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-09-02 10:53
+ * @Feature:
+ */
+public class Solution {
+
+    public int minIncrementForUnique(int[] A) {
+        Arrays.sort(A);
+        int res = 0,taken = 0;
+        for (int i = 1; i < A.length; i++) {
+            if (A[i] == A[i - 1]){
+                taken++;
+                res -= A[i];
+            }else {
+                int give = Math.min(taken, A[i] - A[i - 1] - 1);
+                res += (A[i - 1] * give) + (1 + give) * give / 2;
+                taken -= give;
+            }
+        }
+        if (taken > 0){
+            res += (taken + 1) * taken / 2 + A[A.length - 1] * taken;
+        }
+        return res;
+    }
+}
+```
+
+### *2.6.13 数组嵌套
+
+[565. Array Nesting](https://leetcode.com/problems/array-nesting/)
+
+> A zero-indexed array A of length N contains all integers from 0 to N-1. Find and return the longest length of set S, where S[i] = {A[i], A[A[i]], A[A[A[i]]], ... } subjected to the rule below.
+>
+> Suppose the first element in S starts with the selection of element A[i] of index = i, the next element in S should be A[A[i]], and then A[A[A[i]]]… By that analogy, we stop adding right before a duplicate element occurs in S.
+>
+>  
+>
+> **Example 1:**
+>
+> ```
+> Input: A = [5,4,0,3,1,6,2]
+> Output: 4
+> Explanation: 
+> A[0] = 5, A[1] = 4, A[2] = 0, A[3] = 3, A[4] = 1, A[5] = 6, A[6] = 2.
+> 
+> One of the longest S[K]:
+> S[0] = {A[0], A[5], A[6], A[2]} = {5, 6, 2, 0}
+> ```
+>
+>  
+>
+> **Note:**
+>
+> 1. N is an integer within the range [1, 20,000].
+> 2. The elements of A are all distinct.
+> 3. Each element of A is an integer within the range [0, N-1].
+
+```java
+package com.problem565;
+
+class Solution {
+
+    public static int arrayNesting(int[] nums) {
+        int res = 0;
+        for (int i = 0; i < nums.length; i++) {
+            int count = 0;
+            for (int j = i; nums[j] != -1;) {
+                count++;
+                int t = nums[j];
+                nums[j] = -1;
+                j = t;
+            }
+            res = Math.max(res, count);
+        }
+        return res;
+    }
+}
+```
+
+### 2.6.14 最多能完成排序的块
+
+[769. Max Chunks To Make Sorted](https://leetcode.com/problems/max-chunks-to-make-sorted/)
+
+> Given an array `arr` that is a permutation of `[0, 1, ..., arr.length - 1]`, we split the array into some number of "chunks" (partitions), and individually sort each chunk.  After concatenating them, the result equals the sorted array.
+>
+> What is the most number of chunks we could have made?
+>
+> **Example 1:**
+>
+> ```
+> Input: arr = [4,3,2,1,0]
+> Output: 1
+> Explanation:
+> Splitting into two or more chunks will not return the required result.
+> For example, splitting into [4, 3], [2, 1, 0] will result in [3, 4, 0, 1, 2], which isn't sorted.
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: arr = [1,0,2,3,4]
+> Output: 4
+> Explanation:
+> We can split into two chunks, such as [1, 0], [2, 3, 4].
+> However, splitting into [1, 0], [2], [3], [4] is the highest number of chunks possible.
+> ```
+>
+> **Note:**
+>
+> - `arr` will have length in range `[1, 10]`.
+> - `arr[i]` will be a permutation of `[0, 1, ..., arr.length - 1]`.
+
+思路：因为数组中存放的数字是0——arr.length-1，所以可以切分的依据就是max(arr[0~i])==i
+
+```java
+package com.problem769;
+
+class Solution {
+    public int maxChunksToSorted(int[] arr) {
+        int res = 0;
+        int max = 0;
+        for (int i = 0; i < arr.length; i++) {
+            max = Math.max(max, arr[i]);
+            if (max == i){
+                res++;
+            }
+        }
+        return res;
+    }
+}
+```
+
+## *2.7 图
+
+深度优先搜索的时间复杂度和广度优先搜索的时间复杂度是一样的，邻接矩阵存储为O(n^2)， 邻接表存储为O(n+e)。
+
+### 2.7.1 二分图
+
+如果可以用两种颜色对图中的节点进行着色，并且保证相邻的节点颜色不同，那么这个图就是二分图。
+
+[785. Is Graph Bipartite?](https://leetcode.com/problems/is-graph-bipartite/)
+
+> Given an undirected `graph`, return `true` if and only if it is bipartite.
+>
+> Recall that a graph is *bipartite* if we can split it's set of nodes into two independent subsets A and B such that every edge in the graph has one node in A and another node in B.
+>
+> The graph is given in the following form: `graph[i]` is a list of indexes `j` for which the edge between nodes `i` and `j`exists.  Each node is an integer between `0` and `graph.length - 1`.  There are no self edges or parallel edges: `graph[i]` does not contain `i`, and it doesn't contain any element twice.
+>
+> ```
+> Example 1:
+> Input: [[1,3], [0,2], [1,3], [0,2]]
+> Output: true
+> Explanation: 
+> The graph looks like this:
+> 0----1
+> |    |
+> |    |
+> 3----2
+> We can divide the vertices into two groups: {0, 2} and {1, 3}.
+> Example 2:
+> Input: [[1,2,3], [0,2], [0,1,3], [0,2]]
+> Output: false
+> Explanation: 
+> The graph looks like this:
+> 0----1
+> | \  |
+> |  \ |
+> 3----2
+> We cannot find a way to divide the set of nodes into two independent subsets.
+> ```
+>
+>  
+>
+> **Note:**
+>
+> - `graph` will have length in range `[1, 100]`.
+> - `graph[i]` will contain integers in range `[0, graph.length - 1]`.
+> - `graph[i]` will not contain `i` or duplicate values.
+> - The graph is undirected: if any element `j` is in `graph[i]`, then `i` will be in `graph[j]`.
+
+思路：DFS
+
+```java 
+package com.problem785;
+
+class Solution {
+    int len = 100;
+    boolean[] color = new boolean[len];
+    boolean[] marked = new boolean[len];
+    boolean tag = true;
+    public boolean isBipartite(int[][] graph) {
+        for (int i = 0; i < graph.length; i++) {
+            if (!tag){
+                break;
+            }
+            if (!marked[i]){
+                dfs(graph,i);
+            }
+        }
+        return tag;
+    }
+
+    private void dfs(int[][] graph, int i) {
+        if (!tag){
+            return;
+        }
+        marked[i] = true;
+        for (int n : graph[i]){
+            if (!marked[n]){
+                color[n] = !color[i];
+                dfs(graph, n);
+            }else if (color[n] == color[i]){
+                tag = false;
+            }
+        }
+    }
+}
+```
+
+BFS
+
+注：题目没有说明图一定是连通的，所以需要对每个节点都要进行BFS染色
+
+```java
+package com.problem785;
+
+import java.util.LinkedList;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-09-03 10:59
+ * @Feature:
+ */
+public class Solution2 {
+
+    public boolean isBipartite(int[][] graph) {
+        LinkedList<Integer> list = new LinkedList<>();
+        boolean[] marked = new boolean[100];
+        boolean[] color = new boolean[100];
+        boolean tag = true;
+        for (int i = 0; i < graph.length; i++) {
+            if (graph[i].length != 0 && !marked[i]){
+                list.add(i);
+                while (!list.isEmpty()){
+                    if (!tag){
+                        break;
+                    }
+                    int node = list.pollFirst();
+                    if (!marked[node]) {
+                        marked[node] = true;
+                    }
+                    for (int n : graph[node]){
+                        if (!marked[n]) {
+                            color[n] = !color[node];
+                            list.add(n);
+                        }else if (color[n] == color[node]){
+                            tag = false;
+                        }
+                    }
+                }
+            }
+        }
+        return tag;
+    }
+}
+```
+
+### *2.7.2 拓扑排序
+
+常用于在具有先序关系的任务规划中。
+
+在一个有向图中找到一个拓扑排序的过程如下：
+
+1）从有向图中找到一个没有前驱（入度为0）的顶点输出
+
+2）删除1）中的顶点，并且删除从该顶点发出的全部边
+
+3）重复上述两步，直到剩余的网中不存在没有前驱的顶点为止
+
+#### 2.7.2.1 课程表
+
+[207. Course Schedule](https://leetcode.com/problems/course-schedule/)
+
+> There are a total of *n* courses you have to take, labeled from `0` to `n-1`.
+>
+> Some courses may have prerequisites, for example to take course 0 you have to first take course 1, which is expressed as a pair: `[0,1]`
+>
+> Given the total number of courses and a list of prerequisite **pairs**, is it possible for you to finish all courses?
+>
+> **Example 1:**
+>
+> ```
+> Input: 2, [[1,0]] 
+> Output: true
+> Explanation: There are a total of 2 courses to take. 
+>              To take course 1 you should have finished course 0. So it is possible.
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: 2, [[1,0],[0,1]]
+> Output: false
+> Explanation: There are a total of 2 courses to take. 
+>              To take course 1 you should have finished course 0, and to take course 0 you should
+>              also have finished course 1. So it is impossible.
+> ```
+>
+> **Note:**
+>
+> 1. The input prerequisites is a graph represented by **a list of edges**, not adjacency matrices. Read more about [how a graph is represented](https://www.khanacademy.org/computing/computer-science/algorithms/graph-representation/a/representing-graphs).
+> 2. You may assume that there are no duplicate edges in the input prerequisites.
+
+思路一：DFS判断图中是否有环
+
+这里要使用逆邻接表。其实就是检测这个有向图中有没有环，只要存在环，这些课程就不能按要求学完。
+
+具体方法是：
+
+第 1 步：构建逆邻接表；
+
+第 2 步：递归处理每一个还没有被访问的结点，具体做法很简单：对于一个结点来说，先输出指向它的所有顶点，再输出自己。
+
+第 3 步：如果这个顶点还没有被遍历过，就递归遍历它，把所有指向它的结点都输出了，再输出自己。注意：当访问一个结点的时候，应当先递归访问它的前驱结点，直至前驱结点没有前驱结点为止。使用一个mark数组来表示节点的访问状态，如果marked[i] == 1，说明被重复访问；如果marked[i] == 2，说明该节点的前驱节点已经访问完了，且该访问过程中不存在环。
+
+```java
+package com.problem207;
+
+import java.util.ArrayList;
+
+class Solution {
+    public boolean canFinish(int numCourses, int[][] prerequisites) {
+        ArrayList[] graphic = new ArrayList[numCourses];
+        for (int i = 0; i < numCourses; i++) {
+            graphic[i] = new ArrayList<Integer>();
+        }
+        for (int[] temp : prerequisites){
+            graphic[temp[0]].add(temp[1]);
+        }
+
+        int[] marked = new int[numCourses];
+        for (int i = 0; i < numCourses; i++) {
+            if (dfs(marked,graphic,i)){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean dfs(int[] marked, ArrayList<Integer>[] graphic, int i) {
+        if (marked[i] == 1){
+            return true;
+        }
+        if (marked[i] == 2){
+            return false;
+        }
+        marked[i] = 1;
+        for (int node : graphic[i]){
+            if (dfs(marked, graphic, node)){
+                return true;
+            }
+        }
+        marked[i] = 2;
+        return false;
+    }
+}
+```
+
+时间复杂度：O(E+V)
+
+空间复杂度：O(V)
+
+思路二：拓扑排序（使用栈或者队列）
+
+1、在开始排序前，扫描对应的存储空间（使用邻接表），将入度为 0 的结点放入队列。
+
+2、只要队列非空，就从队首取出入度为 0 的结点，将这个结点输出到结果集中，并且将这个结点的所有邻接结点（它指向的结点）的入度减 1，在减 1 以后，如果这个被减 1的结点的入度为 0，就继续入队。
+
+3、当队列为空的时候，检查结果集中的顶点个数是否和课程数相等即可。
+
+在代码具体实现的时候，除了保存入度为 0 的队列，我们还需要两个辅助的数据结构：
+
+1、邻接表：通过结点的索引，我们能够得到这个结点的后继结点；
+
+2、入度数组：通过结点的索引，我们能够得到指向这个结点的结点个数。
+
+这个两个数据结构在遍历题目给出的邻边以后就可以很方便地得到。
+
+```java
+package com.problem207;
+
+import java.util.*;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-09-04 10:50
+ * @Feature:
+ */
+public class Solution2 {
+
+    public boolean canFinish(int numCourses, int[][] prerequisites) {
+        if (numCourses <= 0){
+            return false;
+        }
+        int[] d = new int[numCourses];
+        for (int[] node : prerequisites){
+            d[node[0]]++;
+        }
+        LinkedList<Integer> queue = new LinkedList<>();
+        for (int i = 0; i < numCourses; i++) {
+            if (d[i] == 0){
+                queue.add(i);
+            }
+        }
+        //拓扑排序的结果
+        List<Integer> list = new ArrayList<>();
+        while(!queue.isEmpty()){
+            Integer num = queue.pollFirst();
+            list.add(num);
+            for (int[] node : prerequisites){
+                if (node[1] == num){
+                    d[node[0]]--;
+                    if (d[node[0]] == 0){
+                        queue.add(node[0]);
+                    }
+                }
+            }
+        }
+        return list.size() == numCourses;
+    }
+}
+```
+
+#### 2.7.2.2 课程表Ⅱ
+
+[210. Course Schedule II](https://leetcode.com/problems/course-schedule-ii/)
+
+> There are a total of *n* courses you have to take, labeled from `0` to `n-1`.
+>
+> Some courses may have prerequisites, for example to take course 0 you have to first take course 1, which is expressed as a pair: `[0,1]`
+>
+> Given the total number of courses and a list of prerequisite **pairs**, return the ordering of courses you should take to finish all courses.
+>
+> There may be multiple correct orders, you just need to return one of them. If it is impossible to finish all courses, return an empty array.
+>
+> **Example 1:**
+>
+> ```
+> Input: 2, [[1,0]] 
+> Output: [0,1]
+> Explanation: There are a total of 2 courses to take. To take course 1 you should have finished   
+>              course 0. So the correct course order is [0,1] .
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: 4, [[1,0],[2,0],[3,1],[3,2]]
+> Output: [0,1,2,3] or [0,2,1,3]
+> Explanation: There are a total of 4 courses to take. To take course 3 you should have finished both     
+>              courses 1 and 2. Both courses 1 and 2 should be taken after you finished course 0. 
+>              So one correct course order is [0,1,2,3]. Another correct ordering is [0,2,1,3] .
+> ```
+>
+> **Note:**
+>
+> 1. The input prerequisites is a graph represented by **a list of edges**, not adjacency matrices. Read more about [how a graph is represented](https://www.khanacademy.org/computing/computer-science/algorithms/graph-representation/a/representing-graphs).
+> 2. You may assume that there are no duplicate edges in the input prerequisites.
+
+```java 
+package com.problem210;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
+
+class Solution {
+    public int[] findOrder(int numCourses, int[][] prerequisites) {
+        int[] d = new int[numCourses];
+        for (int[] temp : prerequisites){
+            d[temp[0]]++;
+        }
+        Stack<Integer> stack = new Stack<>();
+        for (int i = 0; i < numCourses; i++) {
+            if (d[i] == 0){
+                stack.push(i);
+            }
+        }
+        int[] res = new int[numCourses];
+        int index = 0;
+        while (!stack.isEmpty()){
+            int node = stack.pop();
+            res[index++] = node;
+            for (int[] temp : prerequisites){
+                if (temp[1] == node){
+                    d[temp[0]]--;
+                    if (d[temp[0]] == 0){
+                        stack.add(temp[0]);
+                    }
+                }
+            }
+        }
+        if (index == numCourses) {
+            return res;
+        }else {
+            return new int[0];
+        }
+    }
+}
+```
+
+### 2.7.3 并查集
+
+#### 2.7.3.1 基本概念
+
+用于解决动态连通性问题，能动态连接两个点，并且判断两个点是否连通。
+
+![](http://mycsdnblog.work/201919051034-n.png)
+
+|              方法               |           描述            |
+| :-----------------------------: | :-----------------------: |
+|            UF(int N)            | 构造一个大小为 N 的并查集 |
+|    void union(int p, int q)     |     连接 p 和 q 节点      |
+|         int find(int p)         | 查找 p 所在的连通分量编号 |
+| boolean connected(int p, int q) | 判断 p 和 q 节点是否连通  |
+
+#### 2.7.3.2 模板方法
+
+```java
+public abstract class UF {
+
+    protected int[] id;
+
+    public UF(int N) {
+        id = new int[N];
+        for (int i = 0; i < N; i++) {
+            id[i] = i;
+        }
+    }
+
+    public boolean connected(int p, int q) {
+        return find(p) == find(q);
+    }
+
+    public abstract int find(int p);
+
+    public abstract void union(int p, int q);
+}
+```
+
+> **Quick Find**
+
+可以快速进行 find 操作，也就是可以快速判断两个节点是否连通。
+
+需要保证同一连通分量的所有节点的 id 值相等，就可以通过判断两个节点的 id 值是否相等从而判断其连通性。
+
+但是 union 操作代价却很高，需要将其中一个连通分量中的所有节点 id 值都修改为另一个节点的 id 值。
+
+![](http://mycsdnblog.work/201919051041-E.png)
+
+```java
+public class QuickFindUF extends UF {
+
+    public QuickFindUF(int N) {
+        super(N);
+    }
+
+
+    @Override
+    public int find(int p) {
+        return id[p];
+    }
+
+
+    @Override
+    public void union(int p, int q) {
+        int pID = find(p);
+        int qID = find(q);
+
+        if (pID == qID) {
+            return;
+        }
+
+        for (int i = 0; i < id.length; i++) {
+            if (id[i] == pID) {
+                id[i] = qID;
+            }
+        }
+    }
+}
+```
+
+> **Quick Union**
+
+可以快速进行 union 操作，只需要修改一个节点的 id 值即可。
+
+但是 find 操作开销很大，因为同一个连通分量的节点 id 值不同，id 值只是用来指向另一个节点。因此需要一直向上查找操作，直到找到最上层的节点。
+
+![](http://mycsdnblog.work/201919051046-X.png)
+
+```java 
+public class QuickUnionUF extends UF {
+
+    public QuickUnionUF(int N) {
+        super(N);
+    }
+
+
+    @Override
+    public int find(int p) {
+        while (p != id[p]) {
+            p = id[p];
+        }
+        return p;
+    }
+
+
+    @Override
+    public void union(int p, int q) {
+        int pRoot = find(p);
+        int qRoot = find(q);
+
+        if (pRoot != qRoot) {
+            id[pRoot] = qRoot;
+        }
+    }
+}
+```
+
+这种方法可以快速进行 union 操作，但是 find 操作和树高成正比，最坏的情况下树的高度为节点的数目。
+
+![](http://mycsdnblog.work/201919051049-F.png)
+
+> **加权Quick Union**
+
+为了解决 quick-union 的树通常会很高的问题，加权 quick-union 在 union 操作时会让较小的树连接较大的树上面。
+
+理论研究证明，加权 quick-union 算法构造的树深度最多不超过 logN。
+
+![](http://mycsdnblog.work/201919051051-P.png)
+
+```java
+public class WeightedQuickUnionUF extends UF {
+
+    // 保存节点的数量信息
+    private int[] sz;
+
+
+    public WeightedQuickUnionUF(int N) {
+        super(N);
+        this.sz = new int[N];
+        for (int i = 0; i < N; i++) {
+            this.sz[i] = 1;
+        }
+    }
+
+
+    @Override
+    public int find(int p) {
+        while (p != id[p]) {
+            p = id[p];
+        }
+        return p;
+    }
+
+
+    @Override
+    public void union(int p, int q) {
+
+        int i = find(p);
+        int j = find(q);
+
+        if (i == j) return;
+
+        if (sz[i] < sz[j]) {
+            id[i] = j;
+            sz[j] += sz[i];
+        } else {
+            id[j] = i;
+            sz[i] += sz[j];
+        }
+    }
+}
+```
+
+| 算法                       | union      | find       |
+| -------------------------- | ---------- | ---------- |
+| Quick Find                 | N          | 1          |
+| Quick Union                | 树高       | 树高       |
+| 加权 Quick Union           | logN       | logN       |
+| 路径压缩的加权 Quick Union | 非常接近 1 | 非常接近 1 |
+
+#### 2.7.3.3 冗余连接
+
+[684. Redundant Connection](https://leetcode.com/problems/redundant-connection/)
+
+> In this problem, a tree is an **undirected** graph that is connected and has no cycles.
+>
+> The given input is a graph that started as a tree with N nodes (with distinct values 1, 2, ..., N), with one additional edge added. The added edge has two different vertices chosen from 1 to N, and was not an edge that already existed.
+>
+> The resulting graph is given as a 2D-array of `edges`. Each element of `edges` is a pair `[u, v]` with `u < v`, that represents an **undirected** edge connecting nodes `u` and `v`.
+>
+> Return an edge that can be removed so that the resulting graph is a tree of N nodes. If there are multiple answers, return the answer that occurs last in the given 2D-array. The answer edge `[u, v]` should be in the same format, with `u < v`.
+>
+> **Example 1:**
+>
+> ```
+> Input: [[1,2], [1,3], [2,3]]
+> Output: [2,3]
+> Explanation: The given undirected graph will be like this:
+>   1
+>  / \
+> 2 - 3
+> ```
+>
+> 
+>
+> **Example 2:**
+>
+> ```
+> Input: [[1,2], [2,3], [3,4], [1,4], [1,5]]
+> Output: [1,4]
+> Explanation: The given undirected graph will be like this:
+> 5 - 1 - 2
+>     |   |
+>     4 - 3
+> ```
+>
+> 
+>
+> **Note:**
+>
+> The size of the input 2D-array will be between 3 and 1000.
+>
+> Every integer represented in the 2D-array will be between 1 and N, where N is the size of the input array.
+
+思路一：Quick Find
+
+```java
+package com.problem684;
+
+import java.util.ArrayList;
+import java.util.List;
+
+class Solution {
+    public int[] findRedundantConnection(int[][] edges) {
+        int n = edges.length;
+        int[] dp = new int[n];
+        for (int i = 0; i < n; i++) {
+            dp[i] = i;
+        }
+        List<int[]> res = new ArrayList<>();
+        for (int[] temp : edges){
+            int i = dp[temp[0] - 1];
+            int j = dp[temp[1] - 1];
+
+            if (i == j){
+                res.add(temp);
+            }else {
+                for (int k = 0; k < n; k++) {
+                    if (dp[k] == i){
+                        dp[k] = j;
+                    }
+                }
+
+            }
+        }
+        return res.get(res.size() - 1);
+    }
+
+}
+```
+
+思路二：Quick Union
+
+```java
+package com.problem684;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-09-05 11:31
+ * @Feature:
+ */
+public class Solution2 {
+
+    public int[] findRedundantConnection(int[][] edges) {
+        int n = edges.length;
+        int[] dp = new int[n];
+        for (int i = 0; i < n; i++) {
+            dp[i] = i;
+        }
+        List<int[]> res = new ArrayList<>();
+        for (int[] temp : edges){
+            int i = find(dp,temp[0] - 1);
+            int j = find(dp,temp[1] - 1);
+
+            if (i == j){
+                res.add(temp);
+            }else {
+                dp[i] = j;
+            }
+        }
+        return res.get(res.size() - 1);
+    }
+
+    private int find(int[] dp, int i) {
+        while (dp[i] != i){
+            i = dp[i];
+        }
+        return i;
+    }
+}
+```
 
 
 

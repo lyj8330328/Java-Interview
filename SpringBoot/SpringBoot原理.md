@@ -470,7 +470,17 @@ protected Class<?> getSpringFactoriesLoaderFactoryClass() {
 
 如果我们要覆盖这些默认属性，只需要在application.properties中定义与其前缀prefix和字段名一致的属性即可。
 
-## 2.5 总结
+## 2.5 配置文件加载优先级
+
+bootstrap.properties
+
+bootstrap.yml
+
+application.properties
+
+application.yml
+
+## 2.6 总结
 
 SpringBoot为我们提供了默认配置，而默认配置生效的条件一般有两个：
 

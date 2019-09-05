@@ -6,6 +6,111 @@
 
 BIO 就是传统的 [java.io](http://java.io/) 包，它是基于流模型实现的，交互的方式是同步、阻塞方式，也就是说在读入输入流或者输出流时，在读写动作完成之前，线程会一直阻塞在那里，它们之间的调用时可靠的线性顺序。它的有点就是代码比较简单、直观；缺点就是 IO 的效率和扩展性很低，容易成为应用性能瓶颈。
 
+### 1.1.1 客户端
+
+```java
+package com.example.exe1;
+
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-08-31 14:44
+ * @Feature: 客户端
+ */
+public class TcpClient {
+
+    public static void main(String[] args) throws IOException {
+        Socket socket = new Socket("127.0.0.1",6666);
+        OutputStream outputStream = socket.getOutputStream();
+        outputStream.write("你好服务器,我是客户端1".getBytes());
+
+        InputStream inputStream = socket.getInputStream();
+        byte[] bytes = new byte[1024];
+        int len = inputStream.read(bytes);
+        System.out.println(new String(bytes,0,len));
+        inputStream.close();
+        socket.close();
+    }
+}
+```
+
+### 1.1.2 服务器端
+
+```java
+package com.example.exe1;
+
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-08-31 14:50
+ * @Feature:
+ */
+public class TcpServer {
+
+    public static void main(String[] args) throws IOException {
+        ServerSocket serverSocket = new ServerSocket(6666);
+        Socket socket;
+        while (true) {
+            socket = serverSocket.accept();
+            ServerThread thread = new ServerThread(socket);
+            thread.start();
+        }
+    }
+}
+```
+
+```java
+package com.example.exe1;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-08-31 15:22
+ * @Feature:
+ */
+public class ServerThread extends Thread{
+
+    Socket socket;
+
+    public ServerThread(Socket socket) {
+        this.socket = socket;
+    }
+
+    @Override
+    public void run() {
+        InputStream inputStream = null;
+        try {
+            inputStream = socket.getInputStream();
+            byte[] bytes = new byte[1024];
+            int len = inputStream.read(bytes);
+            System.out.println(socket.getInetAddress() + new String(bytes, 0, len));
+            OutputStream outputStream = socket.getOutputStream();
+            outputStream.write("收到谢谢".getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
+```
+
 ## 1.2 NIO
 
 NIO基于Reactor，当socket有流可读或可写入socket时，操作系统会相应的通知引用程序进行处理，应用再将流读取到缓冲区或写入操作系统。  也就是说，这个时候，已经不是一个连接就要对应一个处理线程了，而是有效的请求，对应一个线程，当连接没有数据时，是没有工作线程来处理的。

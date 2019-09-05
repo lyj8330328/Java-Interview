@@ -1,4 +1,4 @@
-#### 一、介绍
+# 一、介绍
 
 1. ArrayList 是一个**数组队列**，相当于 **动态数组**。与Java中的数组相比，它的容量能动态增长。它继承于AbstractList，实现了List, RandomAccess, Cloneable, java.io.Serializable这些接口。
 2. ArrayList 继承了AbstractList，实现了List。它是一个数组队列，提供了相关的添加、删除、修改、遍历等功能。
@@ -10,7 +10,7 @@
 
 ![1545382296775](F:\images/201818271425-l.png)
 
-##### 1.1 ArrayList构造函数
+## 1.1 ArrayList构造函数
 
 ```java
 // 默认构造函数
@@ -23,7 +23,7 @@ ArrayList(int capacity)
 ArrayList(Collection<? extends E> collection)
 ```
 
-##### 1.2 ArrayList API
+## 1.2 ArrayList API
 
 ```java
 // Collection中定义的API
@@ -60,13 +60,13 @@ void                 trimToSize()
 void                 removeRange(int fromIndex, int toIndex)
 ```
 
-#### 二、数据结构
+# 二、数据结构
 
-##### 2.1 ArrayList的继承关系
+## 2.1 ArrayList的继承关系
 
 ![1545373231486](F:\images/201818271425-L.png)
 
-##### 2.2 ArrayList与Collection的关系
+## 2.2 ArrayList与Collection的关系
 
 ![1545373273549](F:\images/201818271425-R.png)
 
@@ -75,17 +75,17 @@ ArrayList包含了两个重要的对象：elementData 和 size。
 1. elementData 是"Object[]类型的数组"，它保存了添加到ArrayList中的元素。实际上，elementData是个动态数组，可以通过构造函数 ArrayList(int initialCapacity)来执行它的初始容量为initialCapacity；如果通过不含参数的构造函数ArrayList()来创建ArrayList，则elementData的容量默认是10。elementData数组的大小会根据ArrayList容量的增长而动态的增长，具体的增长方式，请参考源码分析中的ensureCapacity()函数。
 2. size 则是动态数组的实际大小。
 
-#### 三、源码分析(JDK 1.8)
+# 三、源码分析(JDK 1.8)
 
-##### 3.1 ArrayList使用的存储结构
+## 3.1 ArrayList使用的存储结构
 
 从源码中我们可以发现，ArrayList使用的存储的数据结构是Object的对象数组。 
 
 ![1545382028006](F:\images/201818271426-r.png)
 
-我想大家一定对这里出现的transient（禁止序列化）关键字很疑惑，我们都知道ArrayList对象是可序列化的，但这里为什么要用transient关键字修饰它呢？查看源码，发现ArrayList实现了自己的readObject和writeObject方法，所以这保证了ArrayList的可序列化。
+我想大家一定对这里出现的transient（禁止序列化）关键字很疑惑，我们都知道ArrayList对象是可序列化的，但这里为什么要用transient关键字修饰它呢？**查看源码，发现ArrayList实现了自己的readObject和writeObject方法，所以这保证了ArrayList的可序列化。**
 
-#####  3.2 ArrayList的初始化
+##  3.2 ArrayList的初始化
 
 ArrayList提供了三个构造函数，依次分析。
 
@@ -117,7 +117,7 @@ ArrayList提供了三个构造函数，依次分析。
 
 首先调用给定的collection的toArray方法将其转换成一个Array。 然后根据这个array的大小进行判断，如果不为0，就调用Arrays的copyOf的方法，复制到Object数组中，完成初始化，如果为0，就直接初始化为空的Object数组。 
 
-##### 3.3 ArrayList动态增长
+## 3.3 ArrayList动态增长
 
 当向一个ArrayList中添加数组的时候，首先会先检查数组中是不是有足够的空间来存储这个新添加的元素。如果有的话，那就什么都不用做，直接添加。如果空间不够用了，那么就根据原始的容量增加原始容量的一半。 源码中是如此实现的： 
 
@@ -157,7 +157,45 @@ DEFAULT_CAPACITY为：
 
 ![1545389307255](F:\images/201818271434-g.png)
 
-##### 3.4 ArrayList移除元素
+## 3.4 add操作
+
+```java
+public boolean add(E e) {
+    ensureCapacityInternal(size + 1);  // Increments modCount!!
+    elementData[size++] = e;
+    return true;
+}
+```
+
+**时间复杂度O(1)**
+
+```java
+public void add(int index, E element) {
+    rangeCheckForAdd(index);
+
+    ensureCapacityInternal(size + 1);  // Increments modCount!!
+    System.arraycopy(elementData, index, elementData, index + 1,
+                     size - index);
+    elementData[index] = element;
+    size++;
+}
+```
+
+**时间复杂度O(n)**
+
+## 3.5 get操作
+
+```java
+public E get(int index) {
+	rangeCheck(index);
+
+	return elementData(index);
+}
+```
+
+**时间复杂度O(1)**
+
+## 3.5 remove操作
 
 移除元素的时候，有两种方法，一是指定下标，二是指定对象 ：
 
@@ -176,15 +214,17 @@ list.remove("aaa");//object
 
 ![1545389772766](F:\images/201818271434-6.png)
 
-我们可以看到，这个remove方法会移除数组中第一个符合的给定对象，如果不存在就什么也不做，如果存在多个只移除第一个。 fastRemove方法如下 ：
+我们可以看到，**这个remove方法会移除数组中第一个符合的给定对象**，如果不存在就什么也不做，如果存在多个只移除第一个。 fastRemove方法如下 ：
 
 ![1545389853050](F:\images/201818271434-2.png)
 
 相当于再次调用remove(index)
 
-#### 四、遍历方式
+**时间复杂度O(n)**
 
-##### 4.1 通过迭代器
+# 四、遍历方式
+
+## 4.1 通过迭代器
 
 ```java
 Integer value = null;
@@ -194,7 +234,7 @@ while (iter.hasNext()) {
 }
 ```
 
-##### 4.2 随机访问，通过索引值去遍历
+## 4.2 随机访问，通过索引值去遍历
 
 ```Java
 Integer value = null;
@@ -204,7 +244,7 @@ for (int i=0; i<size; i++) {
 }
 ```
 
-##### 4.3 for循环
+## 4.3 for循环
 
 ```java
 Integer value = null;
@@ -213,7 +253,7 @@ for (Integer integ:list) {
 }
 ```
 
-##### 4.4 三种方式速度比较
+## 4.4 三种方式速度比较
 
 ```java
 package com.util.arraylist;
@@ -277,7 +317,7 @@ public class Test2 {
 
 总体来说使用随机访问还是比较快一点。
 
-#### 五、toArray异常
+# 五、toArray异常
 
 源码：
 
@@ -302,7 +342,7 @@ toArray() 会抛出异常是因为 toArray() 返回的是 Object[] 数组，将 
 
 ![1550628241555](assets/1550628241555.png)
 
-#### 六、查看ArrayList的容量
+# 六、查看ArrayList的容量
 
 ```java
 package com.util.arraylist;
@@ -333,7 +373,7 @@ public class Test {
 }
 ```
 
-#### 七、ArrayList为什么不是线程安全的
+# 七、ArrayList为什么不是线程安全的
 
 主要是针对add的时候：
 
@@ -452,16 +492,17 @@ public class Test4 {
 
 **参考**：http://www.cnblogs.com/skywang12345/p/3308556.html
 
-#### 八、什么时候使用ArrayList
+# 八、什么时候使用ArrayList
 
 当遇到访问元素比插入或者删除元素更加频繁的时候，应该使用ArrayList。
 
 插入和删除比较频繁，使用LinkedList
 
-#### 九、ArrayList的拷贝
+# 九、ArrayList的拷贝
 
 使用clone方法 浅拷贝
 
 使用ArrayList的构造方法  浅拷贝
 
 Collection的copy方法 深拷贝
+

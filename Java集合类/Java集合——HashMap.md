@@ -1,4 +1,4 @@
-#### 一、介绍
+# 一、介绍
 
 HashMap 是一个散列表，它存储的内容是键值对(key-value)映射。
 
@@ -138,7 +138,7 @@ Collection<V>        values()
  */
 ```
 
-#### 二、数据结构
+# 二、数据结构
 
 **在JDK1.8之前，HashMap采用数组+链表实现，即使用链表处理冲突，同一hash值的节点都存储在一个链表里。但是当位于一个桶中的元素较多，即hash值相等的元素较多时，通过key值依次查找的效率较低。而JDK1.8中，HashMap采用数组+链表+红黑树实现，当链表长度超过阈值（8）时，将链表转换为红黑树，这样大大减少了查找时间。**
 
@@ -156,7 +156,7 @@ jdk1.8之前的hashmap都采用上图的结构，都是基于一个数组和多�
 
 ![](http://mycsdnblog.work/201818241409-c.png)
 
-##### 2.1 链表的实现
+## 2.1 链表的实现
 
 ![](http://mycsdnblog.work/201818241416-1.png)
 
@@ -204,7 +204,7 @@ static class Node<K,V> implements Map.Entry<K,V> {
 }
 ```
 
-##### 2.2 红黑树
+## 2.2 红黑树
 
 具体请参考：https://blog.csdn.net/lyj2018gyq/article/details/85265403
 
@@ -212,7 +212,7 @@ static class Node<K,V> implements Map.Entry<K,V> {
 
 TreeNode是继承LinkedHashMap的！！！！！！！！！！
 
-##### 2.3 位桶
+## 2.3 位桶
 
 ![](http://mycsdnblog.work/201818261721-O.png)
 
@@ -220,15 +220,15 @@ HashMap类中有一个非常重要的字段，就是 Node[] table，即哈希桶
 
 首先有一个每个元素都是链表（可能表述不准确）的数组，当添加一个元素（key-value）时，就首先计算元素key的hash值，以此确定插入数组中的位置，但是可能存在同一hash值的元素已经被放在数组同一位置了，这时就添加到同一hash值的元素的后面，他们在数组的同一位置，但是形成了链表，所以说数组存放的是链表。而当链表长度太长时，链表就转换为红黑树，这样大大提高了查找的效率。 
 
-#### 三、源码解析（JDK 1.8）
+# 三、源码解析（JDK 1.8）
 
-##### 3.1 类的继承关系
+## 3.1 类的继承关系
 
 ![](http://mycsdnblog.work/201818262009-j.png)
 
 HashMap继承自父类（AbstractMap），实现了Map、Cloneable、Serializable接口。其中，Map接口定义了一组通用的操作；Cloneable接口则表示可以进行拷贝，在HashMap中，实现的是浅层次拷贝，即对拷贝对象的改变会影响被拷贝的对象；Serializable接口表示HashMap实现了序列化，即可以将HashMap对象保存至本地，之后可以恢复状态。 
 
-##### 3.2 类的属性
+## 3.2 类的属性
 
 ```java
 public class HashMap<K,V> extends AbstractMap<K,V> implements Map<K,V>, Cloneable, Serializable {
@@ -261,7 +261,7 @@ public class HashMap<K,V> extends AbstractMap<K,V> implements Map<K,V>, Cloneabl
 }
 ```
 
-##### 3.3 构造函数
+## 3.3 构造函数
 
 <1>**HashMap(int, float)型构造函数** 
 
@@ -324,7 +324,7 @@ final void putMapEntries(Map<? extends K, ? extends V> m, boolean evict) {
 }
 ```
 
-##### 3.4 Hash算法
+## 3.4 Hash算法
 
 ![](http://mycsdnblog.work/201818262046-3.png)
 
@@ -344,9 +344,9 @@ tab即是table，n是map集合的容量大小，hash是上面方法的返回值�
 
 ![](http://mycsdnblog.work/201818262103-c.png)
 
-##### 3.5 重要方法分析
+## 3.5 重要方法分析
 
-<1> **putVal方法**
+### 3.5.1 putVal方法
 
 HashMap并没有直接提供putVal接口给用户调用，而是提供的put方法，而put方法就是通过putVal来插入元素的。 
 
@@ -458,7 +458,7 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
 
    ③ 如果该位置有数据是一个链表，分两种情况一是该链表没有这个节点，另一个是该链表上有这个节点，注意这里判断的依据是key.hash是否一样：如果该链表没有这个节点，那么采用尾插法新增节点保存新数据，返回null；如果该链表已经有这个节点了，那么找到该节点并更新新数据，返回老数据。
 
-注意：HashMap的put会返回key的上一次保存的数据 （插入相同key的数据）
+**注意：HashMap的put会返回key的上一次保存的数据 （插入相同key的数据）**
 
 ```java
 public static void main(String[] args) {
@@ -473,7 +473,21 @@ public static void main(String[] args) {
 
 ![](http://mycsdnblog.work/201818262221-6.png)
 
-<2>**getNode方法** 
+**时间复杂度的分析：**
+
+put操作的流程：
+
+第一步：key.hashcode()，时间复杂度O(1)。
+
+第二步：找到桶以后，判断桶里是否有元素，如果没有，直接new一个entey节点插入到数组中。时间复杂度O(1)。
+
+第三步：如果桶里有元素，并且元素个数小于6，则调用equals方法，比较是否存在相同名字的key，不存在则new一个entry插入都链表尾部。时间复杂度O(1)+O(n)=O(n)。
+
+第四步：如果桶里有元素，并且元素个数大于6，则调用equals方法，比较是否存在相同名字的key，不存在则new一个entry插入都链表尾部。时间复杂度O(1)+O(logn)=O(logn)。红黑树查询的时间复杂度是logn。
+
+通过上面的分析，我们可以得出结论，HashMap新增元素的时间复杂度是不固定的，可能的值有O(1)、O(logn)、O(n)。
+
+### 3.5.2 getNode方法
 
 HashMap同样并没有直接提供getNode接口给用户调用，而是提供的get方法，而get方法就是通过getNode来取得元素的。 
 
@@ -507,7 +521,7 @@ final Node<K,V> getNode(int hash, Object key) {
 }
 ```
 
-<3>**removeNode方法**
+### 3.5.3 removeNode方法
 
 ![](http://mycsdnblog.work/201818272317-Z.png)
 
@@ -562,11 +576,11 @@ final Node<K,V> removeNode(int hash, Object key, Object value,
 }
 ```
 
-<4>**size()方法**
+### 3.5.4 size()方法
 
 ![](http://mycsdnblog.work/201818281458-J.png)
 
-<5>**resize()方法**
+### 3.5.5 resize()方法
 
 ①.在jdk1.8中，resize方法是在HashMap中的键值对大于阈值时或者初始化时，就调用resize方法进行扩容；
 
@@ -666,9 +680,11 @@ if (oldTab != null) {//进行扩容操作，复制Node对象值到新的hash桶�
 
  ![](http://mycsdnblog.work/201818262302-4.png)
 
-#### 四、遍历方式
+**当我们明确知道HashMap中元素的个数的时候，把默认容量设置成expectedSize / 0.75F + 1.0F 是一个在性能上相对好的选择，但是，同时也会牺牲些内存。**
 
-##### 4.1 遍历HashMap的键值对
+# 四、遍历方式
+
+## 4.1 遍历HashMap的键值对
 
 ```java
 // 假设map是HashMap对象
@@ -684,7 +700,7 @@ while(iter.hasNext()) {
 }
 ```
 
-##### 4.2 遍历HashMap的键
+## 4.2 遍历HashMap的键
 
 ```java
 // 假设map是HashMap对象
@@ -700,7 +716,7 @@ while (iter.hasNext()) {
 }
 ```
 
-##### 4.3 遍历HashMap的值
+## 4.3 遍历HashMap的值
 
 ```java
 // 假设map是HashMap对象
@@ -713,7 +729,7 @@ while (iter.hasNext()) {
 }
 ```
 
-#### 五、线程安全问题
+# 五、线程安全问题
 
 JDK1.7 HashMap在多线程的扩容时确实会出现循环引用，导致下次get时死循环的问题，具体可以参考[HashMap死循环问题](https://link.jianshu.com/?t=http%3A%2F%2Fblog.csdn.net%2Fxuefeng0707%2Farticle%2Fdetails%2F40797085)。很多文章在说到死循环时都以JDK1.7来举例，其实JDK1.8的优化已经避免了死循环这个问题，但是会造成数据丢失。
 
@@ -788,24 +804,24 @@ public class Test {
 
 ![](http://mycsdnblog.work/201818262332-g.png)
 
-##### 5.1 线程安全1（放入）
+## 5.1 线程安全1（放入）
 
 插入数据的时候，两个线程同时获取到空的桶位，那么就会发生覆盖现象
 
-##### 5.2 线程安全2（扩容）
+## 5.2 线程安全2（扩容）
 
 数据丢失问题，主要发生在resize内部。创建 thread1 和 thread2 去添加数据，此时都在resize，两个线程分别创建了两个newTable，并且thread1在`table = newTab;`处调度到thread2(没有给table赋值)，等待thread2扩容之后再调度回thread1，注意，扩容时`oldTab[j] = null;` 也就将 oldTable中都清掉了，当回到thread1时，将table指向thread1的newTable，但访问oldTable中的元素全部为null，所以造成了数据丢失。
 
-##### 5.3 线程安全3（删除）
+## 5.3 线程安全3（删除）
 
 覆盖修改
 
-#### 六、对HashMap查找时间复杂度O(1)的理解
+# 六、对HashMap查找时间复杂度O(1)的理解
 
 因为hashMap内部维护了一个Entry数组，hashcode即数组下标，根据key.hashcode()即可在数组中get到Entry对象，即O(1)。当然，这是理想情况。
 倘若数据量大，则可能发生hash碰撞，即一个hashcode可能对应多个key，这时候这个Entry数组中的元素就不是Entry了，而是一个Entry链表。调用map.get(key)的时候，遇到了链表，则会遍历链表，调用equals方法比较key。当然，jdk8做了优化，链表长度超过8的时候，会转变为红黑树结构。当然，除了数据量之外，发生hash碰撞的概率还跟负载因子loadFactor有关。
 
-#### 七、HashMap如何存放null key和null value
+# 七、HashMap如何存放null key和null value
 
 1.先在table[0]的链表中寻找null key，如果有null key就直接覆盖原来的value，返回原来的value； 
 
@@ -859,7 +875,7 @@ public class Test {
 
 ![](http://mycsdnblog.work/201919221728-C.png)
 
-#### 八、HashMap1.7和1.8的区别
+# 八、HashMap1.7和1.8的区别
 
 （1）**JDK1.7用的是头插法，而JDK1.8及之后使用的都是尾插法，那么他们为什么要这样做呢？因为JDK1.7是用单链表进行的纵向延伸，当采用头插法时会容易出现逆序且环形链表死循环问题。但是在JDK1.8之后是因为加入了红黑树使用尾插法，能够避免出现逆序且链表死循环的问题。**
 
@@ -873,9 +889,11 @@ public class Test {
 
 1.7死循环问题https://blog.csdn.net/maohoo/article/details/81531925
 
-#### 九、为什么链表长度超过8会转换成红黑树
+# 九、为什么链表长度超过8会转换成红黑树
 
 HashMap在jdk1.8之后引入了红黑树的概念，表示若桶中链表元素超过8时，会自动转化成红黑树；若桶中元素小于等于6时，树结构还原成链表形式。
+
+**如果HashMap中的桶数小于64，是不会转换将大于8的链表转换成红黑树的，会触发扩容机制**
 
 原因：
 
@@ -885,7 +903,7 @@ HashMap在jdk1.8之后引入了红黑树的概念，表示若桶中链表元素�
 
 　　中间有个差值7可以防止链表和树之间频繁的转换。假设一下，如果设计成链表个数超过8则链表转换成树结构，链表个数小于8则树结构转换成链表，如果一个HashMap不停的插入、删除元素，链表个数在8左右徘徊，就会频繁的发生树转链表、链表转树，效率会很低。
 
-#### 十、HashMap用对象作为Key
+# 十、HashMap用对象作为Key
 
 用对象作为key一定要小心使用，因为地址变了，在map往出get时是找不到的。
 

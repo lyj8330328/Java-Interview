@@ -84,8 +84,6 @@ private void linkNodeLast(LinkedHashMap.Entry<K,V> p) {
 
 **这三个方法的用途是在增删查等操作后，通过回调的方式，让 LinkedHashMap 有机会做一些后置操作。**
 
-
-
 ## 3.4 链表节点删除的过程
 
 与插入操作一样，LinkedHashMap 删除操作相关的代码也是直接用父类的实现。在删除节点时，父类的删除逻辑并不会修复 LinkedHashMap 所维护的双向链表，这不是它的职责。那么删除及节点后，被删除的节点该如何从双链表中移除呢？先看HashMap中删除节点的方法，`removeNode`：
@@ -112,7 +110,7 @@ void afterNodeRemoval(Node<K,V> e) { // unlink
 
 ## 3.5 访问顺序的维护过程
 
-默认情况下，LinkedHashMap 是按插入顺序维护链表。不过可以在初始化 LinkedHashMap，指定 accessOrder 参数为 true，即可让它按访问顺序维护链表。访问顺序的原理上并不复杂，当调用`get/getOrDefault/replace`等方法时，**只需要将这些方法访问的节点移动到链表的尾部即可**。
+**默认情况下，LinkedHashMap 是按插入顺序维护链表**。不过可以在初始化 LinkedHashMap，指定 accessOrder 参数为 true，即可让它按访问顺序维护链表。访问顺序的原理上并不复杂，当调用`get/getOrDefault/replace`等方法时，**只需要将这些方法访问的节点移动到链表的尾部即可**。
 
 LinkedHashMap中的get方法：/
 
