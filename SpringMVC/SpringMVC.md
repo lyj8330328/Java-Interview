@@ -512,7 +512,7 @@ ContextLoaderListener被定义为一个监听器，这个监听器是与Web服�
 
 ## 5.1 IoC容器启动的基本过程
 
-**ContextLoaderListener启动的上下文为根上下文**。在根上下文的基础上，还有一个与Web MVC相关的上下文用来保存控制器（DispatcherServlet）需要的MVC对象，作为根上下文的子上下文，构成一个层次化的上下文体系。
+**ContextLoaderListener启动的上下文为根上下文**。在根上下文的基础上，**还有一个与Web MVC相关的上下文用来保存控制器（DispatcherServlet）需要的MVC对象**，作为根上下文的子上下文，构成一个层次化的上下文体系。
 
 ![](http://mycsdnblog.work/201919201447-R.png)
 

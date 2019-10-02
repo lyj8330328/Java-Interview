@@ -296,7 +296,7 @@ protected final void refreshBeanFactory() throws BeansException {
 }
 ```
 
-在这个方法中，通过createBeanFactory构建了一个IOC容器（DefaultListableBeanFactory），然后调用`loadBeanDefinitions`方法来载入Bean。
+在这个方法中，通过createBeanFactory构建了一个IOC容器（**DefaultListableBeanFactory**），然后调用`loadBeanDefinitions`方法来载入Bean。
 
 ```java
 /**
@@ -441,6 +441,8 @@ protected Resource getResourceByPath(String path) {
 ```
 
 在BeanDefinition定位完成的基础上，就可以通过返回的Resource对象来进行BeanDefinition的载入
+
+**资源文件的定位使用了策略模式**
 
 ## 2.2 BeanDefinition的载入和解析
 
@@ -1122,7 +1124,7 @@ protected Object getSingleton(String beanName, boolean allowEarlyReference) {
 }
 ```
 
-在创建bean的时候，首先想到的是从一级缓存中获取这个单例的bean，这个缓存就是singletonObjects。如果获取不到，并且对象正在创建中，就再从二级缓存earlySingletonObjects中获取。如果还是获取不到且允许singletonFactories通过getObject()获取，就从三级缓存singletonFactory.getObject()(三级缓存)获取，如果获取到了则：从singletonFactories中移除，并放入earlySingletonObjects中。其实也就是从三级缓存移动到了二级缓存。
+**在创建bean的时候，首先想到的是从一级缓存中获取这个单例的bean，这个缓存就是singletonObjects。如果获取不到，并且对象正在创建中，就再从二级缓存earlySingletonObjects中获取。如果还是获取不到且允许singletonFactories通过getObject()获取，就从三级缓存singletonFactory.getObject()(三级缓存)获取，如果获取到了则：从singletonFactories中移除，并放入earlySingletonObjects中。其实也就是从三级缓存移动到了二级缓存。**
 
 ### 2.4.3 依赖注入
 

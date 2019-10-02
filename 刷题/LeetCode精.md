@@ -299,6 +299,74 @@ class Solution {
 }
 ```
 
+### 1.1.12 三数之和
+
+[15. 3Sum](https://leetcode.com/problems/3sum/)
+
+> Given an array `nums` of *n* integers, are there elements *a*, *b*, *c* in `nums` such that *a* + *b* + *c* = 0? Find all unique triplets in the array which gives the sum of zero.
+>
+> **Note:**
+>
+> The solution set must not contain duplicate triplets.
+>
+> **Example:**
+>
+> ```
+> Given array nums = [-1, 0, 1, 2, -1, -4],
+> 
+> A solution set is:
+> [
+>   [-1, 0, 1],
+>   [-1, -1, 2]
+> ]
+> ```
+
+```java
+package com.problem15;
+
+import java.util.*;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-09-06 22:19
+ * @Feature:
+ */
+public class Solution2 {
+
+    public List<List<Integer>> threeSum(int[] nums) {
+        Arrays.sort(nums);
+        Set<List<Integer>> res = new HashSet<>();
+        for (int i = 0; i < nums.length; i++) {
+            int sum = 0 - nums[i];
+            int start = i + 1;
+            int end = nums.length - 1;
+            while (start < end){
+                int temp = nums[start] + nums[end];
+                if (temp == sum){
+                    ArrayList<Integer> list = new ArrayList<>();
+                    list.add(nums[i]);
+                    list.add(nums[start]);
+                    list.add(nums[end]);
+                    res.add(list);
+
+                    start++;
+                    end--;
+                }else if (temp < sum){
+                    start++;
+                }else {
+                    end--;
+                }
+            }
+        }
+        List<List<Integer>> temp = new ArrayList<>();
+        for (List list : res){
+            temp.add(list);
+        }
+        return temp;
+    }
+}
+```
+
 ## 1.2 排序
 
 ### 1.2.1 Kth Largest Element in an Array（215）
@@ -1084,6 +1152,28 @@ class Solution {
 
 [69. Sqrt(x)](https://leetcode.com/problems/sqrtx/)
 
+> Implement `int sqrt(int x)`.
+>
+> Compute and return the square root of *x*, where *x* is guaranteed to be a non-negative integer.
+>
+> Since the return type is an integer, the decimal digits are truncated and only the integer part of the result is returned.
+>
+> **Example 1:**
+>
+> ```
+> Input: 4
+> Output: 2
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: 8
+> Output: 2
+> Explanation: The square root of 8 is 2.82842..., and since 
+>              the decimal part is truncated, 2 is returned.
+> ```
+
 思路一：二分
 
 ```java
@@ -1312,7 +1402,7 @@ public class Solution extends VersionControl{
 }
 ```
 
-### 1.4.5 选择数组的最小值
+### 1.4.5 搜索旋转数组的最小值
 
 [153. Find Minimum in Rotated Sorted Array](https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/)
 
@@ -1436,6 +1526,131 @@ class Solution {
     }
 }
 ```
+
+### 1.4.7 搜索旋转排序数组
+
+[33. Search in Rotated Sorted Array](https://leetcode.com/problems/search-in-rotated-sorted-array/)
+
+> Suppose an array sorted in ascending order is rotated at some pivot unknown to you beforehand.
+>
+> (i.e., `[0,1,2,4,5,6,7]` might become `[4,5,6,7,0,1,2]`).
+>
+> You are given a target value to search. If found in the array return its index, otherwise return `-1`.
+>
+> You may assume no duplicate exists in the array.
+>
+> Your algorithm's runtime complexity must be in the order of *O*(log *n*).
+>
+> **Example 1:**
+>
+> ```
+> Input: nums = [4,5,6,7,0,1,2], target = 0
+> Output: 4
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: nums = [4,5,6,7,0,1,2], target = 3
+> Output: -1
+> ```
+
+```java
+package com.problem33;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-09-16 11:05
+ * @Feature:
+ */
+public class Solution {
+
+    public int search(int[] nums, int target) {
+        int low = 0, high = nums.length - 1;
+        while (low <= high){
+            int mid = (low + high) / 2;
+            if (nums[mid] == target){
+                return mid;
+            }else if (nums[mid] < nums[high]){
+                //后半部分有序
+                if (target > nums[mid] && target <= nums[high]){
+                    low = mid + 1;
+                }else {
+                    high = mid - 1;
+                }
+            }else {
+                //前半部分有序
+                if (target >= nums[low] && target < nums[mid]){
+                    high = mid - 1;
+                }else {
+                    low = mid + 1;
+                }
+            }
+        }
+        return -1;
+    }
+}
+```
+
+### 1.4.8 搜索旋转排序数组Ⅱ
+
+[81. Search in Rotated Sorted Array II](https://leetcode.com/problems/search-in-rotated-sorted-array-ii/)
+
+> Suppose an array sorted in ascending order is rotated at some pivot unknown to you beforehand.
+>
+> (i.e., `[0,0,1,2,2,5,6]` might become `[2,5,6,0,0,1,2]`).
+>
+> You are given a target value to search. If found in the array return `true`, otherwise return `false`.
+>
+> **Example 1:**
+>
+> ```
+> Input: nums = [2,5,6,0,0,1,2], target = 0
+> Output: true
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: nums = [2,5,6,0,0,1,2], target = 3
+> Output: false
+> ```
+
+```java
+package com.problem81;
+
+class Solution {
+    public boolean search(int[] nums, int target) {
+        int low = 0,high = nums.length - 1;
+        while (low <= high){
+            int mid = (low + high) / 2;
+            if (nums[mid] == target){
+                return true;
+            }
+            if (nums[mid] == nums[high]){
+                high--;
+                continue;
+            }
+            if (nums[mid] < nums[high]){
+                if (target > nums[mid] && target <= nums[high]){
+                    low = mid + 1;
+                }else {
+                    high = mid - 1;
+                }
+            }else {
+                if (target >= nums[low] && target < nums[mid]){
+                    high = mid - 1;
+                }else {
+                    low = mid + 1;
+                }
+            }
+        }
+        return false;
+    }
+}
+```
+
+
 
 ## *1.5 分治
 
@@ -1635,59 +1850,71 @@ class Solution {
 ```java
 package com.problem200;
 
-import javafx.util.Pair;
 
 import java.util.LinkedList;
 
-class Solution {
-    public int numIslands(char[][] grid) {
-        int row = grid.length;
-        if (row == 0){
-            return 0;
+/**
+ * @Author: 98050
+ * @Time: 2019-09-08 20:37
+ * @Feature:
+ */
+public class Solution {
+
+    class Node{
+        int x;
+        int y;
+
+        public Node(int x, int y) {
+            this.x = x;
+            this.y = y;
         }
-        int col = grid[0].length;
-        int result = 0;
-        LinkedList<Pair<Integer,Integer>> queue = new LinkedList<>();
-        for (int i = 0; i < row; i++) {
-            for (int j = 0; j < col; j++) {
+    }
+
+    public int numIslands(char[][] grid) {
+        LinkedList<Node> queue = new LinkedList<>();
+        int res = 0;
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[0].length; j++) {
                 if (grid[i][j] == '1'){
-                    queue.add(new Pair<>(i, j));
-                    result++;
+                    res++;
+                    queue.addLast(new Node(i, j));
                     while (!queue.isEmpty()){
-                        Pair<Integer,Integer> cur = queue.poll();
-                        int x = cur.getKey();
-                        int y = cur.getValue();
+                        Node node = queue.pollFirst();
+                        int x = node.x;
+                        int y = node.y;
                         if (grid[x][y] == '0'){
                             continue;
                         }
                         grid[x][y] = '0';
-                        Pair<Integer,Integer> up = new Pair<>(x - 1, y);
-                        Pair<Integer,Integer> down = new Pair<>(x + 1, y);
-                        Pair<Integer,Integer> left = new Pair<>(x, y - 1);
-                        Pair<Integer,Integer> right = new Pair<>(x, y + 1);
-                        if (inGrid(up,grid) && grid[up.getKey()][up.getValue()] == '1'){
-                            queue.add(up);
+                        Node top = new Node(x + 1, y);
+                        Node bottom = new Node(x - 1, y);
+                        Node left = new Node(x, y - 1);
+                        Node right = new Node(x, y + 1);
+                        if (inGrid(top,grid) && grid[top.x][top.y] == '1'){
+                            queue.addLast(top);
                         }
-                        if (inGrid(down,grid) && grid[down.getKey()][down.getValue()] == '1'){
-                            queue.add(down);
+                        if (inGrid(bottom,grid) && grid[bottom.x][bottom.y] == '1'){
+                            queue.addLast(bottom);
                         }
-                        if (inGrid(left,grid) && grid[left.getKey()][left.getValue()] == '1'){
-                            queue.add(left);
+                        if (inGrid(left,grid) && grid[left.x][left.y] == '1'){
+                            queue.addLast(left);
                         }
-                        if (inGrid(right,grid) && grid[right.getKey()][right.getValue()] == '1'){
-                            queue.add(right);
+                        if (inGrid(right,grid) && grid[right.x][right.y] == '1'){
+                            queue.addLast(right);
                         }
                     }
                 }
             }
         }
-        return result;
+        return res;
     }
 
-    private boolean inGrid(Pair<Integer, Integer> pair, char[][] grid) {
-        return pair.getKey() >= 0 && pair.getKey() < grid.length && pair.getValue() >= 0 && pair.getValue() < grid[0].length;
+    private boolean inGrid(Node node, char[][] grid) {
+        if (node.x < 0 || node.x == grid.length || node.y < 0 || node.y == grid[0].length){
+            return false;
+        }
+        return true;
     }
-
 }
 ```
 
@@ -3315,6 +3542,71 @@ class Solution {
 }
 ```
 
+#### 1.6.3.18 下一个排列
+
+[31. Next Permutation](https://leetcode.com/problems/next-permutation/)
+
+> Implement **next permutation**, which rearranges numbers into the lexicographically next greater permutation of numbers.
+>
+> If such arrangement is not possible, it must rearrange it as the lowest possible order (ie, sorted in ascending order).
+>
+> The replacement must be **in-place** and use only constant extra memory.
+>
+> Here are some examples. Inputs are in the left-hand column and its corresponding outputs are in the right-hand column.
+>
+> ```
+> 1,2,3 → 1,3,2
+> 3,2,1 → 1,2,3
+> 1,1,5 → 1,5,1
+> ```
+
+思路:
+
+1.如果数组是逆序的,那么对数组直接进行反转即可.
+
+2.**否则,从后向前扫描,找到第一个num[i]>num[i-1]的位置,然后需要做的工作就是,在[i+1,num.length-1]范围内,从后向前扫描找到第一个比num[i-1]大的数进行交换,此时num中[i,num.length-1]范围内的数字都是逆序存放的,最后将此范围内的数字逆序即可.**
+
+```java
+package com.problem31;
+
+class Solution {
+
+    public static void nextPermutation(int[] nums) {
+        int index = nums.length - 1;
+        while (index >= 1 && nums[index] <= nums[index - 1]){
+            index--;
+        }
+        index--;
+        if (index >= 0){
+            int j = nums.length - 1;
+            while (j >= 0 && nums[j] <= nums[index]){
+                j--;
+            }
+            swap(nums, index, j);
+        }
+        reverse(nums, index + 1, nums.length - 1);
+    }
+
+    private static void swap(int[] nums, int i, int j) {
+        if (i < j) {
+            int a = nums[i];
+            nums[i] = nums[j];
+            nums[j] = a;
+        }
+    }
+
+    private static void reverse(int[] nums, int i, int j) {
+        while (i < j){
+            swap(nums, i, j);
+            i++;
+            j--;
+        }
+    }
+
+
+}
+```
+
 ## 1.7 动态规划
 
 ### 1.7.1 斐波那契数列
@@ -4417,6 +4709,119 @@ public class Solution2 {
 }
 ```
 
+#### 1.7.5.4 最长的斐波那契子序列的长度
+
+[873. Length of Longest Fibonacci Subsequence](https://leetcode.com/problems/length-of-longest-fibonacci-subsequence/)
+
+> A sequence `X_1, X_2, ..., X_n` is *fibonacci-like* if:
+>
+> - `n >= 3`
+> - `X_i + X_{i+1} = X_{i+2}` for all `i + 2 <= n`
+>
+> Given a **strictly increasing** array `A` of positive integers forming a sequence, find the **length** of the longest fibonacci-like subsequence of `A`.  If one does not exist, return 0.
+>
+> (*Recall that a subsequence is derived from another sequence A by deleting any number of elements (including none) from A, without changing the order of the remaining elements.  For example, [3, 5, 8] is a subsequence of [3, 4, 5, 6, 7, 8].*)
+>
+> 
+>
+> 
+>
+> **Example 1:**
+>
+> ```
+> Input: [1,2,3,4,5,6,7,8]
+> Output: 5
+> Explanation:
+> The longest subsequence that is fibonacci-like: [1,2,3,5,8].
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: [1,3,7,11,12,14,18]
+> Output: 3
+> Explanation:
+> The longest subsequence that is fibonacci-like:
+> [1,11,12], [3,11,14] or [7,11,18].
+> ```
+>
+> 
+>
+> **Note:**
+>
+> - `3 <= A.length <= 1000`
+> - `1 <= A[0] < A[1] < ... < A[A.length - 1] <= 10^9`
+> - *(The time limit has been reduced by 50% for submissions in Java, C, and C++.)*
+
+思路一:暴力破解,先确定序列的前两个值,然后根据通项公式找出所有符合条件的值,最后取最大长度即可
+
+```java
+package com.problem873;
+
+import java.util.HashSet;
+
+class Solution {
+	public int lenLongestFibSubseq(int[] A) {
+        HashMap<Integer,Integer> map = new HashMap<>();
+        for (int i = 0; i < A.length; i++) {
+            map.put(A[i],i);
+        }
+        int res = 0;
+        for (int i = 0; i < A.length; i++) {
+            for (int j = i + 1; j < A.length; j++) {
+                int a = A[i];
+                int b = A[j];
+                int sum = a + b;
+                int len = 2;
+                while (map.containsKey(sum)){
+                    a = b;
+                    b = sum;
+                    sum = a + b;
+                    res = Math.max(res, ++len);
+                }
+            }
+        }
+        return res;
+    }
+}
+```
+
+思路二:动态规划
+
+```java
+package com.problem873;
+
+import java.util.HashMap;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-09-06 11:38
+ * @Feature:
+ */
+public class Solution2 {
+
+    public int lenLongestFibSubseq(int[] A) {
+        HashMap<Integer,Integer> map = new HashMap<>();
+        for (int i = 0; i < A.length; i++) {
+            map.put(A[i],i);
+        }
+        int res = 0;
+        HashMap<Integer,Integer> max = new HashMap<>();
+        for (int i = 0; i < A.length; i++) {
+            for (int j = 0; j < i; j++) {
+                int index = map.getOrDefault(A[i] - A[j],-1);
+                if (index >= 0 && index < j){
+                    int len = max.getOrDefault(index * A.length + j, 2) + 1;
+                    max.put(j * A.length + i, len);
+                    res = Math.max(res, len);
+                }
+            }
+        }
+        return res;
+    }
+}
+```
+
 ### 1.7.6 背包问题
 
 #### 1.7.6.1 0-1背包
@@ -5385,11 +5790,75 @@ public class Solution2 {
 }
 ```
 
-### 1.7.7 股票交易
-
-
-
 ## 1.8 数学
+
+### 1.8.1 x的n次方
+
+[50. Pow(x, n)](https://leetcode.com/problems/powx-n/)
+
+> Implement [pow(*x*, *n*)](http://www.cplusplus.com/reference/valarray/pow/), which calculates *x* raised to the power *n* (xn).
+>
+> **Example 1:**
+>
+> ```
+> Input: 2.00000, 10
+> Output: 1024.00000
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: 2.10000, 3
+> Output: 9.26100
+> ```
+>
+> **Example 3:**
+>
+> ```
+> Input: 2.00000, -2
+> Output: 0.25000
+> Explanation: 2-2 = 1/22 = 1/4 = 0.25
+> ```
+>
+> **Note:**
+>
+> - -100.0 < *x* < 100.0
+> - *n* is a 32-bit signed integer, within the range [−231, 231 − 1]
+
+```java
+package com.problem50;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-09-06 22:03
+ * @Feature:
+ */
+public class Solution2 {
+
+    public double myPow(double x, int n) {
+        boolean tag = false;
+        if (n < 0){
+            tag = true;
+            n = - n;
+        }
+        double res = 1;
+        for (int i = n; i != 0; i /= 2) {
+            if (i % 2 != 0){
+                res *= x;
+            }
+            x *= x;
+        }
+        if (tag){
+            return 1 / res;
+        }else {
+            return res;
+        }
+    }
+
+}
+```
+
+
 
 # 二、数据结构
 
@@ -7347,6 +7816,35 @@ public class Solution {
 ```
 
 #### 2.2.1.7 路径总合Ⅱ
+
+[113. Path Sum II](https://leetcode.com/problems/path-sum-ii/)
+
+> Given a binary tree and a sum, find all root-to-leaf paths where each path's sum equals the given sum.
+>
+> **Note:** A leaf is a node with no children.
+>
+> **Example:**
+>
+> Given the below binary tree and `sum = 22`,
+>
+> ```
+>       5
+>      / \
+>     4   8
+>    /   / \
+>   11  13  4
+>  /  \    / \
+> 7    2  5   1
+> ```
+>
+> Return:
+>
+> ```
+> [
+>    [5,4,11,2],
+>    [5,8,4,5]
+> ]
+> ```
 
 思路：回溯法
 
