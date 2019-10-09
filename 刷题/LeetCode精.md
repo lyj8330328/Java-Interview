@@ -1402,9 +1402,11 @@ public class Solution extends VersionControl{
 }
 ```
 
-### 1.4.5 搜索旋转数组的最小值
+### 1.4.5 搜索旋转数组的最小值Ⅰ、Ⅱ
 
 [153. Find Minimum in Rotated Sorted Array](https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/)
+
+[154. Find Minimum in Rotated Sorted Array II](https://leetcode.com/problems/find-minimum-in-rotated-sorted-array-ii/)
 
 > Suppose an array sorted in ascending order is rotated at some pivot unknown to you beforehand.
 >
@@ -1650,7 +1652,119 @@ class Solution {
 }
 ```
 
+### 1.4.9 搜索插入位置
 
+[35. Search Insert Position](https://leetcode.com/problems/search-insert-position/)
+
+> Given a sorted array and a target value, return the index if the target is found. If not, return the index where it would be if it were inserted in order.
+>
+> You may assume no duplicates in the array.
+>
+> **Example 1:**
+>
+> ```
+> Input: [1,3,5,6], 5
+> Output: 2
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: [1,3,5,6], 2
+> Output: 1
+> ```
+>
+> **Example 3:**
+>
+> ```
+> Input: [1,3,5,6], 7
+> Output: 4
+> ```
+>
+> **Example 4:**
+>
+> ```
+> Input: [1,3,5,6], 0
+> Output: 0
+> ```
+
+```java
+package com.problem35;
+
+class Solution {
+    public int searchInsert(int[] nums, int target) {
+        int low = 0;
+        int high = nums.length - 1;
+        while (low <= high){
+            int mid = (low + high) / 2;
+            if (nums[mid] == target){
+                return mid;
+            }else if (nums[mid] > target){
+                high = mid - 1;
+            }else {
+                low = mid + 1;
+            }
+        }
+        return low;
+    }
+}
+```
+
+### 1.4.10 搜索二维矩阵
+
+[74. Search a 2D Matrix](https://leetcode.com/problems/search-a-2d-matrix/)
+
+> Write an efficient algorithm that searches for a value in an *m* x *n* matrix. This matrix has the following properties:
+>
+> - Integers in each row are sorted from left to right.
+> - The first integer of each row is greater than the last integer of the previous row.
+>
+> **Example 1:**
+>
+> ```
+> Input:
+> matrix = [
+>   [1,   3,  5,  7],
+>   [10, 11, 16, 20],
+>   [23, 30, 34, 50]
+> ]
+> target = 3
+> Output: true
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input:
+> matrix = [
+>   [1,   3,  5,  7],
+>   [10, 11, 16, 20],
+>   [23, 30, 34, 50]
+> ]
+> target = 13
+> Output: false
+> ```
+
+```java
+package com.problem74;
+
+class Solution {
+    public boolean searchMatrix(int[][] matrix, int target) {
+        int startX = matrix.length - 1;
+        int startY = 0;
+        while (startX >= 0 && startY < matrix[0].length){
+            if (matrix[startX][startY] == target){
+                return true;
+            }else if (matrix[startX][startY] > target){
+                startX--;
+            }else {
+                startY++;
+            }
+        }
+        return false;
+    }
+}
+```
 
 ## *1.5 分治
 
