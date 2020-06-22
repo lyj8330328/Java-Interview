@@ -1766,6 +1766,136 @@ class Solution {
 }
 ```
 
+### 1.4.11 长度最小的子数组
+
+[209. Minimum Size Subarray Sum](https://leetcode.com/problems/minimum-size-subarray-sum/)
+
+> Given an array of **n** positive integers and a positive integer **s**, find the minimal length of a **contiguous** subarray of which the sum ≥ **s**. If there isn't one, return 0 instead.
+>
+> **Example:** 
+>
+> ```
+> Input: s = 7, nums = [2,3,1,2,4,3]
+> Output: 2
+> Explanation: the subarray [4,3] has the minimal length under the problem constraint.
+> ```
+>
+> **Follow up:**
+>
+> If you have figured out the *O*(n ^ 2) solution, try coding another solution of which the time complexity is *O*(*n* log *n*). 
+
+**时间复杂度O(n^2)**
+
+```java
+package com.problem209;
+
+class Solution {
+
+    public int minSubArrayLen(int s, int[] nums) {
+        int len = nums.length;
+        for (int i = 1; i < len; i++) {
+            nums[i] += nums[i - 1];
+        }
+        for (int i = 1; i <= len; i++) {
+            for (int j = len - 1; j + 1 >= i; j--) {
+                int temp;
+                if (j - i < 0){
+                    temp = nums[j];
+                }else {
+                    temp = nums[j] - nums[j - i];
+                }
+                if (temp >= s){
+                    return i;
+                }
+            }
+        }
+        return 0;
+    }
+}
+```
+
+**时间复杂度*O*(*n* log *n*)**
+
+使用折半查找，累加完的数组是递增的，所以直接在累加完的数组中进行折半查找，查询的目标值为s+sums[i-1]，
+
+```java
+package com.problem209;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-10-16 11:12
+ * @Feature:
+ */
+public class Solution2 {
+
+    public int minSubArrayLen(int s, int[] nums) {
+        int len = nums.length;
+        int res = Integer.MAX_VALUE;
+        int[] sums = new int[len + 1];
+        for (int i = 1; i <= len; i++) {
+            sums[i] = sums[i - 1] + nums[i - 1];
+        }
+        for (int i = 1; i <= len; i++) {
+            int find = s + sums[i - 1];
+            int index = binarySearch(sums,0,sums.length - 1,find);
+            if (index != len + 1){
+                res = Math.min(res, index - (i - 1));
+            }
+        }
+        return res == Integer.MAX_VALUE ? 0 : res;
+    }
+
+    private int binarySearch(int[] sums, int start, int end,int target) {
+        while (start <= end){
+            int mid = (start + end);
+            if (sums[mid] == target){
+                return mid;
+            }else if (sums[mid] < target){
+                start = mid + 1;
+            }else {
+                end = mid - 1;
+            }
+        }
+        return start;
+    }
+}
+```
+
+**时间复杂度O(n)**
+
+```java
+package com.problem209;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-10-16 12:54
+ * @Feature:
+ */
+public class Solution3 {
+
+    public int minSubArrayLen(int s, int[] nums) {
+        int i = 0;
+        int j = 0;
+        int sum = 0;
+        int res = Integer.MAX_VALUE;
+        while (j < nums.length){
+            if (sum + nums[j] < s){
+                sum += nums[j];
+                j++;
+            }else {
+                if (j - i < res){
+                    res = j - i + 1;
+                }
+                sum -= nums[i];
+                i++;
+            }
+        }
+        return res != Integer.MAX_VALUE ? res : 0;
+    }
+
+}
+```
+
 ## *1.5 分治
 
 分治算法的基本思想是将一个规模为N的问题分解为K个规模较小的子问题，这些子问题相互独立且与原问题性质相同。求出子问题的解，就可得到原问题的解。即一种分目标完成程序算法，简单问题可用二分法完成。
@@ -3720,6 +3850,194 @@ class Solution {
 
 }
 ```
+
+#### 1.6.3.19 正则表达式匹配
+
+[ 10. Regular Expression Matching ](https://leetcode.com/problems/regular-expression-matching/)
+
+> Given an input string (`s`) and a pattern (`p`), implement regular expression matching with support for `'.'` and `'*'`.
+>
+> ```
+> '.' Matches any single character.
+> '*' Matches zero or more of the preceding element.
+> ```
+>
+> The matching should cover the **entire** input string (not partial).
+>
+> **Note:**
+>
+> - `s` could be empty and contains only lowercase letters `a-z`.
+> - `p` could be empty and contains only lowercase letters `a-z`, and characters like `.` or `*`.
+>
+> **Example 1:**
+>
+> ```
+> Input:
+> s = "aa"
+> p = "a"
+> Output: false
+> Explanation: "a" does not match the entire string "aa".
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input:
+> s = "aa"
+> p = "a*"
+> Output: true
+> Explanation: '*' means zero or more of the preceding element, 'a'. Therefore, by repeating 'a' once, it becomes "aa".
+> ```
+>
+> **Example 3:**
+>
+> ```
+> Input:
+> s = "ab"
+> p = ".*"
+> Output: true
+> Explanation: ".*" means "zero or more (*) of any character (.)".
+> ```
+>
+> **Example 4:**
+>
+> ```
+> Input:
+> s = "aab"
+> p = "c*a*b"
+> Output: true
+> Explanation: c can be repeated 0 times, a can be repeated 1 time. Therefore, it matches "aab".
+> ```
+>
+> **Example 5:**
+>
+> ```
+> Input:
+> s = "mississippi"
+> p = "mis*is*p*."
+> Output: false
+> ```
+
+使用回溯法来解决这个问题，首先获取s和p的第一个字符的匹配情况：
+
+```java
+boolean firstMatch = (!s.isEmpty() && (s.charAt(0) == p.charAt(0) || p.charAt(0) == '.'));
+```
+
+然后再判断p中第二个字符是不是星号：
+
+（一）如果第二个字符是星号，那么就可以分为两种情况进行判断：
+
+那么就从s的下一个字符开始匹配，前提是s[0]和p[0]可以成功匹配：`firstMatch && isMatch(s.substring(1),p)`
+
+直接将p中星号前面的部分忽略掉，例如：`s = "aab"`和`p = "c*a*b"`
+
+`isMatch(s,p.substring(2))`
+
+（二）如果第二个字符不是星号，那么就依次向后扫描即可：
+
+```java
+firstMatch && isMatch(s.substring(1), p.substring(1));
+```
+
+代码：
+
+```java
+package com.problem10;
+
+class Solution {
+    public boolean isMatch(String s, String p) {
+        if (p.isEmpty()){
+            return s.isEmpty();
+        }
+        boolean firstMatch = (!s.isEmpty() && (s.charAt(0) == p.charAt(0) || p.charAt(0) == '.'));
+        if (p.length() >= 2 && p.charAt(1) == '*'){
+            return isMatch(s,p.substring(2)) || (firstMatch && isMatch(s.substring(1),p));
+        }else {
+            return firstMatch && isMatch(s.substring(1), p.substring(1));
+        }
+    }
+}
+```
+
+#### 1.6.3.20 第k个全排列
+
+[60. 第k个排列](https://leetcode-cn.com/problems/permutation-sequence/)
+
+> 给出集合 [1,2,3,…,n]，其所有元素共有 n! 种排列。
+>
+> 按大小顺序列出所有排列情况，并一一标记，当 n = 3 时, 所有排列如下：
+>
+> "123"
+> "132"
+> "213"
+> "231"
+> "312"
+> "321"
+> 给定 n 和 k，返回第 k 个排列。
+>
+> 说明：
+>
+> 给定 n 的范围是 [1, 9]。
+> 给定 k 的范围是[1,  n!]。
+> 示例 1:
+>
+> 输入: n = 3, k = 3
+> 输出: "213"
+> 示例 2:
+>
+> 输入: n = 4, k = 9
+> 输出: "2314"·
+>
+
+```java
+package com.problem60;
+
+import java.util.ArrayList;
+
+class Solution {
+    int index = 0;
+    public String getPermutation(int n, int k) {
+        if (n == 0){
+            return "0";
+        }
+        boolean[] tag = new boolean[n + 1];
+        ArrayList<ArrayList<Integer>> res = new ArrayList<>();
+        index = k;
+        solve(n,res, new ArrayList<Integer>(), tag);
+        StringBuilder sb = new StringBuilder();
+        for (int i : res.get(res.size() - 1)){
+            sb.append(i);
+        }
+        return sb.toString();
+    }
+
+    private void solve(int n, ArrayList<ArrayList<Integer>> res, ArrayList<Integer> s, boolean[] tag) {
+        if (s.size() == n){
+            index--;
+            if (0 == index){
+                res.add(new ArrayList<>(s));
+                return;
+            }
+            return;
+        }
+        for (int i = 1; i <= n; i++) {
+            if (tag[i]){
+                continue;
+            }
+            tag[i] = true;
+            s.add(i);
+            solve(n, res, s, tag);
+            s.remove(s.size() - 1);
+            tag[i] = false;
+        }
+
+    }
+
+}
+```
+
+
 
 ## 1.7 动态规划
 
@@ -5972,7 +6290,432 @@ public class Solution2 {
 }
 ```
 
+## 1.9 字符串
 
+### 1.9.1 最长有效括号
+
+[32. Longest Valid Parentheses](https://leetcode.com/problems/longest-valid-parentheses/)
+
+> Given a string containing just the characters `'('` and `')'`, find the length of the longest valid (well-formed) parentheses substring.
+>
+> **Example 1:**
+>
+> ```
+> Input: "(()"
+> Output: 2
+> Explanation: The longest valid parentheses substring is "()"
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: ")()())"
+> Output: 4
+> Explanation: The longest valid parentheses substring is "()()"
+> ```
+
+思路一：截取所有子串，然后括号匹配（超时）
+
+```java
+package com.problem32;
+
+import java.util.Stack;
+
+class Solution {
+
+    public int longestValidParentheses(String s) {
+        int len = s.length();
+        int max = 0;
+        for (int i = 1; i <= len; i++) {
+            for (int j = 0; j <= len - i; j++) {
+                String temp = s.substring(j,j + i);
+                System.out.println(temp);
+                if (isValid(temp)){
+                    max = Math.max(max, i);
+                }
+            }
+        }
+        return max;
+    }
+
+    private boolean isValid(String temp) {
+        Stack<Character> stack = new Stack<>();
+        for (char c : temp.toCharArray()){
+            if (c == '('){
+                stack.push(c);
+            }else if (c == ')'){
+                if (!stack.isEmpty() && stack.peek() == '('){
+                    stack.pop();
+                }else {
+                    stack.push(c);
+                }
+            }
+        }
+        return stack.isEmpty();
+    }
+}
+```
+
+思路二：dp
+
+因为有效的括号子串肯定是以`')'`结尾的，所以当`s.charAt(i) == ')'`的时候进行判断：
+
+1、当`s.charAt(i - 1) == '('`，即有效括号子串的格式为`“...........()”`，那么状态转移方程为：
+$$
+dp[i] = dp[i - 2] + 2
+$$
+2、当`s.chartAt(i - 1) == ')'`，即有效括号子串的格式为`“............(((())))”`，那么就需要找到与`s.chartAt(i) == ')'`对应的`‘(’`，它的位置为`s.chartAt(i - dp[i - 1] - 1)`，那么状态转移方程为：
+$$
+dp[i] = dp[i - 1] + dp[i - dp[i - 1] - 2] + 2
+$$
+其中`dp[i-dp[i-1]-2]`是获取上一个有效括号子串的长度
+
+```java
+public int longestValidParentheses(String s) {
+        int len = s.length();
+        int[] dp = new int[len];
+        int res = 0;
+        for (int i = 1; i < len; i++) {
+            if (s.charAt(i) == ')'){
+                if (s.charAt(i - 1) == '('){
+                    dp[i] = i >= 2 ? dp[i - 2] + 2 : 2;
+                }else if (i - dp[i - 1] > 0 && s.charAt(i - dp[i - 1] - 1) == '('){
+                   dp[i] = dp[i - 1] + 2 + (i - dp[i - 1] >= 2 ? dp[i - dp[i - 1] - 2] : 0);
+                }
+                res = Math.max(res, dp[i]);
+            }
+        }
+        return res;
+    }
+```
+
+### 1.9.2 正则表达式匹配
+
+[ \10. Regular Expression Matching ](https://leetcode.com/problems/regular-expression-matching/)
+
+> Given an input string (`s`) and a pattern (`p`), implement regular expression matching with support for `'.'` and `'*'`.
+>
+> ```
+> '.' Matches any single character.
+> '*' Matches zero or more of the preceding element.
+> ```
+>
+> The matching should cover the **entire** input string (not partial).
+>
+> **Note:**
+>
+> - `s` could be empty and contains only lowercase letters `a-z`.
+> - `p` could be empty and contains only lowercase letters `a-z`, and characters like `.` or `*`.
+>
+> **Example 1:**
+>
+> ```
+> Input:
+> s = "aa"
+> p = "a"
+> Output: false
+> Explanation: "a" does not match the entire string "aa".
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input:
+> s = "aa"
+> p = "a*"
+> Output: true
+> Explanation: '*' means zero or more of the preceding element, 'a'. Therefore, by repeating 'a' once, it becomes "aa".
+> ```
+>
+> **Example 3:**
+>
+> ```
+> Input:
+> s = "ab"
+> p = ".*"
+> Output: true
+> Explanation: ".*" means "zero or more (*) of any character (.)".
+> ```
+>
+> **Example 4:**
+>
+> ```
+> Input:
+> s = "aab"
+> p = "c*a*b"
+> Output: true
+> Explanation: c can be repeated 0 times, a can be repeated 1 time. Therefore, it matches "aab".
+> ```
+>
+> **Example 5:**
+>
+> ```
+> Input:
+> s = "mississippi"
+> p = "mis*is*p*."
+> Output: false
+> ```
+
+思路：
+
+ `dp[i][j]` 表示 `s` 的前 i个是否能被 `p` 的前 j个匹配 
+
+首先初始化`dp[0][0] = true`
+
+如果`s[i]==p[j]或者p[j]=='.'`，那么 `dp[i][j] = dp[i-1][j-1]` 
+
+如果p[j] == '*'，那么需要分情况来讨论：
+
+1、如果`p[j-1]!=s[i]`，那么`dp[i][j]=dp[i][j-2]`，相当于把**p[j]和p[j-1]都去掉**
+
+2、如果`p[j-1]==s[i]或者p[j-1]=='.'`，就得判断s[i]和p[j-2]前面的部分能否成功匹配，有以下几种情况：
+
+``dp[i][j] = dp[i-1][j] // 多个字符匹配的情况`，例如：### 和 ###b * 是否匹配，一旦匹配，s 后面再添个 b 也不影响，因为有 * 在，也就是 ###b 和 ###b *也会匹配。
+`dp[i][j] = dp[i][j-1] // 单个字符匹配的情况`，相当于去掉p[j]
+`dp[i][j] = dp[i][j-2] // 没有匹配的情况`，相当于把**p[j]和p[j-1]都去掉**
+
+初始化： 即s为空字符串的时候能否与p进行匹配，即要求如果`p[i]==*`并且`dp[0][i-1]==true`，那么`dp[0][i + 1]=true`，
+
+代码如下：
+
+
+```java
+package com.problem10;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-11-05 16:01
+ * @Feature:
+ */
+public class Solution2 {
+
+    public boolean isMatch(String s, String p) {
+        if (s == null || p == null) {
+            return false;
+        }
+        int row = s.length();
+        int col = p.length();
+        boolean[][] dp = new boolean[row + 1][col + 1];
+        dp[0][0] = true;
+        for (int i = 0; i < col; i++) {
+            if (p.charAt(i) == '*' && dp[0][i - 1]){
+                dp[0][i + 1] = true;
+            }
+        }
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; j++) {
+                if (s.charAt(i) == p.charAt(j) || p.charAt(j) == '.'){
+                    dp[i + 1][j + 1] = dp[i][j];
+                }
+                if (p.charAt(j) == '*'){
+                    if (s.charAt(i) != p.charAt(j - 1) && p.charAt(j - 1) != '.'){
+                        dp[i + 1][j + 1] = dp[i + 1][j - 1];
+                    }else {
+                        dp[i + 1][j + 1] = (dp[i + 1][j] || dp[i][j + 1] || dp[i + 1][j - 1]);
+                    }
+                }
+            }
+        }
+        return dp[row][col];
+    }
+}
+```
+
+
+
+## 1.10 编辑距离
+
+[ 72. Edit Distance ](https://leetcode.com/problems/edit-distance/)
+
+> Given two words *word1* and *word2*, find the minimum number of operations required to convert *word1* to *word2*.
+>
+> You have the following 3 operations permitted on a word:
+>
+> 1. Insert a character
+> 2. Delete a character
+> 3. Replace a character
+>
+> **Example 1:**
+>
+> ```
+> Input: word1 = "horse", word2 = "ros"
+> Output: 3
+> Explanation: 
+> horse -> rorse (replace 'h' with 'r')
+> rorse -> rose (remove 'r')
+> rose -> ros (remove 'e')
+> ```
+>
+> **Example 2:**
+>
+> ```
+> Input: word1 = "intention", word2 = "execution"
+> Output: 5
+> Explanation: 
+> intention -> inention (remove 't')
+> inention -> enention (replace 'i' with 'e')
+> enention -> exention (replace 'n' with 'x')
+> exention -> exection (replace 'n' with 'c')
+> exection -> execution (insert 'u')
+> ```
+
+> **思路：**
+
+设置dp数组`dp[lenA+1][lenB+1]`，初始化第一行和第一列分别为对应字符串的长度，即当两个字符串中有一个为空的情况：
+
+```java
+		for (int i = 1; i <= len2; i++) {
+            dp[0][i] = i;
+        }
+        for (int i = 1; i <= len1; i++) {
+            dp[i][0] = i;
+        }
+```
+
+然后从两个字符串的开始位置，即下标为0进行扫描
+
+对于相同的字符，那么直接复制上一个状态即可，即：
+$$
+dp[i + 1][j + 1] = dp[i][j]
+$$
+对于不同字符的操作一共有三种：插入、删除、替换，考虑A串的第i个字符和B串的第j个字符
+
+- 修改A串的第i个字符成B串的第j个字符，之后仅需要计算A[i+1...lenA]和B[j+1...lenB]的距离即可；
+- 删除A串的第i个字符，之后仅需要计算A[i+1...lenA]和B[j...lenB]的距离即可；
+- 把B串的第j个字符插入到A串的第i个字符之前，之后仅需要计算A[i...lenA]和B[j+1...lenB]的距离即可。
+
+所以可以得到状态转移方程：
+$$
+dp[i+1][j+1]=Math.min(dp[i+1][j] + 1,dp[i][j] + 1,dp[i][j+1] + 1)
+$$
+其中：
+
+- `dp[i][j]+1`表示修改A串的第i个字符成B串的第j个字符，
+
+- `dp[i][j+1]+1`表示把B串的第j个字符插入到A串的第i个字符之前，
+
+- `dp[i+1][j]+1`表示删除A串的第i个字符
+
+其中删除和插入两个操作的对象可以互换
+
+```java
+package com.problem72;
+
+class Solution {
+    public int minDistance(String word1, String word2) {
+        int len1 = word1.length();
+        int len2 = word2.length();
+
+        int[][] dp = new int[len1 + 1][len2 + 1];
+        dp[0][0] = 0;
+        for (int i = 1; i <= len2; i++) {
+            dp[0][i] = i;
+        }
+        for (int i = 1; i <= len1; i++) {
+            dp[i][0] = i;
+        }
+
+        for (int i = 0; i < len1; i++) {
+            for (int j = 0; j < len2; j++) {
+                if (word1.charAt(i) == word2.charAt(j)){
+                    dp[i + 1][j + 1] = dp[i][j];
+                }else {
+                    int delete = dp[i][j + 1] + 1;
+                    int replace = dp[i][j] + 1;
+                    int insert = dp[i + 1][j] + 1;
+                    dp[i + 1][j + 1] = Math.min(Math.min(delete, replace), insert);
+                }
+            }
+        }
+        return dp[len1][len2];
+    }
+}
+```
+
+## 1.11 青蛙过河
+
+[ 403. Frog Jump ](https://leetcode.com/problems/frog-jump/)
+
+> A frog is crossing a river. The river is divided into x units and at each unit there may or may not exist a stone. The frog can jump on a stone, but it must not jump into the water.
+>
+> Given a list of stones' positions (in units) in sorted ascending order, determine if the frog is able to cross the river by landing on the last stone. Initially, the frog is on the first stone and assume the first jump must be 1 unit.
+>
+> If the frog's last jump was *k* units, then its next jump must be either *k* - 1, *k*, or *k* + 1 units. Note that the frog can only jump in the forward direction.
+>
+> **Note:**
+>
+> - The number of stones is ≥ 2 and is < 1,100.
+> - Each stone's position will be a non-negative integer < 231.
+> - The first stone's position is always 0.
+>
+> 
+>
+> **Example 1:**
+>
+> ```
+> [0,1,3,5,6,8,12,17]
+> 
+> There are a total of 8 stones.
+> The first stone at the 0th unit, second stone at the 1st unit,
+> third stone at the 3rd unit, and so on...
+> The last stone at the 17th unit.
+> 
+> Return true. The frog can jump to the last stone by jumping 
+> 1 unit to the 2nd stone, then 2 units to the 3rd stone, then 
+> 2 units to the 4th stone, then 3 units to the 6th stone, 
+> 4 units to the 7th stone, and 5 units to the 8th stone.
+> ```
+>
+> 
+>
+> **Example 2:**
+>
+> ```
+> [0,1,2,3,4,8,9,11]
+> 
+> Return false. There is no way to jump to the last stone as 
+> the gap between the 5th and 6th stone is too large.
+> ```
+
+能否到达当前位置的条件就是上一次所处的位置+步长（通过上一次跳跃的步长来更新）
+
+所以每个位置用一个集合来保存能到达当前位置的所有步长，这样最终只需判断最后一个位置的集合是否为空来判断能否到达。
+
+使用一个map来保存所有位置的信息，key为当前位置stones[i]，value为每个位置的步长集合
+
+只需要判断map中是否包含当前位置的key+步长所构成的值，来进行步长集合的更新
+
+初始化，第一个位置中的步长为0。
+
+```java
+package com.problem403;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+
+class Solution {
+    public boolean canCross(int[] stones) {
+        int len = stones.length;
+        HashMap<Integer, Set<Integer>> map = new HashMap<>();
+
+        for (int i = 0; i < len; i++) {
+            map.put(stones[i],new HashSet<Integer>());
+        }
+        map.get(0).add(0);
+        for (int i = 0; i < len; i++) {
+            for (int k : map.get(stones[i])){
+                for (int j = k - 1; j <= k + 1; j++) {
+                    if (j > 0 && map.containsKey(stones[i] + j)){
+                        map.get(stones[i] + j).add(j);
+                    }
+                }
+            }
+        }
+        return map.get(stones[len - 1]).size() > 0;
+    }
+}
+```
 
 # 二、数据结构
 
@@ -8570,8 +9313,6 @@ class Solution {
 }
 ```
 
-
-
 ### 2.2.2 层次遍历
 
 #### 2.2.2.1 二叉树的层平均值
@@ -9626,6 +10367,277 @@ class Solution {
 }
 ```
 
+### 2.2.5 二叉树展开为链表
+
+> 给定一个二叉树，原地将它展开为链表。
+>
+> 例如，给定二叉树
+>
+>     1
+>    / \
+>   2   5
+>  / \   \
+> 3   4   6
+> 将其展开为：
+>
+> 1
+>  \
+>   2
+>    \
+>     3
+>      \
+>       4
+>        \
+>         5
+>          \
+>           6
+
+思路：
+
+递归：
+
+```java
+package com.problem114;
+
+import com.TreeNode;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-11-08 12:46
+ * @Feature:
+ */
+public class Solution2 {
+
+    TreeNode temp;
+    public void flatten(TreeNode root) {
+        if (root == null){
+            return;
+        }
+        flatten(root.left);
+        flatten(root.right);
+        if (root.left != null) {
+            temp = root.left;
+            while (temp.right != null){
+                temp = temp.right;
+            }
+            temp.right = root.right;
+            root.right = root.left;
+            root.left = null;
+        }
+    }
+}
+```
+
+非递归：
+
+```Java
+package com.problem114;
+
+import com.TreeNode;
+
+
+class Solution {
+    public void flatten(TreeNode root) {
+        if (root == null){
+            return;
+        }
+        TreeNode temp;
+        TreeNode temp2;
+        while (root != null){
+            if (root.left != null){
+                temp = root.left;
+                temp2 = root.right;
+                while (temp.right != null){
+                    temp = temp.right;
+                }
+                root.right = root.left;
+                temp.right = temp2;
+                root.left = null;
+            }
+            root = root.right;
+        }
+    }
+}
+```
+
+### 2.2.6 填充每个节点的下一个右侧节点指针
+
+> 给定一个完美二叉树，其所有叶子节点都在同一层，每个父节点都有两个子节点。二叉树定义如下：
+>
+> struct Node {
+>   int val;
+>   Node *left;
+>   Node *right;
+>   Node *next;
+> }
+> 填充它的每个 next 指针，让这个指针指向其下一个右侧节点。如果找不到下一个右侧节点，则将 next 指针设置为 NULL。
+>
+> 初始状态下，所有 next 指针都被设置为 NULL。
+>
+>  
+>
+> 示例：
+>
+> ![](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2019/02/15/116_sample.png)
+>
+> 输入：{"$id":"1","left":{"$id":"2","left":{"$id":"3","left":null,"next":null,"right":null,"val":4},"next":null,"right":{"$id":"4","left":null,"next":null,"right":null,"val":5},"val":2},"next":null,"right":{"$id":"5","left":{"$id":"6","left":null,"next":null,"right":null,"val":6},"next":null,"right":{"$id":"7","left":null,"next":null,"right":null,"val":7},"val":3},"val":1}
+>
+> 输出：{"$id":"1","left":{"$id":"2","left":{"$id":"3","left":null,"next":{"$id":"4","left":null,"next":{"$id":"5","left":null,"next":{"$id":"6","left":null,"next":null,"right":null,"val":7},"right":null,"val":6},"right":null,"val":5},"right":null,"val":4},"next":{"$id":"7","left":{"$ref":"5"},"next":null,"right":{"$ref":"6"},"val":3},"right":{"$ref":"4"},"val":2},"next":null,"right":{"$ref":"7"},"val":1}
+>
+> 解释：给定二叉树如图 A 所示，你的函数应该填充它的每个 next 指针，以指向其下一个右侧节点，如图 B 所示。
+>
+>
+> 提示：
+>
+> 你只能使用常量级额外空间。
+> 使用递归解题也符合要求，本题中递归程序占用的栈空间不算做额外的空间复杂度。
+
+思路：层次遍历树，然后修改next指针，不能使用栈，但是可以通过已经修改好的next指针来对每一层进行遍历。
+
+```java
+package com.problem116;
+
+class Solution {
+
+    class Node {
+        public int val;
+        public Node left;
+        public Node right;
+        public Node next;
+
+        public Node() {}
+
+        public Node(int _val,Node _left,Node _right,Node _next) {
+            val = _val;
+            left = _left;
+            right = _right;
+            next = _next;
+        }
+    }
+
+    public Node connect(Node root) {
+        if (root == null){
+            return null;
+        }
+        Node level = root,index = level;
+        while (level.left != null){
+            index.left.next = index.right;
+            if (index.next == null){
+                level = level.left;
+                index = level;
+            }else {
+                index.right.next = index.next.left;
+                index = index.next;
+            }
+        }
+        return root;
+    }
+}
+```
+
+### 2.2.7 填充每个节点的下一个右侧节点指针Ⅱ
+
+> 给定一个二叉树
+>
+> struct Node {
+>   int val;
+>   Node *left;
+>   Node *right;
+>   Node *next;
+> }
+> 填充它的每个 next 指针，让这个指针指向其下一个右侧节点。如果找不到下一个右侧节点，则将 next 指针设置为 NULL。
+>
+> 初始状态下，所有 next 指针都被设置为 NULL。
+>
+>  
+>
+> 示例：
+>
+> ![](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2019/02/15/117_sample.png)
+>
+> 输入：{"$id":"1","left":{"$id":"2","left":{"$id":"3","left":null,"next":null,"right":null,"val":4},"next":null,"right":{"$id":"4","left":null,"next":null,"right":null,"val":5},"val":2},"next":null,"right":{"$id":"5","left":null,"next":null,"right":{"$id":"6","left":null,"next":null,"right":null,"val":7},"val":3},"val":1}
+>
+> 输出：{"$id":"1","left":{"$id":"2","left":{"$id":"3","left":null,"next":{"$id":"4","left":null,"next":{"$id":"5","left":null,"next":null,"right":null,"val":7},"right":null,"val":5},"right":null,"val":4},"next":{"$id":"6","left":null,"next":null,"right":{"$ref":"5"},"val":3},"right":{"$ref":"4"},"val":2},"next":null,"right":{"$ref":"6"},"val":1}
+>
+> 解释：给定二叉树如图 A 所示，你的函数应该填充它的每个 next 指针，以指向其下一个右侧节点，如图 B 所示。
+>
+
+问题核心：因为不是完全二叉树，那么在每一层中就可能出现空节点，所以关键就是如何找到每一层的第一个非空节点，还有就是如何将不相邻的节点连接。
+
+问题一：如何定位每一层第一个节点，如下图所示：
+
+![](http://mycsdnblog.work/201919111859-Q.png)
+
+当level指针指向2节点的时候，要找下一层的第一个非空节点，那么就可以根据下面的代码来寻找：
+
+```java
+while (level != null && level.left == null && level.right == null){
+      level = level.next;
+}
+level = level.left != null ? level.left : level.right;
+```
+
+问题二：当找到每一层的第一个节点时，就开始对这一层的节点进行连接，使用一个中间节点index，跳过那些为空的节点。
+
+```java
+			Node index = null;
+            for (Node i = level; i != null; i = i.next){
+                if (i.left != null){
+                    if (index != null){
+                        index.next = i.left;
+                    }
+                    index = i.left;
+                }
+                if (i.right != null){
+                    if (index != null){
+                        index.next = i.right;
+                    }
+                    index = i.right;
+                }
+            }
+```
+
+最终代码：
+
+```java
+class Solution {
+    public Node connect(Node root) {
+        if (root == null){
+            return null;
+        }
+        Node level = root;
+        while (level != null){
+            //1.先找到队首节点
+            while (level != null && level.left == null && level.right == null){
+                level = level.next;
+            }
+            if (level == null){
+                break;
+            }
+            //2.然后开始遍历队列，更新子节点的next指针
+            Node index = null;
+            for (Node i = level; i != null; i = i.next){
+                if (i.left != null){
+                    if (index != null){
+                        index.next = i.left;
+                    }
+                    index = i.left;
+                }
+                if (i.right != null){
+                    if (index != null){
+                        index.next = i.right;
+                    }
+                    index = i.right;
+                }
+            }
+            //3.连接完成后再更新level指针的指向
+            level = level.left == null ? level.right : level.left;
+        }
+        return root;
+    }
+}
+```
+
 ## 2.3 栈和队列
 
 ### 2.3.1 用栈实现队列
@@ -10093,6 +11105,81 @@ class Solution {
             System.out.println();
         }
         return res;
+    }
+}
+```
+
+### 2.3.8 简化路径
+
+[71. 简化路径](https://leetcode-cn.com/problems/simplify-path/)
+
+> 以 Unix 风格给出一个文件的绝对路径，你需要简化它。或者换句话说，将其转换为规范路径。
+>
+> 在 Unix 风格的文件系统中，一个点（.）表示当前目录本身；此外，两个点 （..） 表示将目录切换到上一级（指向父目录）；两者都可以是复杂相对路径的组成部分。更多信息请参阅：Linux / Unix中的绝对路径 vs 相对路径
+>
+> 请注意，返回的规范路径必须始终以斜杠 / 开头，并且两个目录名之间必须只有一个斜杠 /。最后一个目录名（如果存在）不能以 / 结尾。此外，规范路径必须是表示绝对路径的最短字符串。
+>
+>  
+>
+> 示例 1：
+>
+> 输入："/home/"
+> 输出："/home"
+> 解释：注意，最后一个目录名后面没有斜杠。
+> 示例 2：
+>
+> 输入："/../"
+> 输出："/"
+> 解释：从根目录向上一级是不可行的，因为根是你可以到达的最高级。
+> 示例 3：
+>
+> 输入："/home//foo/"
+> 输出："/home/foo"
+> 解释：在规范路径中，多个连续斜杠需要用一个斜杠替换。
+> 示例 4：
+>
+> 输入："/a/./b/../../c/"
+> 输出："/c"
+> 示例 5：
+>
+> 输入："/a/../../b/../c//.//"
+> 输出："/c"
+> 示例 6：
+>
+> 输入："/a//b////c/d//././/.."
+> 输出："/a/b/c"
+
+思路：将原来路径通过"/"进行分割，然后遍历，将目录名压入栈中，当碰到“.”时跳过，当碰到“..”时栈顶元素出栈，最后将栈中的元素用“/”连接起来，形成简化后的路径。
+
+```java
+ package com.problem71;
+
+ import java.util.Stack;
+
+ class Solution {
+
+    public String simplifyPath(String path) {
+        Stack<String> stack = new Stack<>();
+        String[] split = path.split("/");
+        for (String s : split){
+            if (s.equals("..")){
+                if (!stack.isEmpty()) {
+                    System.out.println(stack.pop());
+                }
+            }else if (s.length() != 0 && !s.equals(".")){
+                stack.push(s);
+            }
+        }
+        if (stack.size() == 0){
+            return "/";
+        }
+        StringBuilder sb = new StringBuilder();
+        String[] res = new String[stack.size()];
+        stack.toArray(res);
+        for (String s : res){
+            sb.append("/").append(s);
+        }
+        return sb.toString();
     }
 }
 ```
@@ -10793,6 +11880,285 @@ class Solution {
     }
 }
 ```
+
+### 2.5.11 字符串相乘
+
+[43. 字符串相乘](https://leetcode-cn.com/problems/multiply-strings/)
+
+> 给定两个以字符串形式表示的非负整数 num1 和 num2，返回 num1 和 num2 的乘积，它们的乘积也表示为字符串形式。
+>
+> 示例 1:
+>
+> 输入: num1 = "2", num2 = "3"
+> 输出: "6"
+> 示例 2:
+>
+> 输入: num1 = "123", num2 = "456"
+> 输出: "56088"
+> 说明：
+>
+> num1 和 num2 的长度小于110。
+> num1 和 num2 只包含数字 0-9。
+> num1 和 num2 均不以零开头，除非是数字 0 本身。
+> 不能使用任何标准库的大数类型（比如 BigInteger）或直接将输入转换为整数来处理。
+
+思路一：列算式直接计算
+
+```java
+package com.problem43;
+
+class Solution {
+    public String multiply(String num1, String num2) {
+        if (num1.equals("0") || num2.equals("0")){
+            return "0";
+        }
+        char[] array = num2.toCharArray();
+        int i = num2.length() - 1;
+        StringBuilder sb = new StringBuilder();
+        String res = "0";
+        while (i >= 0){
+            String temp = solve(num1, num2.charAt(i));
+            for (int j = 0; j < num2.length() - 1 - i; j++) {
+                temp += 0;
+            }
+            res = add(res, temp);
+            i--;
+        }
+        return res;
+    }
+
+    public String solve(String s1,char s2){
+        char[] array = s1.toCharArray();
+        int i = s1.length() - 1;
+        int pre = 0;
+        StringBuilder sb = new StringBuilder();
+        while (i >= 0){
+            int a = array[i] - '0';
+            int sum = a * (s2 - '0') + pre;
+            if (sum >= 10){
+                sb.append(sum % 10);
+                pre = sum / 10;
+            }else {
+                sb.append(sum);
+                pre = 0;
+            }
+            i--;
+        }
+        if (pre != 0){
+            sb.append(pre);
+        }
+        return sb.reverse().toString();
+    }
+
+    public String add(String s1,String s2){
+        StringBuilder sb = new StringBuilder();
+        int i = s1.length() - 1;
+        int j = s2.length() - 1;
+        char[] array = s1.toCharArray();
+        char[] array2 = s2.toCharArray();
+        int pre = 0;
+        while (i >= 0 || j >= 0){
+            if (i >= 0 && j >= 0) {
+                int a = array[i] - '0';
+                int b = array2[j] - '0';
+                int sum = a + b + pre;
+                if (sum >= 10) {
+                    pre = 1;
+                    sb.append(sum - 10);
+                } else {
+                    pre = 0;
+                    sb.append(sum);
+                }
+            }else {
+                int temp;
+                if (i < 0){
+                    temp = pre + array2[j] - '0';
+                }else{
+                    temp = pre + array[i] - '0';
+                }
+                if (temp >= 10){
+                    pre = 1;
+                    sb.append(temp - 10);
+                }else {
+                    pre = 0;
+                    sb.append(temp);
+                }
+            }
+
+            i--;
+            j--;
+        }
+        if (pre != 0){
+            sb.append(pre);
+        }
+        return sb.reverse().toString();
+    }
+}
+```
+
+思路二：优化
+
+![](http://mycsdnblog.work/201919181032-m.png)
+
+indices[i+j+1]存储的是进位
+
+indices[i+j]存储的是运算的结果值
+
+```Java
+package com.problem43;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-11-18 10:38
+ * @Feature:
+ */
+public class Solution2 {
+
+    public String multiply(String num1, String num2) {
+        if (num1.equals("0") || num2.equals("0")){
+            return "0";
+        }
+        int[] res = new int[num1.length() + num2.length()];
+        //res[i + j + 1]中保存进位，res[i + j]保存结果
+        for (int i = num2.length() - 1; i >= 0; i--) {
+            int c1 = num2.charAt(i) - '0';
+            for (int j = num1.length() - 1; j >= 0; j--) {
+                int c2 = num1.charAt(j) - '0';
+                int sum = c1 * c2 + res[i + j + 1];
+                res[i + j + 1] = sum % 10;
+                res[i + j] += sum / 10;
+            }
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < res.length; i++) {
+            if (i == 0 && res[i] == 0){
+                continue;
+            }
+            sb.append(res[i]);
+        }
+        return sb.toString();
+    }
+}
+```
+
+### 2.5.12 字符串相加
+
+[415. 字符串相加](https://leetcode-cn.com/problems/add-strings/)
+
+> 给定两个字符串形式的非负整数 num1 和num2 ，计算它们的和。
+>
+> 注意：
+>
+> num1 和num2 的长度都小于 5100.
+> num1 和num2 都只包含数字 0-9.
+> num1 和num2 都不包含任何前导零。
+> 你不能使用任何內建 BigInteger 库， 也不能直接将输入的字符串转换为整数形式。
+
+```java
+package com.problem415;
+
+class Solution {
+    public String addStrings(String num1, String num2) {
+        StringBuilder sb = new StringBuilder();
+        int i = num1.length() - 1;
+        int j = num2.length() - 1;
+        char[] array = num1.toCharArray();
+        char[] array2 = num2.toCharArray();
+        int pre = 0;
+        while (i >= 0 || j >= 0){
+            if (i >= 0 && j >= 0) {
+                int a = array[i] - '0';
+                int b = array2[j] - '0';
+                int sum = a + b + pre;
+                if (sum >= 10) {
+                    pre = 1;
+                    sb.append(sum - 10);
+                } else {
+                    pre = 0;
+                    sb.append(sum);
+                }
+            }else {
+                int temp;
+                if (i < 0){
+                    temp = pre + array2[j] - '0';
+                }else{
+                    temp = pre + array[i] - '0';
+                }
+                if (temp >= 10){
+                    pre = 1;
+                    sb.append(temp - 10);
+                }else {
+                    pre = 0;
+                    sb.append(temp);
+                }
+            }
+
+            i--;
+            j--;
+        }
+        if (pre != 0){
+            sb.append(pre);
+        }
+        return sb.reverse().toString();
+    }
+}
+```
+
+### 2.5.13 二进制求和
+
+[67. 二进制求和](https://leetcode-cn.com/problems/add-binary/)
+
+> 给定两个二进制字符串，返回他们的和（用二进制表示）。
+>
+> 输入为非空字符串且只包含数字 1 和 0。
+>
+> 示例 1:
+>
+> 输入: a = "11", b = "1"
+> 输出: "100"
+> 示例 2:
+>
+> 输入: a = "1010", b = "1011"
+> 输出: "10101"
+
+```java
+package com.problem67;
+
+class Solution {
+    public String addBinary(String a, String b) {
+        int i = a.length() - 1;
+        int j = b.length() - 1;
+        int pre = 0;
+        StringBuilder sb = new StringBuilder();
+        while (i >= 0 || j >= 0){
+            int sum = 0;
+            if (i >= 0 && j >= 0){
+                sum = (a.charAt(i) - '0') + (b.charAt(j) - '0') + pre;
+            }else {
+                if (i < 0){
+                    sum += (b.charAt(j) - '0') + pre;
+                }else {
+                    sum += (a.charAt(i) - '0') + pre;
+                }
+            }
+            if (sum >= 2){
+                pre = 1;
+                sb.append(sum - 2);
+            }else {
+                sb.append(sum);
+                pre = 0;
+            }
+            i--;j--;
+        }
+        if (pre != 0){
+            sb.append(pre);
+        }
+        return sb.reverse().toString();
+    }
+}
+```
+
+
 
 ## 2.6 数组与矩阵
 
@@ -11737,6 +13103,481 @@ class Solution {
 }
 ```
 
+### 2.6.15 最接近的三数之和
+
+[ 16. 3Sum Closest ](https://leetcode.com/problems/3sum-closest/)
+
+> Given an array `nums` of *n* integers and an integer `target`, find three integers in `nums` such that the sum is closest to `target`. Return the sum of the three integers. You may assume that each input would have exactly one solution.
+>
+> **Example:**
+>
+> ```
+> Given array nums = [-1, 2, 1, -4], and target = 1.
+> 
+> The sum that is closest to the target is 2. (-1 + 2 + 1 = 2).
+> ```
+
+```java
+package com.problem16;
+
+import java.util.Arrays;
+
+class Solution {
+    public int threeSumClosest(int[] nums, int target) {
+        Arrays.sort(nums);
+        int min = Integer.MAX_VALUE;
+        int res = 0;
+        for (int i = 0; i < nums.length; i++) {
+            int temp = target - nums[i];
+            int start = i + 1;
+            int end = nums.length - 1;
+            while (start < end){
+                int sum = nums[start] + nums[end];
+                if (sum < temp){
+                    start++;
+                }else {
+                    end--;
+                }
+                if (Math.abs(sum - temp) < min){
+                    min = Math.abs(sum - temp);
+                    res = sum + nums[i];
+                }
+            }
+        }
+        return res;
+    }
+}
+```
+
+### 2.6.16 四数之和
+
+[ 18. 4Sum ](https://leetcode.com/problems/4sum/)
+
+> Given an array `nums` of *n* integers and an integer `target`, are there elements *a*, *b*, *c*, and *d* in `nums` such that *a* + *b* + *c* + *d* = `target`? Find all unique quadruplets in the array which gives the sum of `target`.
+>
+> **Note:**
+>
+> The solution set must not contain duplicate quadruplets.
+>
+> **Example:**
+>
+> ```
+> Given array nums = [1, 0, -1, 0, -2, 2], and target = 0.
+> 
+> A solution set is:
+> [
+> [-1,  0, 0, 1],
+> [-2, -1, 1, 2],
+> [-2,  0, 0, 2]
+> ]
+> ```
+
+思路：先固定一个数，然后采用三数之和的方法，关键是避免使用重复的数字，代码如下：
+
+```java
+package com.problem18;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+class Solution {
+
+    public List<List<Integer>> fourSum(int[] nums, int target) {
+        Arrays.sort(nums);
+        List<List<Integer>> res = new ArrayList<>();
+        for (int i = 0; i < nums.length - 3; i++) {
+            //跳过重复元素
+            if (i > 0 && nums[i] == nums[i - 1]){
+                continue;
+            }
+            int temp = target - nums[i];
+            for (int j = i + 1; j < nums.length - 2; j++) {
+                //跳过重复元素
+                if (j > i + 1 && nums[j] == nums[j - 1]){
+                    continue;
+                }
+                int temp2 = temp - nums[j];
+                int start = j + 1;
+                int end = nums.length - 1;
+                while (start < end){
+                    int t = nums[start] + nums[end];
+                    if (t == temp2){
+                        res.add(Arrays.asList(nums[i],nums[j],nums[start],nums[end]));
+                        while (start < end && nums[start] == nums[start + 1]){
+                            start++;
+                        }
+                        while (start < end && nums[end] == nums[end - 1]){
+                            end--;
+                        }
+                        start++;
+                        end--;
+                    }else if (t < temp2){
+                        start++;
+                    }else {
+                        end--;
+                    }
+                }
+            }
+        }
+        return res;
+    }
+}
+```
+
+### 2.6.17 螺旋矩阵
+
+> 给定一个包含 m x n 个元素的矩阵（m 行, n 列），请按照顺时针螺旋顺序，返回矩阵中的所有元素。
+>
+> 示例 1:
+>
+> 输入:
+> [
+>  [ 1, 2, 3 ],
+>  [ 4, 5, 6 ],
+>  [ 7, 8, 9 ]
+> ]
+> 输出: [1,2,3,6,9,8,7,4,5]
+> 示例 2:
+>
+> 输入:
+> [
+>   [1, 2, 3, 4],
+>   [5, 6, 7, 8],
+>   [9,10,11,12]
+> ]
+> 输出: [1,2,3,4,8,12,11,10,9,5,6,7]
+
+首先统计矩阵有多少层：
+
+```java
+int row = matrix.length;
+int col = matrix[0].length;
+int layers = (Math.min(row, col) - 1) / 2 + 1;
+```
+
+然后按层(层数：i)进行遍历，每一层都包含四条边：
+
+1、从左到右
+
+```
+for (int j = i; j < col - i; j++) {
+    list.add(matrix[i][j]);
+}
+```
+
+2、从右上到右下
+
+```
+for(int j = i + 1;j < row - i;j++){
+	list.add(matrix[j][col - i - 1])
+}
+```
+
+3、从右到左
+
+```
+for(int j = col - i - 2;j >= i && row - i - 1 != i;j--){
+	list.add(matrix[row - i - 1][j])
+}
+```
+
+其中`row - i - 1 != i`代表上下两条边不能重复。
+
+4、从左下到左上
+
+```
+for(int j = row - i - 2;j > i && col - i - 1 != i;j--){
+	list.add(matrix[j][i])
+}
+```
+
+其中`col - i - 1 != i`代表左右两条边不能重复。
+
+```java
+package com.problem54;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-05-23 10:58
+ * @Feature:
+ */
+public class Solution2 {
+
+    public List<Integer> spiralOrder(int[][] matrix) {
+        List<Integer> list = new ArrayList<>();
+        int row = matrix.length;
+        if (row == 0){
+            return list;
+        }
+        int col = matrix[0].length;
+        int layers = (Math.min(row, col) - 1) / 2 + 1;
+        for (int i = 0; i < layers; i++) {
+            //从左往右
+            for (int j = i; j < col - i; j++) {
+                list.add(matrix[i][j]);
+            }
+            //右上到右下
+            for (int j = i + 1; j < row - i; j++) {
+                list.add(matrix[j][col - i - 1]);
+            }
+            //右到左
+            for (int j = col - i - 2; j >= i && row - i - 1 != i; j--) {
+                list.add(matrix[row- i - 1][j]);
+            }
+            //左下到左上
+            for (int j = row - i - 2; j > i && col- i - 1 != i ; j--) {
+                list.add(matrix[j][i]);
+            }
+        }
+        return list;
+    }
+}
+```
+
+### 2.6.18 螺旋矩阵Ⅱ
+
+> 给定一个正整数 n，生成一个包含 1 到 n2 所有元素，且元素按顺时针顺序螺旋排列的正方形矩阵。
+>
+> 示例:
+>
+> 输入: 3
+> 输出:
+> [
+>  [ 1, 2, 3 ],
+>  [ 8, 9, 4 ],
+>  [ 7, 6, 5 ]
+> ]
+
+```java
+package com.problem59;
+
+
+class Solution {
+    public int[][] generateMatrix(int n) {
+        int[][] res = new int[n][n];
+        int layers = n / 2 + 1;
+        int index = 1;
+        for (int i = 0; i < layers; i++) {
+            //从左往右
+            for (int j = i; j < n - i; j++) {
+                res[i][j] = index++;
+            }
+            //右上到右下
+            for (int j = i + 1; j < n - i; j++) {
+                res[j][n - i - 1] = index++;
+            }
+            //右到左
+            for (int j = n - i - 2; j >= i && n - i - 1 != i; j--) {
+                res[n- i - 1][j] = index++;
+            }
+            //左下到左上
+            for (int j = n - i - 2; j > i && n- i - 1 != i ; j--) {
+                res[j][i] = index++;
+            }
+        }
+        return res;
+    }
+}
+```
+
+### 2.6.19 螺旋矩阵Ⅲ
+
+### 2.6.20 矩阵置零
+
+[73. 矩阵置零](https://leetcode-cn.com/problems/set-matrix-zeroes/)
+
+> 给定一个 m x n 的矩阵，如果一个元素为 0，则将其所在行和列的所有元素都设为 0。请使用原地算法。
+>
+> 示例 1:
+>
+> 输入: 
+> [
+>   [1,1,1],
+>   [1,0,1],
+>   [1,1,1]
+> ]
+> 输出: 
+> [
+>   [1,0,1],
+>   [0,0,0],
+>   [1,0,1]
+> ]
+> 示例 2:
+>
+> 输入: 
+> [
+>   [0,1,2,0],
+>   [3,4,5,2],
+>   [1,3,1,5]
+> ]
+> 输出: 
+> [
+>   [0,0,0,0],
+>   [0,4,5,0],
+>   [0,3,1,0]
+> ]
+> 进阶:
+>
+> 一个直接的解决方案是使用  O(mn) 的额外空间，但这并不是一个好的解决方案。
+> 一个简单的改进方案是使用 O(m + n) 的额外空间，但这仍然不是最好的解决方案。
+> 你能想出一个常数空间的解决方案吗？
+
+思路一：使用额外空间
+
+```java
+package com.problem73;
+
+import java.util.ArrayList;
+import java.util.List;
+
+class Solution {
+
+    class Node{
+        public int i;
+        public int j;
+
+        public Node(int i, int j) {
+            this.i = i;
+            this.j = j;
+        }
+    }
+
+    public void setZeroes(int[][] matrix) {
+        int row = matrix.length;
+        if (row == 0){
+            return;
+        }
+        int col = matrix[0].length;
+        List<Node> list = new ArrayList<>();
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; j++) {
+                if (matrix[i][j] == 0){
+                    list.add(new Node(i,j));
+                }
+            }
+        }
+        for (Node nums : list){
+            solve(matrix,nums.i,nums.j);
+        }
+    }
+
+    private void solve(int[][] matrix, int i, int j) {
+        for (int k = 0; k < matrix[0].length; k++) {
+            matrix[i][k] = 0;
+        }
+        for (int k = 0; k < matrix.length; k++) {
+            matrix[k][j] = 0;
+        }
+    }
+}
+```
+
+思路二：不使用额外空间的暴力
+
+```java
+package com.problem73;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-11-19 11:49
+ * @Feature:
+ */
+public class Solution2 {
+
+    public void setZeroes(int[][] matrix) {
+        int row = matrix.length;
+        if (row == 0){
+            return;
+        }
+        int col = matrix[0].length;
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; j++) {
+                if (matrix[i][j] == 0){
+                    for (int k = 0; k < col; k++) {
+                        if (matrix[i][k] != 0) {
+                            matrix[i][k] = -10000;
+                        }
+                    }
+                    for (int k = 0; k < row; k++) {
+                        if (matrix[k][j] != 0) {
+                            matrix[k][j] = -10000;
+                        }
+                    }
+                }
+            }
+        }
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; j++) {
+                if (matrix[i][j] == -10000){
+                    matrix[i][j] = 0;
+                }
+            }
+        }
+    }
+}
+```
+
+思路三：时间复杂度O(n*m)，空间复杂度O(1)
+
+用第一行和第一列来存储需要置0的行和列，然后再单独对第一行和第一列进行处理
+
+```java 
+package com.problem73;
+
+/**
+ * @Author: 98050
+ * @Time: 2019-11-19 14:08
+ * @Feature:
+ */
+public class Solution3 {
+
+    public void setZeroes(int[][] matrix) {
+        int row = matrix.length;
+        if (row == 0){
+            return;
+        }
+        int col = matrix[0].length;
+        boolean tag1 = false;
+        boolean tag2 = false;
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; j++) {
+                if (matrix[i][j] == 0){
+                    if (i == 0){
+                        tag1 = true;
+                    }
+                    if (j == 0){
+                        tag2 = true;
+                    }
+                    matrix[i][0] = 0;
+                    matrix[0][j] = 0;
+                }
+            }
+        }
+        for (int i = 1; i < row; i++) {
+            for (int j = 1; j < col; j++) {
+                if (matrix[i][0] == 0 || matrix[0][j] == 0){
+                    matrix[i][j] = 0;
+                }
+            }
+        }
+        if (tag1){
+            for (int i = 0; i < col; i++) {
+                matrix[0][i] = 0;
+            }
+        }
+        if (tag2){
+            for (int i = 0; i < row; i++) {
+                matrix[i][0] = 0;
+            }
+        }
+    }
+}
+```
+
 ## *2.7 图
 
 深度优先搜索的时间复杂度和广度优先搜索的时间复杂度是一样的，邻接矩阵存储为O(n^2)， 邻接表存储为O(n+e)。
@@ -12423,5 +14264,3 @@ public class Solution2 {
 ```
 
 
-
-## 2.8 位运算
